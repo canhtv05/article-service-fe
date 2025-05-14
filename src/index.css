@@ -1,5 +1,34 @@
+@config "../tailwind.config.ts";
 @import "tailwindcss";
 @import "tw-animate-css";
+
+@font-face {
+  font-family: Chirp;
+  src: url(./assets/fonts/Chirp-Heavy.ttf) format("ttf");
+  font-weight: 800;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: Chirp;
+  src: url(./assets/fonts/Chirp-Bold.ttf) format("ttf");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: Chirp;
+  src: url(./assets/fonts/Chirp-Medium.ttf) format("ttf");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: Chirp;
+  src: url(./assets/fonts/Chirp-Regular.ttf) format("ttf");
+  font-weight: 400;
+  font-style: normal;
+}
 
 @custom-variant dark (&:is(.dark *));
 
@@ -42,6 +71,7 @@
 }
 
 :root {
+  --font-chirp: "Chirp", sans-serif;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.141 0.005 285.823);
@@ -115,6 +145,24 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-chirp;
+  }
+}
+
+@layer utilities {
+  .text-heavy {
+    @apply font-chirp font-extrabold;
+  }
+
+  .text-bold {
+    @apply font-chirp font-bold;
+  }
+
+  .text-medium {
+    @apply font-chirp font-medium;
+  }
+
+  .text-regular {
+    @apply font-chirp font-normal;
   }
 }
