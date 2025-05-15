@@ -1,32 +1,67 @@
 @config "../tailwind.config.ts";
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @font-face {
-  font-family: Chirp;
-  src: url(./assets/fonts/Chirp-Heavy.ttf) format("ttf");
+  font-family: Geist;
+  src: url(./assets/fonts/Geist-Black.ttf) format('ttf');
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: Geist;
+  src: url(./assets/fonts/Geist-ExtraBold.ttf) format('ttf');
   font-weight: 800;
   font-style: normal;
 }
 
 @font-face {
-  font-family: Chirp;
-  src: url(./assets/fonts/Chirp-Bold.ttf) format("ttf");
+  font-family: Geist;
+  src: url(./assets/fonts/Geist-Bold.ttf) format('ttf');
   font-weight: 700;
   font-style: normal;
 }
 
 @font-face {
-  font-family: Chirp;
-  src: url(./assets/fonts/Chirp-Medium.ttf) format("ttf");
+  font-family: Geist;
+  src: url(./assets/fonts/Geist-SemiBold.ttf) format('ttf');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: Geist;
+  src: url(./assets/fonts/Geist-Medium.ttf) format('ttf');
   font-weight: 500;
   font-style: normal;
 }
 
 @font-face {
-  font-family: Chirp;
-  src: url(./assets/fonts/Chirp-Regular.ttf) format("ttf");
+  font-family: Geist;
+  src: url(./assets/fonts/Geist-Regular.ttf) format('ttf');
   font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: Geist;
+  src: url(./assets/fonts/Geist-Light.ttf) format('ttf');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: Geist;
+  src: url(./assets/fonts/Geist-ExtraLight.ttf) format('ttf');
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: Geist;
+  src: url(./assets/fonts/Geist-Thin.ttf) format('ttf');
+  font-weight: 100;
   font-style: normal;
 }
 
@@ -68,10 +103,16 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  --color-customize: var(--customize);
+  --color-customize-hover: var(--customize-hover);
+  --color-customize-border: var(--customize-border);
+  --color-customize-btn-shadow: var(--customize-btn-shadow);
+  --color-customize-btn-shadow-hover: var(--customize-btn-shadow-hover);
 }
 
 :root {
-  --font-chirp: "Chirp", sans-serif;
+  --font-geist: 'Geist', sans-serif;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.141 0.005 285.823);
@@ -104,11 +145,18 @@
   --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.705 0.015 286.067);
+
+  --customize: #22bab3;
+  --customize-hover: #57cbf5;
+  --customize-border: #22bab3;
+  --customize-border-hover: #3ec2bc;
+  --customize-btn-shadow: 0 3px 6px 0 rgba(62, 194, 188, 0.3);
+  --customize-btn-shadow-hover: 0 3px 8px 0 rgba(50, 179, 103, 0.3);
 }
 
 .dark {
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.985 0 0);
+  --background: #282a36;
+  --foreground: #f8f8f2;
   --card: oklch(0.21 0.006 285.885);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.21 0.006 285.885);
@@ -138,6 +186,65 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.552 0.016 285.938);
+
+  --customize: #22bab3;
+  --customize-hover: #57cbf5;
+  --customize-border: #22bab3;
+  --customize-border-hover: #3ec2bc;
+  --customize-btn-shadow: 0 3px 6px 0 rgba(62, 194, 188, 0.3);
+  --customize-btn-shadow-hover: 0 3px 8px 0 rgba(50, 179, 103, 0.3);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50 transition-colors duration-200;
+  }
+
+  body {
+    @apply bg-background text-foreground font-geist;
+  }
+
+  img {
+    @apply rounded-sm object-contain;
+  }
+}
+
+@layer utilities {
+  .font-black {
+    @apply font-geist font-black;
+  }
+
+  .font-extrabold {
+    @apply font-geist font-extrabold;
+  }
+
+  .font-bold {
+    @apply font-geist font-bold;
+  }
+
+  .font-semibold {
+    @apply font-geist font-semibold;
+  }
+
+  .font-medium {
+    @apply font-geist font-medium;
+  }
+
+  .font-normal {
+    @apply font-geist font-normal;
+  }
+
+  .font-light {
+    @apply font-geist font-light;
+  }
+
+  .font-extralight {
+    @apply font-geist font-extralight;
+  }
+
+  .font-thin {
+    @apply font-geist font-thin;
+  }
 }
 
 @layer base {
@@ -145,24 +252,6 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground font-chirp;
-  }
-}
-
-@layer utilities {
-  .text-heavy {
-    @apply font-chirp font-extrabold;
-  }
-
-  .text-bold {
-    @apply font-chirp font-bold;
-  }
-
-  .text-medium {
-    @apply font-chirp font-medium;
-  }
-
-  .text-regular {
-    @apply font-chirp font-normal;
+    @apply bg-background text-foreground;
   }
 }
