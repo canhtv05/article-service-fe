@@ -4,6 +4,7 @@ const routes = {
   authorSwitch: '/author-switch',
   pr: {
     chart: '/pr/chart',
+    topicManagement: '/pr/topic-management',
   },
   admin: {
     chart: '/admin/chart',

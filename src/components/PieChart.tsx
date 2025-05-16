@@ -40,7 +40,19 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
+const fallbackData: ChartDataType[] = [
+  {
+    label: 'Không có dữ liệu',
+    count: 1,
+    dataKey: 'fallback',
+    color: 'hsl(var(--muted-foreground))',
+  },
+];
+
 const PieChart = ({ chartData }: { chartData: ChartDataType[] }) => {
+  const isEmpty = chartData.every((chart) => chart.count === 0);
+  const finalData = isEmpty ? fallbackData : chartData;
+
   return (
     <Card className="flex flex-col h-full border-none shadow-md !bg-muted/50">
       <CardHeader className="items-center pb-0">
@@ -61,7 +73,7 @@ const PieChart = ({ chartData }: { chartData: ChartDataType[] }) => {
               className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
             />
             <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-            <Pie data={chartData} dataKey="count" labelLine={false} nameKey="label" />
+            <Pie data={finalData} dataKey="count" nameKey="label" labelLine={false} />
           </Chart>
         </ChartContainer>
       </CardContent>
