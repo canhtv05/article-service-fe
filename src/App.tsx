@@ -6,8 +6,10 @@ import type { LayoutComponent, RouteType } from './types';
 import PublicRoute from './routers/PublicRoute';
 import PrivateRoute from './routers/PrivateRoute';
 import { modals, privateRoutes, publicRoutes } from './routers/router';
+import useTheme from './hooks/useTheme';
 
 function App() {
+  useTheme();
   const location = useLocation();
   const background = location.state && location.state.background;
 

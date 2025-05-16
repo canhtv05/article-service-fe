@@ -7,7 +7,7 @@ import type { MenuAuthorSwitchType } from '@/types';
 
 const AuthorSwitch = () => {
   return (
-    <section className="flex flex-col items-center justify-center w-full h-screen">
+    <section className="flex flex-col items-center justify-center w-full h-screen !bg-background">
       <h1 className="font-normal text-[18px] sm:text-[28px] text-[#FFB86C]">Thay đổi vai trò quản lý bài viết</h1>
       <div className="flex gap-2">
         <img src={images.fpt} alt="logo-fpt" loading="lazy" className="w-[100px]" />

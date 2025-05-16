@@ -1,18 +1,22 @@
 import {
+  Archive,
   CalendarDays,
   ChartColumn,
+  CircleCheck,
   ClockFading,
   File,
+  FileUp,
   List,
   NotebookPen,
   NotepadText,
   Package,
   Pen,
+  Send,
   Users,
 } from 'lucide-react';
 
 import images from '@/assets/imgs';
-import type { MenuAuthorSwitchType } from '@/types';
+import type { MenuAuthorSwitchType, MenuSidebarItemType, StatisticalItemType } from '@/types';
 
 export const menusAuthorSwitch: MenuAuthorSwitchType[] = [
   {
@@ -37,7 +41,7 @@ export const menusAuthorSwitch: MenuAuthorSwitchType[] = [
   },
 ];
 
-export const menusSidebar = [
+export const menusSidebar: MenuSidebarItemType[] = [
   {
     label: 'Trưởng phòng PR',
     type: 'pr',
@@ -153,3 +157,79 @@ export const menusSidebar = [
     ],
   },
 ];
+
+export const listStatistical: StatisticalItemType[] = [
+  {
+    label: 'Trưởng phòng PR',
+    type: 'pr',
+    children: [
+      {
+        label: 'Số bài viết đã gửi cho PR',
+        count: 1,
+        icon: Send,
+        classText: 'text-yellow-500',
+      },
+      {
+        label: 'Số bài viết đã đăng',
+        count: 2,
+        icon: CircleCheck,
+        classText: 'text-green-500',
+      },
+      {
+        label: 'Số bài viết không đăng',
+        count: 3,
+        icon: Archive,
+        classText: 'text-red-500',
+      },
+    ],
+  },
+  {
+    label: 'Quản trị viên',
+    type: 'admin',
+    children: [
+      {
+        label: 'Đã phê duyệt',
+        count: 0,
+        icon: CircleCheck,
+        classText: 'text-green-500',
+      },
+      {
+        label: 'Đã gửi',
+        count: 0,
+        icon: Send,
+        classText: 'text-yellow-500',
+      },
+      {
+        label: 'Không đăng',
+        count: 0,
+        icon: Archive,
+        classText: 'text-red-500',
+      },
+      {
+        label: 'Đã đăng',
+        count: 0,
+        icon: FileUp,
+        classText: 'text-cyan-500',
+      },
+    ],
+  },
+];
+
+export const chartData = (statistical: StatisticalItemType) => {
+  const children = statistical.children || [];
+
+  const colorVars = [
+    'var(--color-chrome)',
+    'var(--color-safari)',
+    'var(--color-firefox)',
+    'var(--color-edge)',
+    'var(--color-other)',
+  ];
+
+  return children.map((child, index) => ({
+    browser: child.label.toLowerCase(),
+    label: child.label,
+    count: child.count,
+    fill: colorVars[index] || 'var(--color-other)',
+  }));
+};

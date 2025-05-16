@@ -38,3 +38,22 @@ export type MenuSidebarItemType = {
   type: string;
   children: MenuSidebarChildType[];
 };
+
+export type StatisticalChildType = {
+  label: string;
+  count: number;
+  icon: LucideIcon;
+  classText: string;
+};
+
+export type StatisticalItemType = {
+  label: string;
+  type: string;
+  children: StatisticalChildType[];
+};
+
+export type ChartDataType = {
+  label: string;
+  count: number;
+  fill: string;
+};
