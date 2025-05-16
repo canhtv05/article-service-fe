@@ -1,13 +1,13 @@
 import configs from '@/configs';
 import { lazy } from 'react';
 
-const Home = lazy(() => import('@/pages/Home'));
-const AuthorSwitch = lazy(() => import('@/pages/AuthorSwitch'));
-const PRChart = lazy(() => import('@/pages/PR/PRChart'));
-const AdminChart = lazy(() => import('@/pages/Admin/AdminChart'));
-const RegisterWrite = lazy(() => import('@/pages/User/UserRegisterWrite'));
-const StaffListArticles = lazy(() => import('@/pages/Staff/StaffListArticles'));
-const LoginForm = lazy(() => import('@/pages/Login'));
+const Home = lazy(() => import('@/pages/home'));
+const AuthorSwitch = lazy(() => import('@/pages/author_switch'));
+const PRChart = lazy(() => import('@/pages/pr/PRChart'));
+const AdminChart = lazy(() => import('@/pages/admin/AdminChart'));
+const RegisterWrite = lazy(() => import('@/pages/user/UserRegisterWrite'));
+const StaffListArticles = lazy(() => import('@/pages/staff/StaffListArticles'));
+const LoginForm = lazy(() => import('@/pages/login'));
 
 const publicRoutes = [
   {

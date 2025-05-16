@@ -5,6 +5,7 @@ import { NavHeader } from './nav-header';
 import { NavMain } from './nav-main';
 import { NavUser } from './nav-user';
 import useLogicSidebar from '@/hooks/components/useLogicSidebar';
+import { Separator } from '@/components/ui/separator';
 
 const data = {
   user: {
@@ -17,13 +18,15 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const items = useLogicSidebar();
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
         <NavHeader />
       </SidebarHeader>
+      <Separator />
       <SidebarContent>
         <NavMain items={items} />
       </SidebarContent>
+      <Separator />
       <SidebarFooter>
         <NavUser user={data.user} />
       </SidebarFooter>
