@@ -2,11 +2,18 @@ import configs from '@/configs';
 import { lazy } from 'react';
 
 const Home = lazy(() => import('@/pages/home'));
+
 const AuthorSwitch = lazy(() => import('@/pages/author_switch'));
+
 const PRChart = lazy(() => import('@/pages/pr/PRChart'));
+const PRTopicManagement = lazy(() => import('@/pages/pr/PRTopicManagement'));
+
 const AdminChart = lazy(() => import('@/pages/admin/AdminChart'));
+
 const RegisterWrite = lazy(() => import('@/pages/user/UserRegisterWrite'));
+
 const StaffListArticles = lazy(() => import('@/pages/staff/StaffListArticles'));
+
 const LoginForm = lazy(() => import('@/pages/login'));
 
 const publicRoutes = [
@@ -31,6 +38,10 @@ const privateRoutes = [
   {
     path: configs.routes.pr.chart,
     component: PRChart,
+  },
+  {
+    path: configs.routes.pr.topicManagement,
+    component: PRTopicManagement,
   },
   {
     path: configs.routes.admin.chart,

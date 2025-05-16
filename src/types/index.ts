@@ -55,5 +55,7 @@ export type StatisticalItemType = {
 export type ChartDataType = {
   label: string;
   count: number;
-  fill: string;
+  fill?: string;
+  dataKey?: string;
+  color?: string;
 };
