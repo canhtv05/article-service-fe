@@ -57,3 +57,7 @@ export type ChartDataType = {
   count: number;
   fill: string;
 };
+
+export type FieldsSelectType = {
+  label: string;
+};

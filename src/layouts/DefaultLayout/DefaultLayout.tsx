@@ -66,7 +66,7 @@ const DefaultLayout = ({ children }: { children: ReactNode }) => {
           </div>
           <Separator />
         </header>
-        <div className="mt-2 w-full h-full">{children}</div>
+        <div className="mt-2 w-full h-full px-4 py-[0.5px] pb-2">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

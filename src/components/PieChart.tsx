@@ -11,8 +11,9 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
-import SelectWritingBatch from './SelectWritingBatch';
+import FieldsSelect from './FieldsSelect';
 import { ChartDataType } from '@/types';
+import { fakeDataChart } from '@/constant';
 
 const chartConfig = {
   visitors: {
@@ -46,7 +47,7 @@ const PieChart = ({ chartData }: { chartData: ChartDataType[] }) => {
       <CardHeader className="items-center pb-0">
         <CardDescription>
           <div className="flex md:grid auto-rows-min gap-4 grid-cols-3">
-            <SelectWritingBatch />
+            <FieldsSelect placeholder="Chọn đợt viết bài" data={fakeDataChart} label="Đợt viết bài" />
           </div>
         </CardDescription>
       </CardHeader>
