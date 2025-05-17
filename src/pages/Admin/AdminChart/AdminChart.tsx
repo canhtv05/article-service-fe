@@ -1,10 +1,14 @@
 import Statistical from '@/components/Statistical';
+import { listStatistical } from '@/constant';
+import { StatisticalItemType } from '@/types';
 
 const AdminChart = () => {
+  const statistical = listStatistical.find((sta) => location.pathname.includes(sta.type)) as StatisticalItemType;
+
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-      <Statistical />
-      <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
+    <div className="flex flex-col gap-4 pt-0 h-full">
+      <Statistical statistical={statistical} />
+      <div className="rounded-xl md:min-h-min flex-1 border" />
     </div>
   );
 };

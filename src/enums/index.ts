@@ -5,3 +5,9 @@ export enum Viewport {
   'XL' = 1280,
   '2XL' = 1536,
 }
+
+export enum Status {
+  PENDING = 'PENDING',
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+}

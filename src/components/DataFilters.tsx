@@ -1,48 +1,68 @@
-import { Funnel } from 'lucide-react';
+import { Funnel, RefreshCw, Search } from 'lucide-react';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import FieldsSelect from './FieldsSelect';
 import { Button } from './ui/button';
 
 const DataFilters = () => {
-  // handler filter
-  // handle clear
-
   return (
-    <div className="flex flex-col gap-4 bg-muted/50 rounded-xl shadow-md p-5">
+    <div className="flex flex-col gap-4 bg-muted/50 rounded-xl shadow-sm p-5 text-foreground border">
       <div className="flex gap-3 items-center">
         <Funnel />
         <span className="text-foreground text-[18px]">Bộ lọc</span>
       </div>
-      <div className="flex gap-4 mt-2 justify-between items-center">
-        <div className="w-full max-w-xs">
+
+      {/* Grid 3 cột chính */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2 w-full">
+        {/* Email */}
+        <div className="flex flex-col">
           <Label htmlFor="email" className="font-bold mb-2">
             Email:
           </Label>
-          <Input id="email" type="email" placeholder="Email" className="mt-0.5" />
+          <Input id="email" type="email" placeholder="Email" />
         </div>
-        <div className="w-full max-w-xs">
+
+        {/* Trạng thái */}
+        <div className="flex flex-col">
           <Label htmlFor="status" className="font-bold mb-2">
             Trạng thái:
           </Label>
-          <FieldsSelect id="status" placeholder="Trạng thái" data={[{ label: 'Tất cả' }]} label="Chọn trạng thái" />
+          <FieldsSelect
+            id="status"
+            placeholder="Chọn trạng thái"
+            data={[{ label: 'Tất cả' }, { label: 'Hoạt động' }, { label: 'Ngừng hoạt động' }]}
+            label="Trạng thái"
+            defaultValue="Tất cả"
+          />
         </div>
-        <div className="w-full max-w-xs flex justify-between items-end gap-5">
+
+        {/* Nhuận bút (từ - đến) */}
+        <div className="grid grid-cols-2 gap-3">
           <div>
             <Label htmlFor="nhuan-but" className="font-bold mb-2">
               Nhuận bút:
             </Label>
-            <Input id="nhuan-but" type="number" placeholder="Từ" className="mt-0.5" />
+            <Input id="nhuan-but" type="number" placeholder="Từ" />
           </div>
           <div>
-            <Label htmlFor="den" className="font-bold mb-2"></Label>
-            <Input id="den" type="number" placeholder="Đến" className="mt-0.5" />
+            <Label htmlFor="den" className="font-bold mb-2 invisible">
+              Đến
+            </Label>
+            <Input id="den" type="number" placeholder="Đến" />
           </div>
         </div>
       </div>
-      <div className="flex justify-center items-center">
-        <Button>ok</Button>
-        <Button>ok</Button>
+
+      {/* Nút hành động */}
+      <div className="flex justify-center items-center gap-4 mt-4">
+        <Button customize="rounded" className="!py-5 px-6 flex gap-2">
+          <Search />
+          <span>Tìm kiếm</span>
+        </Button>
+        <Button customize="rounded" className="!py-5 px-6 flex gap-2">
+          <RefreshCw />
+          <span>Làm mới</span>
+        </Button>
       </div>
     </div>
   );
