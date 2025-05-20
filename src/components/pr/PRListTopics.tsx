@@ -5,7 +5,7 @@ import PRModalAdd from './PRModalAdd';
 
 const PRListTopics = () => {
   return (
-    <div className="flex flex-col gap-4 bg-muted/50 rounded-xl shadow-md p-5 text-foreground h-full">
+    <div className="flex flex-col gap-4 rounded-xl shadow-md p-5 text-foreground h-full">
       <div className="flex gap-3 items-center justify-between mb-10">
         <div className="flex gap-3 items-center">
           <List />

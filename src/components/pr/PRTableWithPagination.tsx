@@ -10,110 +10,52 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import FieldsSelect from '../FieldsSelect';
 import { formatCurrencyVND } from '@/lib/utils';
-import { Status } from '@/enums';
 import StatusBadge from '../StatusBadge';
-const products = [
-  {
-    ma: 101,
-    topic_name: 'Wireless Headphones',
-    royalty: 30000,
-    description: 'Mô tả',
-    status: Status.ACTIVE,
-  },
-  {
-    ma: 102,
-    topic_name: 'Yoga Mat',
-    royalty: 30000,
-    description: 'Mô tả',
-    status: Status.PENDING,
-  },
-  {
-    ma: 103,
-    topic_name: 'Coffee Maker',
-    royalty: 30000,
-    description: 'Mô tả',
-    status: Status.ACTIVE,
-  },
-  {
-    ma: 104,
-    topic_name: 'Running Shoes',
-    royalty: 30000,
-    description: 'Mô tả',
-    status: Status.ACTIVE,
-  },
-  {
-    ma: 105,
-    topic_name: 'Smartwatch',
-    royalty: 30000,
-    description: 'Mô tả',
-    status: Status.INACTIVE,
-  },
-  {
-    ma: 106,
-    topic_name: 'Wireless Headphones',
-    royalty: 30000,
-    description: 'Mô tả',
-    status: Status.ACTIVE,
-  },
-  {
-    ma: 107,
-    topic_name: 'Yoga Mat',
-    royalty: 30000,
-    description: 'Mô tả',
-    status: Status.PENDING,
-  },
-  {
-    ma: 108,
-    topic_name: 'Coffee Maker',
-    royalty: 30000,
-    description: 'Mô tả',
-    status: Status.ACTIVE,
-  },
-  {
-    ma: 109,
-    topic_name: 'Running Shoes',
-    royalty: 30000,
-    description: 'Mô tả',
-    status: Status.ACTIVE,
-  },
-  {
-    ma: 110,
-    topic_name: 'Smartwatch',
-    royalty: 30000,
-    description: 'Mô tả',
-    status: Status.INACTIVE,
-  },
-];
+import Tooltip from '../Tooltip';
+import { useContext } from 'react';
+import { PRTopicManagementContext } from '@/contexts/context/pr/PRTopicManagementContext';
+
 const PRTableWithPagination = () => {
+  const topics = useContext(PRTopicManagementContext);
+
   return (
     <div className="w-full">
       <div className="w-full border rounded-md overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="pl-4">#</TableHead>
-              <TableHead className="pl-4">Mã</TableHead>
-              <TableHead>Tên chủ đề</TableHead>
-              <TableHead>Nhuận bút</TableHead>
-              <TableHead>Mô tả</TableHead>
-              <TableHead>Trạng thái</TableHead>
-              <TableHead>Hành động</TableHead>
+              {topics?.titlesTable.map((title, index) => (
+                <TableHead className={`${index === 0 || index === 1 ? 'pl-4' : ''}`} key={index}>
+                  {title}
+                </TableHead>
+              ))}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {products.map((product, index) => (
-              <TableRow key={product.ma} className="odd:bg-muted/50">
-                <TableCell className="pl-4">{index + 1}</TableCell>
-                <TableCell className="pl-4">{product.ma}</TableCell>
-                <TableCell className="font-medium">{product.topic_name}</TableCell>
-                <TableCell>{formatCurrencyVND(product.royalty)}</TableCell>
-                <TableCell>{product.description}</TableCell>
-                <TableCell>
-                  <StatusBadge status={product.status} />
-                </TableCell>
-                <TableCell>ok</TableCell>
-              </TableRow>
-            ))}
+            {topics?.data &&
+              topics?.data.map((topic, index) => (
+                <TableRow key={topic.ma} className="odd:bg-muted/50">
+                  <TableCell className="pl-4">{index + 1}</TableCell>
+                  <TableCell className="pl-4">{topic.ma}</TableCell>
+                  <TableCell className="font-medium">{topic.topic_name}</TableCell>
+                  <TableCell>{formatCurrencyVND(topic.royalty)}</TableCell>
+                  <TableCell>{topic.description}</TableCell>
+                  <TableCell>
+                    <StatusBadge status={topic.status} />
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-4 cursor-pointer">
+                      {topics.tooltips.map((item, index) => (
+                        <Tooltip
+                          key={index}
+                          toolTipContent={item.content}
+                          toolTipTrigger={<item.icon className="size-5" />}
+                        />
+                      ))}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </div>
@@ -162,15 +104,21 @@ const PRTableWithPagination = () => {
         <div>
           <FieldsSelect
             placeholder="Số trang"
-            defaultValue="10 / trang"
+            defaultValue="10"
             label="Số trang"
             data={[
-              { label: '10 / trang' },
-              { label: '20 / trang' },
-              { label: '30 / trang' },
-              { label: '50 / trang' },
-              { label: '100 / trang' },
+              { label: '10 / trang', value: 10 },
+              { label: '20 / trang', value: 20 },
+              { label: '30 / trang', value: 30 },
+              { label: '50 / trang', value: 50 },
+              { label: '100 / trang', value: 100 },
             ]}
+            value={topics?.perPage}
+            setValue={(val) => {
+              if (topics) {
+                topics.setPerPage(val);
+              }
+            }}
           />
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { ChevronDown } from 'lucide-react';
 import * as SelectPrimitive from '@radix-ui/react-select';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect } from 'react';
 
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
@@ -13,6 +13,8 @@ const FieldsSelect = ({
   id,
   defaultValue,
   resetValue,
+  value,
+  setValue,
 }: {
   data: FieldsSelectType[];
   placeholder: string;
@@ -20,18 +22,20 @@ const FieldsSelect = ({
   id?: string;
   defaultValue?: string;
   resetValue?: boolean;
+  value: string | undefined;
+  setValue: Dispatch<SetStateAction<string>>;
 }) => {
-  const [value, setValue] = useState<string>(defaultValue || '');
+  useEffect(() => {
+    if (defaultValue && !value) {
+      setValue(defaultValue);
+    }
+  }, [defaultValue, setValue, value]);
 
   useEffect(() => {
     if (resetValue) {
-      handleClear();
+      setValue('');
     }
-  }, [resetValue]);
-
-  const handleClear = () => {
-    setValue('');
-  };
+  }, [resetValue, setValue]);
 
   const handleChange = (val: string) => {
     setValue(val);
@@ -57,7 +61,7 @@ const FieldsSelect = ({
           {data
             .filter((d) => d.label?.trim() !== '')
             .map((d, index) => (
-              <SelectItem className="cursor-pointer" value={d.label} key={index}>
+              <SelectItem className="cursor-pointer" value={String(d.value)} key={index}>
                 {d.label}
               </SelectItem>
             ))}

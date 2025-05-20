@@ -43,7 +43,7 @@ const chartConfig = {
 
 const PieChart = ({ chartData }: { chartData: ChartDataType[] }) => {
   return (
-    <Card className="flex flex-col h-full border-none shadow-md !bg-muted/50">
+    <Card className="flex flex-col h-full border-none shadow-md bg-transparent">
       <CardHeader className="items-center pb-0">
         <CardDescription>
           <div className="flex md:grid auto-rows-min gap-4 grid-cols-3">

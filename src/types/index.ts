@@ -1,5 +1,5 @@
 import { LucideIcon } from 'lucide-react';
-import type { ComponentType, ReactNode } from 'react';
+import type { ComponentType, Dispatch, ReactNode, SetStateAction } from 'react';
 
 export type LayoutComponent = ComponentType<{ children: ReactNode }>;
 
@@ -60,4 +60,46 @@ export type ChartDataType = {
 
 export type FieldsSelectType = {
   label: string;
+  value: string | number;
+};
+
+export type TopicType = {
+  ma: string;
+  topic_name: string;
+  royalty: number;
+  description: string;
+  status: string;
+};
+
+export type TopicFilterType = {
+  topic_name: string;
+  valueSelect: string | undefined;
+  from: number | undefined;
+  to: number | undefined;
+};
+
+export type AddTopicType = {
+  title: string;
+  royalty: number | undefined;
+  description: string;
+};
+
+export type TopicContextType = {
+  data: TopicType[] | undefined;
+  isLoading: boolean;
+  error: unknown;
+  titlesTable: string[];
+  tooltips: {
+    content: string;
+    icon: LucideIcon;
+  }[];
+  valueFilter: TopicFilterType;
+  setValueFilter: Dispatch<SetStateAction<TopicFilterType>>;
+  perPage: string;
+  setPerPage: Dispatch<SetStateAction<string>>;
+  handleClearFields: VoidFunction;
+  handleFilters: VoidFunction;
+  dataAdd: AddTopicType;
+  setDataAdd: Dispatch<SetStateAction<AddTopicType>>;
+  handleAdd: VoidFunction;
 };

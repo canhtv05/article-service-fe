@@ -4,7 +4,7 @@ import { Status } from '@/enums';
 import RenderIf from './RenderIf';
 import { Badge } from './ui/badge';
 
-const StatusBadge = ({ status }: { status: Status }) => {
+const StatusBadge = ({ status }: { status: Status | string }) => {
   const s = status.charAt(0).toUpperCase() + status.substring(1).toLowerCase();
 
   return (

@@ -8,6 +8,8 @@ import PrivateRoute from './routers/PrivateRoute';
 import { modals, privateRoutes, publicRoutes } from './routers/router';
 import useTheme from './hooks/useTheme';
 import ScrollToTop from './components/ScrollToTop';
+import { Toaster } from '@/components/ui/sonner';
+// import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 function App() {
   useTheme();
@@ -60,6 +62,8 @@ function App() {
         </Routes>
       )}
       <ScrollToTop />
+      <Toaster richColors />
+      {/* <ReactQueryDevtools /> */}
     </>
   );
 }

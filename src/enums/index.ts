@@ -7,6 +7,7 @@ export enum Viewport {
 }
 
 export enum Status {
+  ALL = 'ALL',
   PENDING = 'PENDING',
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',

@@ -22,7 +22,7 @@ const Statistical = ({ statistical }: { statistical: StatisticalItemType }) => {
       {statistical.children.map((statistical) => (
         <li
           key={statistical.label}
-          className="rounded-xl border bg-muted/50 h-[130px] py-6 shadow hover:shadow-lg transition-all duration-200"
+          className="rounded-xl border h-[130px] py-6 shadow hover:shadow-lg transition-all duration-200"
         >
           <div className="p-2 text-[16px] font-bold md:text-[14px]">
             <span className="block text-center text-foreground">{statistical.label}</span>

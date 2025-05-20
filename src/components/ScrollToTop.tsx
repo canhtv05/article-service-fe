@@ -37,7 +37,7 @@ const ScrollToTop = () => {
     <button
       onClick={onScrollToTop}
       className={`${
-        isScrolling ? 'bg-black' : 'bg-black/40'
+        isScrolling ? 'bg-background' : 'bg-background/40'
       } fixed bottom-3 right-3 z-50 rounded-full p-2 cursor-pointer border hover:bg-accent duration-200 transition-colors`}
     >
       <ChevronsUp className="size-5" />
