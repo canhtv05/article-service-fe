@@ -165,19 +165,19 @@ export const listStatistical: StatisticalItemType[] = [
     children: [
       {
         label: 'Số bài viết đã gửi cho PR',
-        count: 1,
+        count: 0,
         icon: Send,
         classText: 'text-yellow-500',
       },
       {
         label: 'Số bài viết đã đăng',
-        count: 2,
+        count: 0,
         icon: CircleCheck,
         classText: 'text-green-500',
       },
       {
         label: 'Số bài viết không đăng',
-        count: 3,
+        count: 0,
         icon: Archive,
         classText: 'text-red-500',
       },
