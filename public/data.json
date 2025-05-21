@@ -68,5 +68,285 @@
     "royalty": 30000,
     "description": "Mô tả",
     "status": "INACTIVE"
+  },
+  {
+    "ma": "111",
+    "topic_name": "Wireless Headphones",
+    "royalty": 30000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "112",
+    "topic_name": "Yoga Mat",
+    "royalty": 10000,
+    "description": "Mô tả",
+    "status": "INACTIVE"
+  },
+  {
+    "ma": "113",
+    "topic_name": "Coffee Maker",
+    "royalty": 30000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "114",
+    "topic_name": "Running Shoes",
+    "royalty": 20000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "115",
+    "topic_name": "Smartwatch",
+    "royalty": 30000,
+    "description": "Mô tả",
+    "status": "INACTIVE"
+  },
+  {
+    "ma": "116",
+    "topic_name": "Wireless Headphones",
+    "royalty": 90000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "117",
+    "topic_name": "Yoga Mat",
+    "royalty": 100000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "118",
+    "topic_name": "Coffee Maker",
+    "royalty": 30000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "119",
+    "topic_name": "Running Shoes",
+    "royalty": 30000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "120",
+    "topic_name": "Smartwatch",
+    "royalty": 30000,
+    "description": "Mô tả",
+    "status": "INACTIVE"
+  },
+  {
+    "ma": "121",
+    "topic_name": "Wireless Headphones",
+    "royalty": 35000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "122",
+    "topic_name": "Yoga Mat",
+    "royalty": 15000,
+    "description": "Mô tả",
+    "status": "INACTIVE"
+  },
+  {
+    "ma": "123",
+    "topic_name": "Coffee Maker",
+    "royalty": 32000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "124",
+    "topic_name": "Running Shoes",
+    "royalty": 25000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "125",
+    "topic_name": "Smartwatch",
+    "royalty": 40000,
+    "description": "Mô tả",
+    "status": "INACTIVE"
+  },
+  {
+    "ma": "126",
+    "topic_name": "Wireless Headphones",
+    "royalty": 85000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "127",
+    "topic_name": "Yoga Mat",
+    "royalty": 95000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "128",
+    "topic_name": "Coffee Maker",
+    "royalty": 31000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "129",
+    "topic_name": "Running Shoes",
+    "royalty": 28000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "130",
+    "topic_name": "Smartwatch",
+    "royalty": 36000,
+    "description": "Mô tả",
+    "status": "INACTIVE"
+  },
+  {
+    "ma": "131",
+    "topic_name": "Wireless Headphones",
+    "royalty": 37000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "132",
+    "topic_name": "Yoga Mat",
+    "royalty": 12000,
+    "description": "Mô tả",
+    "status": "INACTIVE"
+  },
+  {
+    "ma": "133",
+    "topic_name": "Coffee Maker",
+    "royalty": 33000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "134",
+    "topic_name": "Running Shoes",
+    "royalty": 27000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "135",
+    "topic_name": "Smartwatch",
+    "royalty": 39000,
+    "description": "Mô tả",
+    "status": "INACTIVE"
+  },
+  {
+    "ma": "136",
+    "topic_name": "Wireless Headphones",
+    "royalty": 88000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "137",
+    "topic_name": "Yoga Mat",
+    "royalty": 98000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "138",
+    "topic_name": "Coffee Maker",
+    "royalty": 34000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "139",
+    "topic_name": "Running Shoes",
+    "royalty": 29000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "140",
+    "topic_name": "Smartwatch",
+    "royalty": 41000,
+    "description": "Mô tả",
+    "status": "INACTIVE"
+  },
+  {
+    "ma": "141",
+    "topic_name": "Wireless Headphones",
+    "royalty": 36000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "142",
+    "topic_name": "Yoga Mat",
+    "royalty": 13000,
+    "description": "Mô tả",
+    "status": "INACTIVE"
+  },
+  {
+    "ma": "143",
+    "topic_name": "Coffee Maker",
+    "royalty": 35000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "144",
+    "topic_name": "Running Shoes",
+    "royalty": 26000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "145",
+    "topic_name": "Smartwatch",
+    "royalty": 42000,
+    "description": "Mô tả",
+    "status": "INACTIVE"
+  },
+  {
+    "ma": "146",
+    "topic_name": "Wireless Headphones",
+    "royalty": 89000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "147",
+    "topic_name": "Yoga Mat",
+    "royalty": 99000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "148",
+    "topic_name": "Coffee Maker",
+    "royalty": 36000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "149",
+    "topic_name": "Running Shoes",
+    "royalty": 30000,
+    "description": "Mô tả",
+    "status": "ACTIVE"
+  },
+  {
+    "ma": "150",
+    "topic_name": "Smartwatch",
+    "royalty": 43000,
+    "description": "Mô tả",
+    "status": "INACTIVE"
   }
 ]

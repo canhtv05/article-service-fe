@@ -78,7 +78,7 @@ export type TopicFilterType = {
   to: number | undefined;
 };
 
-export type AddTopicType = {
+export type AddOrUpdateTopicType = {
   title: string;
   royalty: number | undefined;
   description: string;
@@ -92,6 +92,7 @@ export type TopicContextType = {
   tooltips: {
     content: string;
     icon: LucideIcon;
+    type: string;
   }[];
   valueFilter: TopicFilterType;
   setValueFilter: Dispatch<SetStateAction<TopicFilterType>>;
@@ -99,7 +100,11 @@ export type TopicContextType = {
   setPerPage: Dispatch<SetStateAction<string>>;
   handleClearFields: VoidFunction;
   handleFilters: VoidFunction;
-  dataAdd: AddTopicType;
-  setDataAdd: Dispatch<SetStateAction<AddTopicType>>;
+  dataAddOrUpdate: AddOrUpdateTopicType;
+  setDataAddOrUpdate: Dispatch<SetStateAction<AddOrUpdateTopicType>>;
   handleAdd: VoidFunction;
+  currentPage: number;
+  setCurrentPage: Dispatch<SetStateAction<number>>;
+  handleToggleStatus: (ma: string) => void;
+  handleUpdate: (ma: string, updatedTopic: AddOrUpdateTopicType) => void;
 };

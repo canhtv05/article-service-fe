@@ -6,17 +6,19 @@ import _ from 'lodash';
 import { toast } from 'sonner';
 
 import { PRTopicManagementContext } from '@/contexts/context/pr/PRTopicManagementContext';
-import { AddTopicType, TopicFilterType, TopicType } from '@/types';
-import { Status } from '@/enums';
+import { AddOrUpdateTopicType, TopicFilterType, TopicType } from '@/types';
+import { Notice, Status } from '@/enums';
 
 const tooltips = [
   {
     content: 'Chỉnh sửa',
     icon: SquarePen,
+    type: 'update',
   },
   {
     content: 'Chuyển đổi trạng thái',
     icon: ArrowLeftRight,
+    type: 'status_change',
   },
 ];
 
@@ -43,8 +45,9 @@ const PRTopicManagementProvider = ({ children }: { children: ReactNode }) => {
     to: undefined,
   });
 
-  const [perPage, setPerPage] = useState<string>('');
-  const [dataAdd, setDataAdd] = useState<AddTopicType>({
+  const [perPage, setPerPage] = useState<string>('5');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [dataAddOrUpdate, setDataAddOrUpdate] = useState<AddOrUpdateTopicType>({
     title: '',
     royalty: undefined,
     description: '',
@@ -53,6 +56,7 @@ const PRTopicManagementProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (topics) {
       setData(topics);
+      setCurrentPage(1);
     }
   }, [topics]);
 
@@ -65,19 +69,20 @@ const PRTopicManagementProvider = ({ children }: { children: ReactNode }) => {
     });
     if (!topics) return;
     setData(topics);
+    setCurrentPage(1);
   };
 
   const handleFilters = useCallback(() => {
-    if (!topics) return;
+    if (!data) return;
 
     const { from, to, topic_name, valueSelect } = valueFilter;
 
     if (_.isEmpty(topic_name) && valueSelect === Status.ALL && _.isUndefined(from) && _.isUndefined(to)) {
-      setData(topics);
+      setData(data);
       return;
     }
 
-    const filteredData = _.filter(topics, (topic) => {
+    const filteredData = _.filter(data, (topic) => {
       if (!_.isEmpty(topic_name)) {
         if (!_.includes(topic.topic_name.toLowerCase(), topic_name.toLowerCase())) {
           return false;
@@ -106,15 +111,11 @@ const PRTopicManagementProvider = ({ children }: { children: ReactNode }) => {
     });
 
     setData(filteredData);
-  }, [topics, valueFilter]);
+    setCurrentPage(1);
+  }, [data, valueFilter]);
 
   const handleAdd = useCallback(() => {
-    const { description, royalty, title } = dataAdd;
-    if (_.isEmpty(description) || _.isUndefined(royalty) || _.isEmpty(title)) {
-      toast.error('Vui lòng nhập đủ trường.');
-      return;
-    }
-
+    const { description, royalty, title } = dataAddOrUpdate;
     const maxMa = data?.length ? Number(data[data.length - 1].ma) : 0;
 
     const newTopic: TopicType = {
@@ -127,12 +128,51 @@ const PRTopicManagementProvider = ({ children }: { children: ReactNode }) => {
 
     setData((prev): TopicType[] => [newTopic, ...(prev ?? [])]);
 
-    setDataAdd({
+    setDataAddOrUpdate({
       title: '',
       royalty: undefined,
       description: '',
     });
-  }, [data, dataAdd]);
+
+    toast.success(Notice.ADD_SUCCESS);
+  }, [data, dataAddOrUpdate]);
+
+  const handleToggleStatus = (ma: string) => {
+    setData((prevData) => {
+      if (!prevData) return prevData;
+      const updated = prevData.map((topic) => {
+        if (topic.ma === ma) {
+          return {
+            ...topic,
+            status: topic.status === Status.ACTIVE ? Status.INACTIVE : Status.ACTIVE,
+          };
+        }
+        return topic;
+      });
+      return updated;
+    });
+
+    toast.success(Notice.UPDATE_SUCCESS);
+  };
+
+  const handleUpdate = (ma: string, updatedTopic: AddOrUpdateTopicType) => {
+    setData((prevData) => {
+      if (!prevData) return prevData;
+      const updated = prevData.map((topic) => {
+        if (topic.ma === ma) {
+          return {
+            ...topic,
+            topic_name: updatedTopic.title,
+            royalty: updatedTopic.royalty ?? topic.royalty,
+            description: updatedTopic.description,
+          };
+        }
+        return topic;
+      });
+      return updated;
+    });
+    toast.success(Notice.UPDATE_SUCCESS);
+  };
 
   const values = {
     data,
@@ -144,11 +184,15 @@ const PRTopicManagementProvider = ({ children }: { children: ReactNode }) => {
     setValueFilter,
     perPage,
     setPerPage,
+    currentPage,
+    setCurrentPage,
     handleClearFields,
     handleFilters,
-    dataAdd,
-    setDataAdd,
+    dataAddOrUpdate,
+    setDataAddOrUpdate,
     handleAdd,
+    handleToggleStatus,
+    handleUpdate,
   };
 
   return <PRTopicManagementContext.Provider value={values}>{children}</PRTopicManagementContext.Provider>;

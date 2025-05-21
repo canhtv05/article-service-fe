@@ -12,3 +12,12 @@ export enum Status {
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',
 }
+
+export enum Notice {
+  ADD_SUCCESS = 'Thêm thành công',
+  ADD_FAILED = 'Thêm thất bại',
+  REMOVE_SUCCESS = 'Xóa thành công',
+  REMOVE_FAILED = 'Xóa thất bại',
+  UPDATE_SUCCESS = 'Cập nhật thành công',
+  UPDATE_FAILED = 'Cập nhật thất bại',
+}

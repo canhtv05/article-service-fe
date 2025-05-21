@@ -1,7 +1,7 @@
 import { List, Plus } from 'lucide-react';
 import { Button } from '../ui/button';
 import PRTableWithPagination from './PRTableWithPagination';
-import PRModalAdd from './PRModalAdd';
+import PRModalAddOrUpdate from './PRModalAddOrUpdate';
 
 const PRListTopics = () => {
   return (
@@ -11,7 +11,8 @@ const PRListTopics = () => {
           <List />
           <span className="text-foreground text-[18px]">Danh sách chủ đề</span>
         </div>
-        <PRModalAdd
+        <PRModalAddOrUpdate
+          type="add"
           compTrigger={
             <Button customize={'rounded'} className="py-5">
               <Plus />

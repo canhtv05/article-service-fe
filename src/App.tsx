@@ -62,7 +62,7 @@ function App() {
         </Routes>
       )}
       <ScrollToTop />
-      <Toaster richColors />
+      <Toaster richColors position="top-right" closeButton />
       {/* <ReactQueryDevtools /> */}
     </>
   );

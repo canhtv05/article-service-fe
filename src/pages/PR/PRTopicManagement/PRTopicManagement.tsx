@@ -1,6 +1,6 @@
 import PRFilterProvider from '@/components/pr/PRFilterProvider';
 import PRListTopics from '@/components/pr/PRListTopics';
-import PRTopicManagementProvider from '@/contexts/provider/pr/PrTopicManagementProvider';
+import PRTopicManagementProvider from '@/contexts/provider/pr/PRTopicManagementProvider';
 
 const PRTopicManagement = () => {
   return (
