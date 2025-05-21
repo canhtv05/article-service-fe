@@ -29,7 +29,7 @@ const DefaultLayout = ({ children }: { children: ReactNode }) => {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="sticky top-0 lef-0 bg-background">
+        <header className="sticky top-0 lef-0 bg-background z-50">
           <div className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
             <div className="flex items-center gap-2 px-4">
               <SidebarTrigger className="-ml-1" />
@@ -66,7 +66,7 @@ const DefaultLayout = ({ children }: { children: ReactNode }) => {
           </div>
           <Separator />
         </header>
-        <div className="mt-2 w-full h-full">{children}</div>
+        <div className="mt-2 w-full h-full px-4 py-[0.5px] pb-2">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

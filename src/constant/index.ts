@@ -233,3 +233,15 @@ export const chartData = (statistical: StatisticalItemType) => {
     fill: colorVars[index] || 'var(--color-other)',
   }));
 };
+
+export const fakeDataChart = [
+  {
+    label: 'Đợt 16/05/2025 - 17/05/2025',
+  },
+  {
+    label: 'Đợt 16/05/2025 - 18/05/2025',
+  },
+  {
+    label: 'Đợt 16/05/2025 - 19/05/2025',
+  },
+];

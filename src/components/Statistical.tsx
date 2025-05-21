@@ -1,3 +1,5 @@
+import cn from 'clsx';
+
 import { StatisticalItemType } from '@/types';
 import useViewport from '@/hooks/useViewport';
 
@@ -7,12 +9,20 @@ const Statistical = ({ statistical }: { statistical: StatisticalItemType }) => {
 
   if (!statistical) return null;
 
+  const columnClass = cn({
+    'md:grid-cols-1': checkLength === 1,
+    'md:grid-cols-2': checkLength === 2,
+    'md:grid-cols-3': checkLength === 3,
+    'md:grid-cols-4': checkLength === 4,
+    'md:grid-cols-5': checkLength === 5,
+  });
+
   return (
-    <ul className={`grid auto-rows-min gap-4 md:grid-cols-${checkLength} cursor-pointer`}>
+    <ul className={`grid auto-rows-min gap-4 ${columnClass} cursor-pointer`}>
       {statistical.children.map((statistical) => (
         <li
           key={statistical.label}
-          className="rounded-xl border bg-muted/50 h-[130px] py-6 shadow hover:shadow-lg transition-all duration-200"
+          className="rounded-xl border h-[130px] py-6 shadow hover:shadow-lg transition-all duration-200"
         >
           <div className="p-2 text-[16px] font-bold md:text-[14px]">
             <span className="block text-center text-foreground">{statistical.label}</span>

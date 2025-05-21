@@ -7,6 +7,9 @@ import PublicRoute from './routers/PublicRoute';
 import PrivateRoute from './routers/PrivateRoute';
 import { modals, privateRoutes, publicRoutes } from './routers/router';
 import useTheme from './hooks/useTheme';
+import ScrollToTop from './components/ScrollToTop';
+import { Toaster } from '@/components/ui/sonner';
+// import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 function App() {
   useTheme();
@@ -53,12 +56,14 @@ function App() {
         <Route element={<PublicRoute />}>{publicRoutes.map(loadRoute)}</Route>
         <Route element={<PrivateRoute />}>{privateRoutes.map(loadRoute)}</Route>
       </Routes>
-
       {background && (
         <Routes>
           <Route element={<PrivateRoute />}>{modals.map(loadModalRoute)}</Route>
         </Routes>
       )}
+      <ScrollToTop />
+      <Toaster richColors position="top-right" closeButton />
+      {/* <ReactQueryDevtools /> */}
     </>
   );
 }
