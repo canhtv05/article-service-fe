@@ -1,9 +1,9 @@
 import { List, Plus } from 'lucide-react';
 import { Button } from '../ui/button';
-import PRTableWithPagination from './PRTableWithPagination';
+import PRTopicTableWithPagination from './PRTopicTableWithPagination';
 import PRModalAddOrUpdate from './PRModalAddOrUpdate';
 
-const PRListTopics = () => {
+const PRListArticles = () => {
   return (
     <div className="flex flex-col gap-4 rounded-xl shadow-md p-5 text-foreground h-full">
       <div className="flex gap-3 items-center justify-between mb-10">
@@ -14,16 +14,16 @@ const PRListTopics = () => {
         <PRModalAddOrUpdate
           type="add"
           compTrigger={
-            <Button customize={'rounded'} className="py-5">
+            <Button customize={'default'} className="py-5 rounded-full">
               <Plus />
               Thêm chủ đề
             </Button>
           }
         />
       </div>
-      <PRTableWithPagination />
+      <PRTopicTableWithPagination />
     </div>
   );
 };
 
-export default PRListTopics;
+export default PRListArticles;

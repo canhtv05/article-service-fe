@@ -22,11 +22,11 @@ const DataFilters = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2 w-full">{filterComponent}</div>
 
       <div className="flex justify-center items-center gap-4 mt-4">
-        <Button customize="rounded" className="!py-5 px-6 flex gap-2" onClick={() => onSearch?.()}>
+        <Button customize="default" className="!py-5 px-6 flex gap-2 rounded-full" onClick={() => onSearch?.()}>
           <Search />
           <span>Tìm kiếm</span>
         </Button>
-        <Button customize="rounded" className="!py-5 px-6 flex gap-2" onClick={() => onClear?.()}>
+        <Button customize="default" className="!py-5 px-6 flex gap-2 rounded-full" onClick={() => onClear?.()}>
           <RefreshCw />
           <span>Làm mới</span>
         </Button>

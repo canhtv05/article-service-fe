@@ -1,18 +1,18 @@
 import { useContext } from 'react';
 import DataFilters from '../DataFilters';
 import { PRTopicManagementContext } from '@/contexts/context/pr/PRTopicManagementContext';
-import PRFilterComponent from './PRFilterComponent';
+import PRFilterTopicComponent from './PRFilterTopicComponent';
 
-const PRFilterProvider = () => {
+const PRFilterTopicProvider = () => {
   const topics = useContext(PRTopicManagementContext);
 
   return (
     <DataFilters
       onClear={topics?.handleClearFields}
       onSearch={topics?.handleFilters}
-      filterComponent={<PRFilterComponent />}
+      filterComponent={<PRFilterTopicComponent />}
     />
   );
 };
 
-export default PRFilterProvider;
+export default PRFilterTopicProvider;

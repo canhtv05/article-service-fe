@@ -25,7 +25,7 @@ const AuthorSwitch = () => {
                   className="h-full w-full object-cover hover:scale-105 transition-transform duration-300"
                 />
               </div>
-              <Button customize={'default'} className="w-full">
+              <Button customize={'default'} className="w-full rounded-full">
                 {menu.label}
               </Button>
             </div>

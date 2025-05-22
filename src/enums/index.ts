@@ -21,3 +21,14 @@ export enum Notice {
   UPDATE_SUCCESS = 'Cập nhật thành công',
   UPDATE_FAILED = 'Cập nhật thất bại',
 }
+
+export enum Assignment {
+  NOT_ASSIGNED = 'Chưa phân công',
+  ASSIGNED = 'Đã phân công',
+}
+
+export enum StatusSend {
+  SENT = 'Đã gửi cho PR',
+  NOT_SENT = 'Chưa gửi cho PR',
+  ALL = 'Tất cả',
+}

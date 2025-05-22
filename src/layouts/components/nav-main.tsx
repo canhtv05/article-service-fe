@@ -5,6 +5,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Collapsible, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { MenuSidebarChildType } from '@/types';
+import RenderIf from '@/components/RenderIf';
 
 export function NavMain({ items }: { items: MenuSidebarChildType[] }) {
   const location = useLocation();
@@ -13,11 +14,14 @@ export function NavMain({ items }: { items: MenuSidebarChildType[] }) {
     <SidebarGroup>
       <SidebarMenu>
         {items.map((item) => {
-          const isActive = item.to.includes(location.pathname);
+          const isActive = location.pathname.includes(item.to);
 
           return (
             <Collapsible key={item.label} asChild className="group/collapsible">
-              <SidebarMenuItem className={`${isActive ? 'bg-sidebar-accent' : ''} rounded-lg`}>
+              <SidebarMenuItem className={`${isActive ? 'bg-customize/30 relative' : ''} rounded-lg`}>
+                <RenderIf value={isActive}>
+                  <span className="absolute bg-customize-hover/30 w-[10px] h-full rounded-l-lg left-[0.3px] bg-[]"></span>
+                </RenderIf>
                 <CollapsibleTrigger asChild>
                   <Link to={item.to}>
                     <SidebarMenuButton tooltip={item.label}>

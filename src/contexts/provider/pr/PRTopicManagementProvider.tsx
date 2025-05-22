@@ -32,7 +32,7 @@ const PRTopicManagementProvider = ({ children }: { children: ReactNode }) => {
   } = useQuery<TopicType[]>({
     queryKey: ['topics'],
     queryFn: async () => {
-      const response = await axios.get('/data.json');
+      const response = await axios.get('/data_topic.json');
       return response.data;
     },
   });
@@ -40,7 +40,7 @@ const PRTopicManagementProvider = ({ children }: { children: ReactNode }) => {
   const [data, setData] = useState<TopicType[] | undefined>(undefined);
   const [valueFilter, setValueFilter] = useState<TopicFilterType>({
     topic_name: '',
-    valueSelect: Status.ALL,
+    status: Status.ALL,
     from: undefined,
     to: undefined,
   });
@@ -63,7 +63,7 @@ const PRTopicManagementProvider = ({ children }: { children: ReactNode }) => {
   const handleClearFields = () => {
     setValueFilter({
       topic_name: '',
-      valueSelect: Status.ALL,
+      status: Status.ALL,
       from: undefined,
       to: undefined,
     });
@@ -75,22 +75,22 @@ const PRTopicManagementProvider = ({ children }: { children: ReactNode }) => {
   const handleFilters = useCallback(() => {
     if (!data) return;
 
-    const { from, to, topic_name, valueSelect } = valueFilter;
+    const { from, to, topic_name, status } = valueFilter;
 
-    if (_.isEmpty(topic_name) && valueSelect === Status.ALL && _.isUndefined(from) && _.isUndefined(to)) {
+    if (_.isEmpty(topic_name) && status === Status.ALL && _.isUndefined(from) && _.isUndefined(to)) {
       setData(data);
       return;
     }
 
-    const filteredData = _.filter(data, (topic) => {
+    const filteredData = _.filter(topics, (topic) => {
       if (!_.isEmpty(topic_name)) {
         if (!_.includes(topic.topic_name.toLowerCase(), topic_name.toLowerCase())) {
           return false;
         }
       }
 
-      if (valueSelect !== Status.ALL) {
-        if (topic.status !== valueSelect) {
+      if (status !== Status.ALL) {
+        if (topic.status !== status) {
           return false;
         }
       }
@@ -112,7 +112,7 @@ const PRTopicManagementProvider = ({ children }: { children: ReactNode }) => {
 
     setData(filteredData);
     setCurrentPage(1);
-  }, [data, valueFilter]);
+  }, [data, topics, valueFilter]);
 
   const handleAdd = useCallback(() => {
     const { description, royalty, title } = dataAddOrUpdate;

@@ -11,6 +11,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { cn } from '@/lib/utils';
+import { buttonVariants } from './ui/button';
 
 const ConfirmDialog = ({
   triggerComponent,
@@ -35,7 +37,9 @@ const ConfirmDialog = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Hủy</AlertDialogCancel>
-          <AlertDialogAction onClick={onContinue}>Tiếp tục</AlertDialogAction>
+          <AlertDialogAction onClick={onContinue} className={cn(buttonVariants({ customize: 'default' }))}>
+            Tiếp tục
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
