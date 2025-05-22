@@ -5,6 +5,13 @@ export type LayoutComponent = ComponentType<{ children: ReactNode }>;
 
 export type RouteComponent = ComponentType<unknown>;
 
+export type DialogLinkProps = {
+  children: React.ReactNode;
+  title: string;
+  outline?: boolean;
+  open: boolean;
+};
+
 export type MenuAuthorSwitchType = {
   image: string;
   label: string;
@@ -75,7 +82,7 @@ export type TopicType = {
 
 export type TopicFilterType = {
   topic_name: string;
-  valueSelect: string | undefined;
+  status: string | undefined;
   from: number | undefined;
   to: number | undefined;
 };
@@ -109,4 +116,46 @@ export type TopicContextType = {
   setCurrentPage: Dispatch<SetStateAction<number>>;
   handleToggleStatus: (ma: string) => void;
   handleUpdate: (ma: string, updatedTopic: AddOrUpdateTopicType) => void;
+};
+
+export type ArticleFilterType = {
+  title_and_author_name: string;
+  assigned_name_and_assigned_id: string;
+  topic_name: string;
+  status: string;
+  campaign_period: string;
+};
+
+export type ListArticlesType = {
+  article_id: string;
+  title: string;
+  author_name: string;
+  topic_name: string;
+  campaign_period: string;
+  status: string;
+  assignment: string;
+  assignee_id: string;
+  assignee_name: string;
+  created_at: string;
+};
+
+export type PRListArticlesContextType = {
+  data: ListArticlesType[] | undefined;
+  isLoading: boolean;
+  error: unknown;
+  titlesTable: string[];
+  tooltips: {
+    content: string;
+    icon: LucideIcon;
+    type: string;
+    className: string;
+  }[];
+  currentPage: number;
+  setCurrentPage: Dispatch<SetStateAction<number>>;
+  perPage: string;
+  setPerPage: Dispatch<SetStateAction<string>>;
+  handleClearFields: VoidFunction;
+  handleFilters: VoidFunction;
+  valueFilter: ArticleFilterType;
+  setValueFilter: Dispatch<SetStateAction<ArticleFilterType>>;
 };

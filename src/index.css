@@ -1,6 +1,7 @@
 @config "../tailwind.config.ts";
 @import 'tailwindcss';
 @import 'tw-animate-css';
+@plugin 'tailwind/typography';
 
 @font-face {
   font-family: Geist;
@@ -208,6 +209,23 @@
 
   img {
     @apply rounded-sm object-contain;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  *::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
   }
 }
 

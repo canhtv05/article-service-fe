@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import {
   Breadcrumb,
@@ -21,7 +21,7 @@ const DefaultLayout = ({ children }: { children: ReactNode }) => {
   const location = useLocation();
   const menus = useLogicSidebar();
 
-  const label: string = menus.find((menu) => menu.to.includes(location.pathname))?.label || '';
+  const menu = menus.find((menu) => location.pathname.includes(menu.to));
 
   const { theme, toggleTheme } = useTheme();
 
@@ -54,11 +54,13 @@ const DefaultLayout = ({ children }: { children: ReactNode }) => {
               <Separator orientation="vertical" className="mr-2 h-4" />
               <Breadcrumb>
                 <BreadcrumbList>
-                  <RenderIf value={!!label}>
+                  <RenderIf value={!!menu?.label}>
                     <BreadcrumbSeparator className="hidden md:block" />
                   </RenderIf>
                   <BreadcrumbItem>
-                    <BreadcrumbPage>{label}</BreadcrumbPage>
+                    <BreadcrumbPage>
+                      <Link to={`${menu?.to}`}>{menu?.label}</Link>
+                    </BreadcrumbPage>
                   </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>

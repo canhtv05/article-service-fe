@@ -6,17 +6,17 @@ import { Input } from '../ui/input';
 import FieldsSelect from '../FieldsSelect';
 import { Status } from '@/enums';
 
-const PRFilterComponent = () => {
+const PRFilterTopicComponent = () => {
   const topics = useContext(PRTopicManagementContext);
 
   if (!topics) return;
 
-  const { topic_name, from, to } = topics.valueFilter;
+  const { topic_name, from, to, status } = topics.valueFilter;
 
   return (
     <Fragment>
-      <div className="flex flex-col">
-        <Label htmlFor="topic_name" className="font-bold mb-2">
+      <div className="flex flex-col justify-end">
+        <Label htmlFor="topic_name" className="font-bold mb-2 leading-5">
           Tên chủ đề:
         </Label>
         <Input
@@ -33,8 +33,8 @@ const PRFilterComponent = () => {
         />
       </div>
 
-      <div className="flex flex-col">
-        <Label htmlFor="status" className="font-bold mb-2">
+      <div className="flex flex-col justify-end">
+        <Label htmlFor="status" className="font-bold mb-2 leading-5">
           Trạng thái:
         </Label>
         <FieldsSelect
@@ -47,12 +47,12 @@ const PRFilterComponent = () => {
           ]}
           label="Trạng thái"
           defaultValue={Status.ALL}
-          value={topics?.valueFilter.valueSelect}
+          value={status}
           setValue={(val) => {
-            if (typeof val === 'string' && topics && val !== topics.valueFilter.valueSelect) {
+            if (typeof val === 'string' && topics && val !== status) {
               topics.setValueFilter((prev) => ({
                 ...prev,
-                valueSelect: val,
+                status: val,
               }));
             }
           }}
@@ -61,7 +61,7 @@ const PRFilterComponent = () => {
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <Label htmlFor="nhuan-but" className="font-bold mb-2">
+          <Label htmlFor="nhuan-but" className="font-bold mb-2 leading-5">
             Nhuận bút:
           </Label>
           <Input
@@ -78,7 +78,7 @@ const PRFilterComponent = () => {
           />
         </div>
         <div>
-          <Label htmlFor="den" className="font-bold mb-2 invisible">
+          <Label htmlFor="den" className="font-bold mb-2 leading-5 invisible">
             Đến
           </Label>
           <Input
@@ -99,4 +99,4 @@ const PRFilterComponent = () => {
   );
 };
 
-export default PRFilterComponent;
+export default PRFilterTopicComponent;

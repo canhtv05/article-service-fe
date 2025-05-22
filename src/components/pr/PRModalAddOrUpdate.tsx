@@ -159,6 +159,7 @@ const PRModalAddOrUpdate = ({
             triggerComponent={
               <Button
                 type="button"
+                customize={'default'}
                 onClick={(e) => {
                   if (!validateData()) {
                     e.preventDefault();

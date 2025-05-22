@@ -27,7 +27,6 @@ const buttonVariants = cva(
       customize: {
         default:
           'rounded-md bg-customize hover:bg-customize-hover transition-colors duration-300 text-white border border-customize-border hover:border-customize-border-hover !shadow-customize-btn-shadow !hover:shadow-customize-btn-shadow-hover',
-        rounded: 'rounded-full',
       },
     },
     defaultVariants: {

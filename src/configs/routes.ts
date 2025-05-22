@@ -5,6 +5,10 @@ const routes = {
   pr: {
     chart: '/pr/chart',
     topicManagement: '/pr/topic-management',
+    listArticles: {
+      path: '/pr/list-articles',
+      idArticle: '/pr/list-articles/:idArticle',
+    },
   },
   admin: {
     chart: '/admin/chart',
