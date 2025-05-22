@@ -156,6 +156,7 @@ function ChartTooltipContent({
           const key = `${nameKey || item.name || item.dataKey || 'value'}`;
           const itemConfig = getPayloadConfigFromPayload(config, item, key);
           const indicatorColor = color || item.payload.fill || item.color;
+          const isFallback = item.payload.payload.dataKey;
 
           return (
             <div
@@ -194,10 +195,13 @@ function ChartTooltipContent({
                   >
                     <div className="grid gap-1.5 h-full">
                       {nestLabel ? tooltipLabel : null}
-                      <span className="text-muted-foreground mt-[0.5px]">{itemConfig?.label || item.name}:</span>
+                      <span className="text-muted-foreground mt-[0.5px]">
+                        {itemConfig?.label || item.name}
+                        {isFallback ? '' : ':'}
+                      </span>
                     </div>
 
-                    {item.value && (
+                    {item.value && !isFallback && (
                       <span className="text-foreground font-mono font-medium tabular-nums ml-2">
                         {item.value.toLocaleString()}
                       </span>
