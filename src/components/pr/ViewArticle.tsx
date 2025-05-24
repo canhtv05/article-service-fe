@@ -6,7 +6,7 @@ import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 import RenderIf from '../RenderIf';
 
-const PRViewArticle = () => {
+const ViewArticle = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['markdown'],
     queryFn: async () => {
@@ -68,4 +68,4 @@ const PRViewArticle = () => {
   );
 };
 
-export default PRViewArticle;
+export default ViewArticle;

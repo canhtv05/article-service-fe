@@ -12,9 +12,14 @@ const DataFilters = ({
   filterComponent: ReactNode;
   onSearch?: VoidFunction;
   onClear?: VoidFunction;
-  gridCols?: 3 | 2;
+  gridCols?: 3 | 2 | 4;
 }) => {
-  const grid = gridCols === 3 ? 'md:grid-cols-3' : 'md:grid-cols-2';
+  let grid = 'md:grid-cols-3';
+  if (gridCols === 2) {
+    grid = 'md:grid-cols-2';
+  } else if (gridCols === 4) {
+    grid = 'md:grid-cols-4';
+  }
 
   return (
     <div className="flex flex-col gap-4 rounded-xl shadow-sm p-5 text-foreground border">

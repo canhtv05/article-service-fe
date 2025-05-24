@@ -7,7 +7,6 @@ const routes = {
     topicManagement: '/pr/topic-management',
     listArticles: {
       path: '/pr/list-articles',
-      idArticle: '/pr/list-articles/:idArticle',
     },
     listStaffsPr: {
       path: '/pr/staffs-pr',
@@ -23,6 +22,7 @@ const routes = {
   staff: {
     listArticles: '/staff/list-articles',
   },
+  viewArticle: '/view/articles/:id',
 };
 
 export default routes;
