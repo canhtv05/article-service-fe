@@ -16,7 +16,7 @@ function DialogLink({ children, title, outline = false, open }: DialogLinkProps)
       <DialogContent
         className={`bg-card text-card-foreground w-[80vw]
           ${outline ? 'border-2 border-border' : 'border-none'}
-          rounded-lg font-geist
+          rounded-lg font-geist md:w-[70%] w-full
         `}
       >
         <DialogHeader className="border-b-1 border-foreground/20 py-2">

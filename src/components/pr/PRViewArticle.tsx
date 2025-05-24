@@ -18,7 +18,7 @@ const PRViewArticle = () => {
   return (
     <DialogLink open={true} title="Xem bài viết" outline>
       <RenderIf value={!isLoading}>
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-start">
           <div className="flex items-center gap-2">
             <div className="flex justify-center">
               <Avatar className="size-[45px]">
@@ -31,13 +31,13 @@ const PRViewArticle = () => {
               <span className="font-medium text-foreground/60 text-[14px]">17/10/2005 17:10</span>
             </div>
           </div>
-          <div className="flex gap-2 max-h-[25px]">
+          <div className="flex md:flex-row flex-col md:items-start items-end gap-2">
             <Badge className="bg-emerald-600/10 dark:bg-emerald-600/20 hover:bg-emerald-600/10 text-emerald-500 border-emerald-600/60 shadow-none rounded-full">
               Tháng 10 (01/10/2005 - 30/10/2005)
             </Badge>
-            <Badge className="bg-emerald-600/10 dark:bg-emerald-600/20 hover:bg-emerald-600/10 text-emerald-500 border-emerald-600/60 shadow-none rounded-full">
-              w
-            </Badge>
+            <span className="text-[12px] border p-2 break-words max-w-[300px] bg-emerald-600/10 dark:bg-emerald-600/20 hover:bg-emerald-600/10 text-emerald-500 border-emerald-600/60 shadow-none rounded-lg">
+              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nisi rem quasi illum. Cupiditate maxime sint rem
+            </span>
           </div>
         </div>
 

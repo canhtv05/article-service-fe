@@ -1,0 +1,52 @@
+[
+  {
+    "ma": "NV001",
+    "fullName": "Nguyễn Văn An",
+    "email": "an.nguyenvan@company.com"
+  },
+  {
+    "ma": "NV002",
+    "fullName": "Trần Thị Bình",
+    "email": "binh.tranthi@company.com"
+  },
+  {
+    "ma": "NV003",
+    "fullName": "Lê Minh Châu",
+    "email": "chau.leminh@company.com"
+  },
+  {
+    "ma": "NV004",
+    "fullName": "Phạm Quốc Đạt",
+    "email": "dat.phamquoc@company.com"
+  },
+  {
+    "ma": "NV005",
+    "fullName": "Hoàng Thị Mai",
+    "email": "mai.hoangthi@company.com"
+  },
+  {
+    "ma": "NV006",
+    "fullName": "Vũ Văn Hùng",
+    "email": "hung.vuvan@company.com"
+  },
+  {
+    "ma": "NV007",
+    "fullName": "Đỗ Thị Lan",
+    "email": "lan.dothi@company.com"
+  },
+  {
+    "ma": "NV008",
+    "fullName": "Ngô Quang Minh",
+    "email": "minh.ngoquang@company.com"
+  },
+  {
+    "ma": "NV009",
+    "fullName": "Bùi Thị Ngọc",
+    "email": "ngoc.buithi@company.com"
+  },
+  {
+    "ma": "NV010",
+    "fullName": "Trương Văn Phong",
+    "email": "phong.truongvan@company.com"
+  }
+]

@@ -7,6 +7,8 @@ const PRChart = lazy(() => import('@/pages/pr/PRChart'));
 const PRTopicManagement = lazy(() => import('@/pages/pr/PRTopicManagement'));
 const PRListArticles = lazy(() => import('@/pages/pr/PRListArticles'));
 const PRViewArticle = lazy(() => import('@/components/pr/PRViewArticle'));
+const PRStaffs = lazy(() => import('@/pages/pr/PRStaffs'));
+const PRAssignedStaff = lazy(() => import('@/components/pr/PRAssignedStaff'));
 const AdminChart = lazy(() => import('@/pages/admin/AdminChart'));
 const RegisterWrite = lazy(() => import('@/pages/user/UserRegisterWrite'));
 const StaffListArticles = lazy(() => import('@/pages/staff/StaffListArticles'));
@@ -42,6 +44,14 @@ const privateRoutes = [
   {
     path: configs.routes.pr.listArticles.path,
     component: PRListArticles,
+  },
+  {
+    path: configs.routes.pr.listStaffsPr.path,
+    component: PRStaffs,
+  },
+  {
+    path: configs.routes.pr.listStaffsPr.assigned_article,
+    component: PRAssignedStaff,
   },
   {
     path: configs.routes.admin.chart,
