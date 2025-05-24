@@ -1,7 +1,6 @@
-import { Fragment, useContext } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { toast } from 'sonner';
+'use client';
 
+import { useContext } from 'react';
 import {
   Pagination,
   PaginationContent,
@@ -12,20 +11,31 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Checkbox } from '@/components/ui/checkbox';
 import FieldsSelect from '../FieldsSelect';
-import StatusBadge from '../StatusBadge';
-import Tooltip from '../Tooltip';
 import FallbackNoDataTable from '../FallbackNoDataTable';
-import ConfirmDialog from '../ConfirmDialog';
 import RenderIf from '../RenderIf';
 import LoadingTable from '../LoadingTable';
-import { PRListArticlesContext } from '@/contexts/context/pr/PRListArticlesContext';
-import { Badge } from '../ui/badge';
-import { Notice } from '@/enums';
+import { PRStaffsContext } from '@/contexts/context/pr/PRStaffsContext';
+import StatusBadge from '../StatusBadge';
+import { PRStaffsType } from '@/types';
 
-const PRArticleTableWithPagination = () => {
-  const location = useLocation();
-  const articles = useContext(PRListArticlesContext);
+type PRListNotAssignStaffTableWithPaginationProps = {
+  selectedRows: string[];
+  setSelectedRows: React.Dispatch<React.SetStateAction<string[]>>;
+  handleSelectAll: (checked: boolean, currentPageData: PRStaffsType[]) => void;
+  handleSelectRow: (id: string, checked: boolean) => void;
+  isAllSelected: (currentPageData: PRStaffsType[]) => boolean;
+};
+
+const PRListNotAssignStaffTableWithPagination = ({
+  selectedRows,
+  setSelectedRows,
+  handleSelectAll,
+  handleSelectRow,
+  isAllSelected,
+}: PRListNotAssignStaffTableWithPaginationProps) => {
+  const articles = useContext(PRStaffsContext);
 
   // Tính toán phân trang
   const perPage = Number(articles?.perPage) || 10;
@@ -73,19 +83,33 @@ const PRArticleTableWithPagination = () => {
     }
   };
 
-  const handleClick = () => {
-    toast.success(Notice.UPDATE_SUCCESS);
-  };
+  // Cập nhật titlesTable để thêm cột checkbox
+  const titlesTable = [
+    ' ',
+    ...(articles?.titlesTable || ['#', 'Tiêu đề', 'Chủ đề', 'Tác giả', 'Ngày tạo', 'Trạng thái']),
+  ];
 
   return (
     <div className="w-full">
+      <div className="text-sm text-muted-foreground mb-2">
+        Đã chọn {selectedRows.length} / {totalItems} bài viết
+      </div>
       <div className="w-full border rounded-md overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
-              {articles?.titlesTable.map((title, index) => (
-                <TableHead className={`${index === 0 || index === 1 ? 'pl-4' : ''}`} key={index}>
-                  {title}
+              {titlesTable.map((title, index) => (
+                <TableHead className={`${index <= 1 ? 'pl-4' : ''} ${index === 0 ? 'w-12' : ''}`} key={index}>
+                  {index === 0 ? (
+                    <Checkbox
+                      checked={isAllSelected(currentData)}
+                      onCheckedChange={(checked) => handleSelectAll(!!checked, currentData)}
+                      aria-label="Select all"
+                      className="border-emerald-500 translate-y-[2px]"
+                    />
+                  ) : (
+                    title
+                  )}
                 </TableHead>
               ))}
             </TableRow>
@@ -93,7 +117,7 @@ const PRArticleTableWithPagination = () => {
           <TableBody>
             <RenderIf value={!!articles?.isLoading}>
               <TableRow className="h-[130px]">
-                <TableCell colSpan={articles?.titlesTable.length} className="flex my-auto justify-center items-center">
+                <TableCell colSpan={titlesTable.length} className="flex my-auto justify-center items-center">
                   <LoadingTable />
                 </TableCell>
               </TableRow>
@@ -101,66 +125,28 @@ const PRArticleTableWithPagination = () => {
             <RenderIf value={!articles?.isLoading}>
               {Array.isArray(currentData) && currentData.length > 0 ? (
                 currentData.map((article, index) => (
-                  <TableRow key={index} className="odd:bg-muted/50">
+                  <TableRow key={article.article_id} className="odd:bg-muted/50">
+                    <TableCell className="pl-4 w-12">
+                      <Checkbox
+                        checked={selectedRows.includes(article.article_id)}
+                        onCheckedChange={(checked) => handleSelectRow(article.article_id, !!checked)}
+                        aria-label="Select row"
+                        className="border-emerald-500 translate-y-[2px]"
+                      />
+                    </TableCell>
                     <TableCell className="pl-4">{startIndex + index + 1}</TableCell>
                     <TableCell className="pl-4">{article.title}</TableCell>
-                    <TableCell className="font-medium">{article.author_name}</TableCell>
-                    <TableCell>{article.topic_name}</TableCell>
-                    <TableCell className="pl-4">{article.created_at}</TableCell>
-                    <TableCell>{article.campaign_period}</TableCell>
+                    <TableCell className="font-medium">{article.topic_name}</TableCell>
+                    <TableCell>{article.author_name}</TableCell>
+                    <TableCell>{article.created_at}</TableCell>
                     <TableCell>
                       <StatusBadge status={article.status} />
-                    </TableCell>
-                    <TableCell className="flex justify-center">
-                      <RenderIf value={article.assignee_id !== null}>
-                        <span className="font-medium">{`${article.assignee_id} - ${article.assignee_name}`}</span>
-                      </RenderIf>
-                      <RenderIf value={article.assignee_id === null}>
-                        <Badge className="bg-amber-600/10 dark:bg-amber-600/20 hover:bg-amber-600/10 text-amber-500 border-amber-600/60 shadow-none rounded-full">
-                          <div>Chưa phân công</div>
-                        </Badge>
-                      </RenderIf>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-4">
-                        {articles?.tooltips.map((item, idx) => (
-                          <Fragment key={idx}>
-                            <RenderIf value={item.type !== 'view'}>
-                              <ConfirmDialog
-                                key={idx}
-                                onContinue={handleClick}
-                                typeTitle={'chỉnh sửa'}
-                                triggerComponent={
-                                  <div className="cursor-pointer">
-                                    <Tooltip
-                                      toolTipContent={item.content}
-                                      toolTipTrigger={<item.icon className={`size-5 ${item.className}`} />}
-                                    />
-                                  </div>
-                                }
-                              />
-                            </RenderIf>
-                            <RenderIf value={item.type === 'view'}>
-                              <Link
-                                to={`/pr/list-articles/${article.article_id}`}
-                                state={{ background: location }}
-                                className="cursor-pointer"
-                              >
-                                <Tooltip
-                                  toolTipContent={item.content}
-                                  toolTipTrigger={<item.icon className={`size-5 ${item.className}`} />}
-                                />
-                              </Link>
-                            </RenderIf>
-                          </Fragment>
-                        ))}
-                      </div>
                     </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={articles?.titlesTable.length} className="text-center">
+                  <TableCell colSpan={titlesTable.length} className="text-center">
                     <FallbackNoDataTable />
                   </TableCell>
                 </TableRow>
@@ -179,7 +165,6 @@ const PRArticleTableWithPagination = () => {
                   className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                 />
               </PaginationItem>
-
               {getPageNumbers().map((page, index) => (
                 <PaginationItem key={index}>
                   {page === 'ellipsis' ? (
@@ -195,7 +180,6 @@ const PRArticleTableWithPagination = () => {
                   )}
                 </PaginationItem>
               ))}
-
               <PaginationItem>
                 <PaginationNext
                   onClick={() => handlePageChange(currentPage + 1)}
@@ -220,6 +204,7 @@ const PRArticleTableWithPagination = () => {
                 if (articles?.setPerPage && articles?.setCurrentPage) {
                   articles.setPerPage(val);
                   articles.setCurrentPage(1);
+                  setSelectedRows([]); // Xóa lựa chọn khi thay đổi perPage
                 }
               }}
             />
@@ -230,4 +215,4 @@ const PRArticleTableWithPagination = () => {
   );
 };
 
-export default PRArticleTableWithPagination;
+export default PRListNotAssignStaffTableWithPagination;

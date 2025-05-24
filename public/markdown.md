@@ -43,6 +43,8 @@ strikethrough, tables, tasklists).
   - [Related](#related)
   - [Contribute](#contribute)
   - [License](#license)
+  - [author: John Doe](#author-john-doe)
+- [Heading](#heading)
 
 ## What is this?
 
@@ -440,3 +442,29 @@ abide by its terms.
 [remark-rehype]: https://github.com/remarkjs/remark-rehype
 [rehype-slug]: https://github.com/rehypejs/rehype-slug
 [string-width]: https://github.com/sindresorhus/string-width
+
+---
+
+title: My Document
+author: John Doe
+
+---
+
+# Heading
+
+This is a paragraph.
+This is a new line in the same paragraph.
+
+- [x] Task done
+- [ ] Task todo
+
+> Blockquote with a soft break
+> Another line
+
+| Col1 | Col2 |
+| ---- | ---- |
+| Data | Data |
+
+A footnote[^1]
+
+[^1]: This is a footnote.

@@ -159,3 +159,33 @@ export type PRListArticlesContextType = {
   valueFilter: ArticleFilterType;
   setValueFilter: Dispatch<SetStateAction<ArticleFilterType>>;
 };
+
+export type PRStaffsType = {
+  title: string;
+  topic_name: string;
+  author_name: string;
+  created_at: string;
+  status: string;
+  article_id: string;
+};
+
+export type PRStaffsFilterType = {
+  title_and_author_name: string;
+  topic_name: string;
+};
+
+export type PRStaffsContextType = {
+  data: PRStaffsType[] | undefined;
+  setData: Dispatch<SetStateAction<PRStaffsType[] | undefined>>;
+  isLoading: boolean;
+  error: unknown;
+  titlesTable: string[];
+  currentPage: number;
+  setCurrentPage: Dispatch<SetStateAction<number>>;
+  perPage: string;
+  setPerPage: Dispatch<SetStateAction<string>>;
+  handleClearFields: VoidFunction;
+  handleFilters: VoidFunction;
+  valueFilter: PRStaffsFilterType;
+  setValueFilter: Dispatch<SetStateAction<PRStaffsFilterType>>;
+};

@@ -9,6 +9,10 @@ const routes = {
       path: '/pr/list-articles',
       idArticle: '/pr/list-articles/:idArticle',
     },
+    listStaffsPr: {
+      path: '/pr/staffs-pr',
+      assigned_article: '/pr/staffs-pr/assigned-article/:id',
+    },
   },
   admin: {
     chart: '/admin/chart',

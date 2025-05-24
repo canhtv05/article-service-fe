@@ -66,8 +66,8 @@ export const menusSidebar: MenuSidebarItemType[] = [
       },
       {
         label: 'Danh sách nhân viên',
-        to: '/pr/list-staffs-pr',
-        type: 'list-staffs-pr',
+        to: '/pr/staffs-pr',
+        type: 'staffs-pr',
         icon: Users,
       },
     ],
