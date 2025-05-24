@@ -14,6 +14,7 @@ import {
 import FieldsSelect from './FieldsSelect';
 import { ChartDataType } from '@/types';
 import { fakeDataChart } from '@/constant';
+import { useState } from 'react';
 
 const chartConfig = {
   visitors: {
@@ -54,12 +55,20 @@ const PieChart = ({ chartData }: { chartData: ChartDataType[] }) => {
   const isEmpty = chartData.every((chart) => chart.count === 0);
   const finalData = isEmpty ? fallbackData : chartData;
 
+  const [selected, setSelected] = useState<string>(fakeDataChart[0]?.value || '');
+
   return (
     <Card className="flex flex-col h-full border-none shadow-md bg-transparent">
       <CardHeader className="items-center pb-0">
         <CardDescription>
           <div className="flex md:grid auto-rows-min gap-4 grid-cols-3">
-            <FieldsSelect placeholder="Chọn đợt viết bài" data={fakeDataChart} label="Đợt viết bài" />
+            <FieldsSelect
+              placeholder="-- Chọn đợt viết bài --"
+              data={fakeDataChart}
+              value={selected}
+              label="Đợt viết bài"
+              setValue={setSelected}
+            />
           </div>
         </CardDescription>
       </CardHeader>

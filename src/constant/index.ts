@@ -236,12 +236,7 @@ export const chartData = (statistical: StatisticalItemType) => {
 
 export const fakeDataChart = [
   {
-    label: 'Đợt 16/05/2025 - 17/05/2025',
-  },
-  {
-    label: 'Đợt 16/05/2025 - 18/05/2025',
-  },
-  {
-    label: 'Đợt 16/05/2025 - 19/05/2025',
+    label: 'Tháng 10 (01/10/2005 - 30/10/2005)',
+    value: 'Tháng 10 (01/10/2005 - 30/10/2005)',
   },
 ];

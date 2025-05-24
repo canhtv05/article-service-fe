@@ -1,5 +1,5 @@
-import { Fragment, useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { Fragment, useContext } from 'react';
 import { toast } from 'sonner';
 
 import {
@@ -19,13 +19,12 @@ import FallbackNoDataTable from '../FallbackNoDataTable';
 import ConfirmDialog from '../ConfirmDialog';
 import RenderIf from '../RenderIf';
 import LoadingTable from '../LoadingTable';
-import { PRListArticlesContext } from '@/contexts/context/pr/PRListArticlesContext';
-import { Badge } from '../ui/badge';
 import { Notice } from '@/enums';
+import { StaffListArticlesContext } from '@/contexts/context/staff/StaffListArticlesContext';
 
-const PRArticleTableWithPagination = () => {
+const StaffListArticleTableWithPagination = () => {
   const location = useLocation();
-  const articles = useContext(PRListArticlesContext);
+  const articles = useContext(StaffListArticlesContext);
 
   // Tính toán phân trang
   const perPage = Number(articles?.perPage) || 10;
@@ -107,19 +106,8 @@ const PRArticleTableWithPagination = () => {
                     <TableCell className="font-medium">{article.author_name}</TableCell>
                     <TableCell>{article.topic_name}</TableCell>
                     <TableCell className="pl-4">{article.created_at}</TableCell>
-                    <TableCell>{article.campaign_period}</TableCell>
                     <TableCell>
                       <StatusBadge status={article.status} />
-                    </TableCell>
-                    <TableCell className="flex justify-center">
-                      <RenderIf value={article.assignee_id !== null}>
-                        <span className="font-medium">{`${article.assignee_id} - ${article.assignee_name}`}</span>
-                      </RenderIf>
-                      <RenderIf value={article.assignee_id === null}>
-                        <Badge className="bg-amber-600/10 dark:bg-amber-600/20 hover:bg-amber-600/10 text-amber-500 border-amber-600/60 shadow-none rounded-full">
-                          <div>Chưa phân công</div>
-                        </Badge>
-                      </RenderIf>
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-4">
@@ -230,4 +218,4 @@ const PRArticleTableWithPagination = () => {
   );
 };
 
-export default PRArticleTableWithPagination;
+export default StaffListArticleTableWithPagination;
