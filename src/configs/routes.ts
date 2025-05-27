@@ -15,6 +15,7 @@ const routes = {
   },
   admin: {
     chart: '/admin/chart',
+    registrationPeriod: '/admin/registration-period',
   },
   user: {
     registerWrite: '/user/register-to-write',

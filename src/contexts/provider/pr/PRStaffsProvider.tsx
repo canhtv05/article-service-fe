@@ -6,7 +6,7 @@ import _ from 'lodash';
 import { PRStaffsFilterType, PRStaffsType } from '@/types';
 import { PRStaffsContext } from '@/contexts/context/pr/PRStaffsContext';
 
-const titlesTable = ['#', 'Tiêu đề', 'Chủ đề', 'Tác giả', 'Ngày tạo', 'Trạng thái'];
+const titlesTable = [' ', '#', 'Tiêu đề', 'Chủ đề', 'Tác giả', 'Ngày tạo', 'Trạng thái'];
 
 const PRStaffsProvider = ({ children }: { children: ReactNode }) => {
   const {

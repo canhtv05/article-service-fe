@@ -11,6 +11,8 @@ import { Separator } from '@/components/ui/separator';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useDispatch } from 'react-redux';
+import { setOpen } from '@/redux/reducers/sidebarSlice';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -232,7 +234,15 @@ function Sidebar({
 }
 
 function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<typeof Button>) {
-  const { toggleSidebar } = useSidebar();
+  const { toggleSidebar, open } = useSidebar();
+  const dispatch = useDispatch();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleToggleSidebar = (event: any) => {
+    onClick?.(event);
+    toggleSidebar();
+    dispatch(setOpen(open));
+  };
 
   return (
     <Button
@@ -241,10 +251,7 @@ function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<t
       variant="ghost"
       size="icon"
       className={cn('size-7', className, 'p-[18px]')}
-      onClick={(event) => {
-        onClick?.(event);
-        toggleSidebar();
-      }}
+      onClick={handleToggleSidebar}
       {...props}
     >
       <PanelLeftIcon className="bg-background text-foreground" />
