@@ -32,3 +32,8 @@ export enum StatusSend {
   NOT_SENT = 'Chưa gửi cho PR',
   ALL = 'Tất cả',
 }
+
+export enum StatusRegistration {
+  OPEN = 'Mở đăng ký',
+  CLOSE = 'Đóng đăng ký',
+}

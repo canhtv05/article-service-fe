@@ -227,3 +227,41 @@ export type StaffListArticleContextType = {
   valueFilter: StaffListArticleFilterType;
   setValueFilter: Dispatch<SetStateAction<StaffListArticleFilterType>>;
 };
+
+export type AdminRegistrationPeriodType = {
+  id: string;
+  name: string;
+  time: string;
+  time_registration: string;
+  campaign_period: number;
+  status: string;
+};
+
+export type AdminRegistrationPeriodFilterType = {
+  id_or_name: string;
+  start_date: string;
+  status: string;
+  end_date: string;
+};
+
+export type AdminRegistrationPeriodContextType = {
+  data: AdminRegistrationPeriodType[] | undefined;
+  setData: Dispatch<SetStateAction<AdminRegistrationPeriodType[] | undefined>>;
+  isLoading: boolean;
+  error: unknown;
+  titlesTable: string[];
+  tooltips: {
+    content: string;
+    icon: LucideIcon;
+    type: string;
+    className: string;
+  }[];
+  currentPage: number;
+  setCurrentPage: Dispatch<SetStateAction<number>>;
+  perPage: string;
+  setPerPage: Dispatch<SetStateAction<string>>;
+  handleClearFields: VoidFunction;
+  handleFilters: VoidFunction;
+  valueFilter: AdminRegistrationPeriodFilterType;
+  setValueFilter: Dispatch<SetStateAction<AdminRegistrationPeriodFilterType>>;
+};

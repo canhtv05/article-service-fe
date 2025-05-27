@@ -1,6 +1,6 @@
 'use client';
 
-import { useContext } from 'react';
+import { Fragment, useContext } from 'react';
 import {
   Pagination,
   PaginationContent,
@@ -16,16 +16,17 @@ import FieldsSelect from '../FieldsSelect';
 import FallbackNoDataTable from '../FallbackNoDataTable';
 import RenderIf from '../RenderIf';
 import LoadingTable from '../LoadingTable';
-import { PRStaffsContext } from '@/contexts/context/pr/PRStaffsContext';
 import StatusBadge from '../StatusBadge';
-import { PRStaffsType } from '@/types';
+import { AdminRegistrationPeriodType } from '@/types';
+import { AdminRegistrationPeriodContext } from '@/contexts/context/admin/AdminRegistrationPeriodContext';
+import Tooltip from '../Tooltip';
 
 type PRListNotAssignStaffTableWithPaginationProps = {
   selectedRows: string[];
   setSelectedRows: React.Dispatch<React.SetStateAction<string[]>>;
-  handleSelectAll: (checked: boolean, currentPageData: PRStaffsType[]) => void;
+  handleSelectAll: (checked: boolean, currentPageData: AdminRegistrationPeriodType[]) => void;
   handleSelectRow: (id: string, checked: boolean) => void;
-  isAllSelected: (currentPageData: PRStaffsType[]) => boolean;
+  isAllSelected: (currentPageData: AdminRegistrationPeriodType[]) => boolean;
 };
 
 const PRListNotAssignStaffTableWithPagination = ({
@@ -35,18 +36,18 @@ const PRListNotAssignStaffTableWithPagination = ({
   handleSelectRow,
   isAllSelected,
 }: PRListNotAssignStaffTableWithPaginationProps) => {
-  const articles = useContext(PRStaffsContext);
+  const registrationPeriod = useContext(AdminRegistrationPeriodContext);
 
   // Tính toán phân trang
-  const perPage = Number(articles?.perPage) || 10;
-  const currentPage = articles?.currentPage || 1;
-  const totalItems = articles?.data?.length || 0;
+  const perPage = Number(registrationPeriod?.perPage) || 10;
+  const currentPage = registrationPeriod?.currentPage || 1;
+  const totalItems = registrationPeriod?.data?.length || 0;
   const totalPages = Math.ceil(totalItems / perPage);
 
   // Lấy dữ liệu cho trang hiện tại
   const startIndex = (currentPage - 1) * perPage;
   const endIndex = startIndex + perPage;
-  const currentData = articles?.data?.slice(startIndex, endIndex) || [];
+  const currentData = registrationPeriod?.data?.slice(startIndex, endIndex) || [];
 
   // Tạo danh sách số trang
   const getPageNumbers = () => {
@@ -78,8 +79,8 @@ const PRListNotAssignStaffTableWithPagination = ({
 
   // Xử lý chuyển trang
   const handlePageChange = (page: number) => {
-    if (articles?.setCurrentPage && page >= 1 && page <= totalPages) {
-      articles.setCurrentPage(page);
+    if (registrationPeriod?.setCurrentPage && page >= 1 && page <= totalPages) {
+      registrationPeriod.setCurrentPage(page);
     }
   };
 
@@ -92,7 +93,7 @@ const PRListNotAssignStaffTableWithPagination = ({
         <Table>
           <TableHeader>
             <TableRow>
-              {articles?.titlesTable.map((title, index) => (
+              {registrationPeriod?.titlesTable.map((title, index) => (
                 <TableHead className={`${index <= 1 ? 'pl-4' : ''} ${index === 0 ? 'w-12' : ''}`} key={index}>
                   {index === 0 ? (
                     <Checkbox
@@ -109,38 +110,73 @@ const PRListNotAssignStaffTableWithPagination = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            <RenderIf value={!!articles?.isLoading}>
+            <RenderIf value={!!registrationPeriod?.isLoading}>
               <TableRow className="h-[130px]">
-                <TableCell colSpan={articles?.titlesTable.length} className="flex my-auto justify-center items-center">
+                <TableCell
+                  colSpan={registrationPeriod?.titlesTable.length}
+                  className="flex my-auto justify-center items-center"
+                >
                   <LoadingTable />
                 </TableCell>
               </TableRow>
             </RenderIf>
-            <RenderIf value={!articles?.isLoading}>
+            <RenderIf value={!registrationPeriod?.isLoading}>
               {Array.isArray(currentData) && currentData.length > 0 ? (
-                currentData.map((article, index) => (
-                  <TableRow key={article.article_id} className="odd:bg-muted/50">
+                currentData.map((registration, index) => (
+                  <TableRow key={registration.id} className="odd:bg-muted/50">
                     <TableCell className="pl-4 w-12">
                       <Checkbox
-                        checked={selectedRows.includes(article.article_id)}
-                        onCheckedChange={(checked) => handleSelectRow(article.article_id, !!checked)}
+                        checked={selectedRows.includes(registration.id)}
+                        onCheckedChange={(checked) => handleSelectRow(registration.id, !!checked)}
                         aria-label="Select row"
                         className="border-emerald-500 translate-y-[2px]"
                       />
                     </TableCell>
                     <TableCell className="pl-4">{startIndex + index + 1}</TableCell>
-                    <TableCell className="pl-4">{article.title}</TableCell>
-                    <TableCell className="font-medium">{article.topic_name}</TableCell>
-                    <TableCell>{article.author_name}</TableCell>
-                    <TableCell>{article.created_at}</TableCell>
+                    <TableCell className="pl-4">{registration.name}</TableCell>
+                    <TableCell className="font-medium">{registration.time}</TableCell>
+                    <TableCell>{registration.time_registration}</TableCell>
+                    <TableCell>{registration.campaign_period}</TableCell>
                     <TableCell>
-                      <StatusBadge status={article.status} />
+                      <StatusBadge status={registration.status} />
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-4">
+                        {registrationPeriod?.tooltips.map((item, idx) => (
+                          <Fragment key={idx}>
+                            <RenderIf value={item.type === 'view'}>
+                              <div className="cursor-pointer">
+                                <Tooltip
+                                  toolTipContent={item.content}
+                                  toolTipTrigger={<item.icon className={item.className} />}
+                                />
+                              </div>
+                            </RenderIf>
+                            <RenderIf value={item.type === 'assign_topic'}>
+                              <div className="cursor-pointer">
+                                <Tooltip
+                                  toolTipContent={item.content}
+                                  toolTipTrigger={<item.icon className={item.className} />}
+                                />
+                              </div>
+                            </RenderIf>
+                            <RenderIf value={item.type === 'remove'}>
+                              <div className="cursor-pointer">
+                                <Tooltip
+                                  toolTipContent={item.content}
+                                  toolTipTrigger={<item.icon className={item.className} />}
+                                />
+                              </div>
+                            </RenderIf>
+                          </Fragment>
+                        ))}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={articles?.titlesTable.length} className="text-center">
+                  <TableCell colSpan={registrationPeriod?.titlesTable.length} className="text-center">
                     <FallbackNoDataTable />
                   </TableCell>
                 </TableRow>
@@ -149,7 +185,7 @@ const PRListNotAssignStaffTableWithPagination = ({
           </TableBody>
         </Table>
       </div>
-      <RenderIf value={!!articles?.data && articles?.data?.length > 0}>
+      <RenderIf value={!!registrationPeriod?.data && registrationPeriod?.data?.length > 0}>
         <div className="flex lg:flex-row flex-col gap-5 mt-4 items-center">
           <Pagination>
             <PaginationContent>
@@ -193,11 +229,11 @@ const PRListNotAssignStaffTableWithPagination = ({
                 { label: '50 / trang', value: 50 },
                 { label: '100 / trang', value: 100 },
               ]}
-              value={articles?.perPage}
+              value={registrationPeriod?.perPage}
               setValue={(val) => {
-                if (articles?.setPerPage && articles?.setCurrentPage) {
-                  articles.setPerPage(val);
-                  articles.setCurrentPage(1);
+                if (registrationPeriod?.setPerPage && registrationPeriod?.setCurrentPage) {
+                  registrationPeriod.setPerPage(val);
+                  registrationPeriod.setCurrentPage(1);
                   setSelectedRows([]); // Xóa lựa chọn khi thay đổi perPage
                 }
               }}

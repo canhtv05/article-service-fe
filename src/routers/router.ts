@@ -13,6 +13,7 @@ const PRStaffs = lazy(() => import('@/pages/pr/PRStaffs'));
 const PRAssignedStaff = lazy(() => import('@/components/pr/PRAssignedStaff'));
 
 const AdminChart = lazy(() => import('@/pages/admin/AdminChart'));
+const AdminRegistrationPeriod = lazy(() => import('@/pages/admin/AdminRegistrationPeriod'));
 
 const RegisterWrite = lazy(() => import('@/pages/user/UserRegisterWrite'));
 
@@ -62,6 +63,10 @@ const privateRoutes = [
   {
     path: configs.routes.admin.chart,
     component: AdminChart,
+  },
+  {
+    path: configs.routes.admin.registrationPeriod,
+    component: AdminRegistrationPeriod,
   },
   {
     path: configs.routes.user.registerWrite,

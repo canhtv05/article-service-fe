@@ -8,7 +8,12 @@ import FallbackNoDataTable from '../FallbackNoDataTable';
 import RenderIf from '../RenderIf';
 import LoadingTable from '../LoadingTable';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
-import { PRStaffsType } from '@/types';
+
+interface StaffType {
+  ma: string;
+  fullName: string;
+  email: string;
+}
 
 const tooltips = [
   {
@@ -22,7 +27,7 @@ const tooltips = [
 const titlesTable = ['#', 'Mã', 'Tên', 'Email', 'Hành động'];
 
 const PRStaffsTable = () => {
-  const { data, isLoading } = useQuery<PRStaffsType[]>({
+  const { data, isLoading } = useQuery<StaffType[]>({
     queryKey: ['staffs'],
     queryFn: async () => {
       const response = await axios.get('/data_staffs.json');
