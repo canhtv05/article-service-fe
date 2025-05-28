@@ -1,6 +1,9 @@
 'use client';
 
-import { Fragment, useContext } from 'react';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useQuery } from '@tanstack/react-query';
+
 import {
   Pagination,
   PaginationContent,
@@ -16,39 +19,58 @@ import FieldsSelect from '../FieldsSelect';
 import FallbackNoDataTable from '../FallbackNoDataTable';
 import RenderIf from '../RenderIf';
 import LoadingTable from '../LoadingTable';
-import StatusBadge from '../StatusBadge';
-import { AdminRegistrationPeriodType } from '@/types';
-import { AdminRegistrationPeriodContext } from '@/contexts/context/admin/AdminRegistrationPeriodContext';
-import Tooltip from '../Tooltip';
-import { Link } from 'react-router-dom';
+import { AddUserToCampaignType } from '@/types';
+import { Button } from '../ui/button';
+import { UserPlus } from 'lucide-react';
+import { Input } from '../ui/input';
 
-type AdminRegistrationTableWithPaginationProps = {
+const titlesTable = ['', '#', 'Giảng viên', 'Chủ đề', 'Số lượng bài viết', 'Hành động'];
+
+type AddUserToCampaignWithPaginationProps = {
   selectedRows: string[];
   setSelectedRows: React.Dispatch<React.SetStateAction<string[]>>;
-  handleSelectAll: (checked: boolean, currentPageData: AdminRegistrationPeriodType[]) => void;
+  handleSelectAll: (checked: boolean, currentPageData: AddUserToCampaignType[]) => void;
   handleSelectRow: (id: string, checked: boolean) => void;
-  isAllSelected: (currentPageData: AdminRegistrationPeriodType[]) => boolean;
+  isAllSelected: (currentPageData: AddUserToCampaignType[]) => boolean;
+  handleAssign: () => void;
 };
 
-const AdminRegistrationTableWithPagination = ({
+const AddUserToCampaignWithPagination = ({
   selectedRows,
   setSelectedRows,
   handleSelectAll,
   handleSelectRow,
   isAllSelected,
-}: AdminRegistrationTableWithPaginationProps) => {
-  const registrationPeriod = useContext(AdminRegistrationPeriodContext);
+}: // handleAssign,
+AddUserToCampaignWithPaginationProps) => {
+  const { data: users, isLoading } = useQuery<AddUserToCampaignType[]>({
+    queryKey: ['users_to_campaign'],
+    queryFn: async () => {
+      const response = await axios.get('/data_add_users_to_campaign.json');
+      return response.data;
+    },
+  });
 
-  // Tính toán phân trang
-  const perPage = Number(registrationPeriod?.perPage) || 10;
-  const currentPage = registrationPeriod?.currentPage || 1;
-  const totalItems = registrationPeriod?.data?.length || 0;
+  const [data, setData] = useState<AddUserToCampaignType[] | undefined>(undefined);
+  const [perPage, setPerPage] = useState<number>(5);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [values, setValues] = useState<number[]>([]);
+
+  useEffect(() => {
+    if (users) {
+      setData(users);
+      const articles = users.map((user) => Number(user.number_of_articles));
+      setValues(articles);
+    }
+  }, [users]);
+
+  const totalItems = data?.length || 0;
   const totalPages = Math.ceil(totalItems / perPage);
 
   // Lấy dữ liệu cho trang hiện tại
   const startIndex = (currentPage - 1) * perPage;
   const endIndex = startIndex + perPage;
-  const currentData = registrationPeriod?.data?.slice(startIndex, endIndex) || [];
+  const currentData = data?.slice(startIndex, endIndex) || [];
 
   // Tạo danh sách số trang
   const getPageNumbers = () => {
@@ -80,8 +102,24 @@ const AdminRegistrationTableWithPagination = ({
 
   // Xử lý chuyển trang
   const handlePageChange = (page: number) => {
-    if (registrationPeriod?.setCurrentPage && page >= 1 && page <= totalPages) {
-      registrationPeriod.setCurrentPage(page);
+    if (setCurrentPage && page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const handleChange = (value: number, index: number) => {
+    setValues((prev) => prev.map((val, idx) => (idx === index ? value : val)));
+  };
+
+  const handleDivide = () => {
+    if (users) {
+      const total = users.reduce((sum, user) => sum + Number(user.number_of_articles), 0);
+      const n = users.length;
+      const base = Math.floor(total / n);
+      const extra = total % n;
+
+      const result = users.map((_, index) => (index < extra ? base + 1 : base));
+      setValues(result);
     }
   };
 
@@ -94,7 +132,7 @@ const AdminRegistrationTableWithPagination = ({
         <Table>
           <TableHeader>
             <TableRow>
-              {registrationPeriod?.titlesTable.map((title, index) => (
+              {titlesTable.map((title, index) => (
                 <TableHead className={`${index <= 1 ? 'pl-4' : ''} ${index === 0 ? 'w-12' : ''}`} key={index}>
                   {index === 0 ? (
                     <Checkbox
@@ -111,76 +149,45 @@ const AdminRegistrationTableWithPagination = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            <RenderIf value={!!registrationPeriod?.isLoading}>
+            <RenderIf value={!!isLoading}>
               <TableRow className="h-[130px]">
-                <TableCell
-                  colSpan={registrationPeriod?.titlesTable.length}
-                  className="flex my-auto justify-center items-center"
-                >
+                <TableCell colSpan={titlesTable.length} className="flex my-auto justify-center items-center">
                   <LoadingTable />
                 </TableCell>
               </TableRow>
             </RenderIf>
-            <RenderIf value={!registrationPeriod?.isLoading}>
+            <RenderIf value={!isLoading}>
               {Array.isArray(currentData) && currentData.length > 0 ? (
-                currentData.map((registration, index) => (
-                  <TableRow key={registration.id} className="odd:bg-muted/50">
+                currentData.map((user, index) => (
+                  <TableRow key={index} className="odd:bg-muted/50">
                     <TableCell className="pl-4 w-12">
                       <Checkbox
-                        checked={selectedRows.includes(registration.id)}
-                        onCheckedChange={(checked) => handleSelectRow(registration.id, !!checked)}
+                        checked={selectedRows.includes(user.id)}
+                        onCheckedChange={(checked) => handleSelectRow(user.id, !!checked)}
                         aria-label="Select row"
                         className="border-emerald-500 translate-y-[2px]"
                       />
                     </TableCell>
                     <TableCell className="pl-4">{startIndex + index + 1}</TableCell>
-                    <TableCell className="pl-4">{registration.name}</TableCell>
-                    <TableCell className="font-medium">{registration.time}</TableCell>
-                    <TableCell>{registration.time_registration}</TableCell>
-                    <TableCell>{registration.campaign_period}</TableCell>
+                    <TableCell className="pl-4">{user.name}</TableCell>
+                    <TableCell className="font-medium">{user.topic_name}</TableCell>
                     <TableCell>
-                      <StatusBadge status={registration.status} />
+                      <Input
+                        value={values[index] + ''}
+                        type="number"
+                        onChange={(e) => handleChange(Number(e.target.value), index)}
+                      ></Input>
                     </TableCell>
                     <TableCell>
-                      <div className="flex gap-4">
-                        {registrationPeriod?.tooltips.map((item, idx) => (
-                          <Fragment key={idx}>
-                            <RenderIf value={item.type === 'view'}>
-                              <Link
-                                to={`/admin/registration-period/detail/${registration.id}`}
-                                className="cursor-pointer"
-                              >
-                                <Tooltip
-                                  toolTipContent={item.content}
-                                  toolTipTrigger={<item.icon className={item.className} />}
-                                />
-                              </Link>
-                            </RenderIf>
-                            <RenderIf value={item.type === 'assign_topic'}>
-                              <div className="cursor-pointer">
-                                <Tooltip
-                                  toolTipContent={item.content}
-                                  toolTipTrigger={<item.icon className={item.className} />}
-                                />
-                              </div>
-                            </RenderIf>
-                            <RenderIf value={item.type === 'remove'}>
-                              <div className="cursor-pointer">
-                                <Tooltip
-                                  toolTipContent={item.content}
-                                  toolTipTrigger={<item.icon className={item.className} />}
-                                />
-                              </div>
-                            </RenderIf>
-                          </Fragment>
-                        ))}
-                      </div>
+                      <Button customize={'default'}>
+                        <UserPlus />
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={registrationPeriod?.titlesTable.length} className="text-center">
+                  <TableCell colSpan={titlesTable.length} className="text-center">
                     <FallbackNoDataTable />
                   </TableCell>
                 </TableRow>
@@ -189,7 +196,7 @@ const AdminRegistrationTableWithPagination = ({
           </TableBody>
         </Table>
       </div>
-      <RenderIf value={!!registrationPeriod?.data && registrationPeriod?.data?.length > 0}>
+      <RenderIf value={!!data && data?.length > 0}>
         <div className="flex lg:flex-row flex-col gap-5 mt-4 items-center">
           <Pagination>
             <PaginationContent>
@@ -222,7 +229,7 @@ const AdminRegistrationTableWithPagination = ({
               </PaginationItem>
             </PaginationContent>
           </Pagination>
-          <div>
+          <div className="flex gap-3">
             <FieldsSelect
               placeholder="Số bản ghi mỗi trang"
               defaultValue="5"
@@ -233,15 +240,19 @@ const AdminRegistrationTableWithPagination = ({
                 { label: '50 / trang', value: 50 },
                 { label: '100 / trang', value: 100 },
               ]}
-              value={registrationPeriod?.perPage}
+              value={perPage + ''}
               setValue={(val) => {
-                if (registrationPeriod?.setPerPage && registrationPeriod?.setCurrentPage) {
-                  registrationPeriod.setPerPage(val);
-                  registrationPeriod.setCurrentPage(1);
+                if (setPerPage && setCurrentPage) {
+                  setPerPage(Number(val));
+                  setCurrentPage(1);
                   setSelectedRows([]); // Xóa lựa chọn khi thay đổi perPage
                 }
               }}
             />
+            <Button customize={'default'} onClick={handleDivide}>
+              Chia đều
+            </Button>
+            <Button customize={'default'}>Thêm ngay</Button>
           </div>
         </div>
       </RenderIf>
@@ -249,4 +260,4 @@ const AdminRegistrationTableWithPagination = ({
   );
 };
 
-export default AdminRegistrationTableWithPagination;
+export default AddUserToCampaignWithPagination;

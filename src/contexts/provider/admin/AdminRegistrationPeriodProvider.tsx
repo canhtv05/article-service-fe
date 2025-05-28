@@ -5,7 +5,7 @@ import _ from 'lodash';
 
 import { AdminRegistrationPeriodFilterType, AdminRegistrationPeriodType } from '@/types';
 import { Status, StatusSend } from '@/enums';
-import { CircleX, Eye, Trash } from 'lucide-react';
+import { Eye, Pen, Trash } from 'lucide-react';
 import { AdminRegistrationPeriodContext } from '@/contexts/context/admin/AdminRegistrationPeriodContext';
 
 const tooltips = [
@@ -17,7 +17,7 @@ const tooltips = [
   },
   {
     content: 'Phân công chủ đề',
-    icon: CircleX,
+    icon: Pen,
     type: 'assign_topic',
     className: 'hover:stroke-yellow-500 size-5',
   },

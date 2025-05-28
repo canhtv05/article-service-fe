@@ -14,6 +14,9 @@ const PRAssignedStaff = lazy(() => import('@/components/pr/PRAssignedStaff'));
 
 const AdminChart = lazy(() => import('@/pages/admin/AdminChart'));
 const AdminRegistrationPeriod = lazy(() => import('@/pages/admin/AdminRegistrationPeriod'));
+const AdminRegistrationPeriodDetail = lazy(() => import('@/pages/admin/AdminRegistrationPeriodDetail'));
+const AdminRegistrationPeriodChild = lazy(() => import('@/pages/admin/AdminRegistrationPeriodChild'));
+const ModalAddUserToCampaign = lazy(() => import('@/components/admin/ModalAddUserToCampaign'));
 
 const RegisterWrite = lazy(() => import('@/pages/user/UserRegisterWrite'));
 
@@ -69,6 +72,14 @@ const privateRoutes = [
     component: AdminRegistrationPeriod,
   },
   {
+    path: configs.routes.admin.registrationPeriodDetail,
+    component: AdminRegistrationPeriodDetail,
+  },
+  {
+    path: configs.routes.admin.registrationPeriodChild,
+    component: AdminRegistrationPeriodChild,
+  },
+  {
     path: configs.routes.user.registerWrite,
     component: RegisterWrite,
   },
@@ -80,8 +91,12 @@ const privateRoutes = [
 
 const modals = [
   {
-    path: configs.routes.viewArticle,
+    path: configs.routes.modals.viewArticle,
     component: ViewArticle,
+  },
+  {
+    path: configs.routes.modals.addUsersToCampaign,
+    component: ModalAddUserToCampaign,
   },
 ];
 

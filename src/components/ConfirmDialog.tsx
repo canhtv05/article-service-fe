@@ -20,7 +20,7 @@ const ConfirmDialog = ({
   onContinue,
 }: {
   triggerComponent: ReactNode;
-  typeTitle: 'thêm' | 'chỉnh sửa' | 'xóa' | 'chuyển đổi trạng thái' | 'phân công';
+  typeTitle: 'thêm' | 'chỉnh sửa' | 'xóa' | 'chuyển đổi trạng thái' | 'phân công' | 'mở đăng ký' | 'đóng đăng ký';
   onContinue: VoidFunction;
 }) => {
   return (
