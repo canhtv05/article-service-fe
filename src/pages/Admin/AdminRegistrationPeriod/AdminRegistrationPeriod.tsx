@@ -9,7 +9,7 @@ import AdminRegistrationTable from '@/components/admin/AdminRegistrationTable';
 const AdminRegistrationPeriod = () => {
   const { width } = useViewport();
   const open = useSelector((state: { sidebar: { isOpen: boolean } }) => state.sidebar.isOpen);
-  const maxWidth = open || width < 768 ? '100%' : `${width - 290}px`;
+  const maxWidth = open || width < 768 ? '100%' : `${width - 300}px`;
 
   return (
     <AdminRegistrationPeriodProvider>

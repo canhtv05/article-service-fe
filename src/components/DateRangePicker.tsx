@@ -6,7 +6,6 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { useEffect } from 'react';
 
 type DateRangePickerProps = {
   className?: string;
@@ -15,13 +14,6 @@ type DateRangePickerProps = {
 };
 
 export function DateRangePicker({ className, value, onChange }: DateRangePickerProps) {
-  useEffect(() => {
-    const el = document.querySelector('[data-radix-popper-content-wrapper]');
-    if (el) {
-      console.log('Wrapper found:', el);
-    }
-  }, []);
-
   return (
     <div className={cn('grid gap-2', className)}>
       <Popover>

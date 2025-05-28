@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { List, Plus } from 'lucide-react';
+import { Check, ClockFading, List, Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '../ui/button';
@@ -46,21 +46,42 @@ const AdminRegistrationTable = () => {
 
   return (
     <div className="flex flex-col gap-4 rounded-xl shadow-md p-5 text-foreground h-full">
-      <div className="flex gap-3 items-center justify-between mb-10">
-        <div className="flex gap-3 items-center">
+      <div className="flex gap-3 items-center justify-between mb-10 lg:flex-row flex-col">
+        <div className="flex gap-3 items-center w-full">
           <List />
           <span className="text-foreground text-[18px]">Danh sách đợt đăng ký</span>
         </div>
-        <ConfirmDialog
-          onContinue={handleAssign}
-          typeTitle="phân công"
-          triggerComponent={
-            <Button customize={'default'} className="py-5 rounded-full" disabled={selectedRows.length === 0}>
-              <Plus />
-              Phân công
-            </Button>
-          }
-        />
+        <div className="grid grid-cols-2 lg:flex lg:flex-row gap-2 w-full">
+          <Button customize={'default'} className="py-5 rounded-full">
+            <ClockFading />
+            Lịch sử
+          </Button>
+          <ConfirmDialog
+            onContinue={handleAssign}
+            typeTitle="mở đăng ký"
+            triggerComponent={
+              <Button customize={'default'} className="py-5 rounded-full" disabled={selectedRows.length === 0}>
+                <Check />
+                Mở đăng ký
+              </Button>
+            }
+          />
+          <ConfirmDialog
+            onContinue={handleAssign}
+            typeTitle="đóng đăng ký"
+            triggerComponent={
+              <Button customize={'default'} className="py-5 rounded-full" disabled={selectedRows.length === 0}>
+                <X />
+                Đóng đăng ký
+              </Button>
+            }
+          />
+
+          <Button customize={'default'} className="py-5 rounded-full">
+            <Plus />
+            Tạo đợt đăng ký
+          </Button>
+        </div>
       </div>
       <AdminRegistrationTableWithPagination
         selectedRows={selectedRows}

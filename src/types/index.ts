@@ -265,3 +265,62 @@ export type AdminRegistrationPeriodContextType = {
   valueFilter: AdminRegistrationPeriodFilterType;
   setValueFilter: Dispatch<SetStateAction<AdminRegistrationPeriodFilterType>>;
 };
+
+export type AdminRegistrationDetailType = {
+  id: string;
+  name: string;
+  time: string;
+  time_registration: string;
+  assigned_articles: number;
+  assigned_people: number;
+};
+
+export type AdminRegistrationDetailContextType = {
+  data: AdminRegistrationDetailType[] | undefined;
+  setData: Dispatch<SetStateAction<AdminRegistrationDetailType[] | undefined>>;
+  isLoading: boolean;
+  error: unknown;
+  titlesTable: string[];
+  tooltips: {
+    content: string;
+    icon: LucideIcon;
+    type: string;
+    className: string;
+  }[];
+  currentPage: number;
+  setCurrentPage: Dispatch<SetStateAction<number>>;
+  perPage: string;
+  setPerPage: Dispatch<SetStateAction<string>>;
+};
+
+export type AdminRegistrationChildType = {
+  id: string;
+  name: string;
+  topic_name: string;
+  total_articles: number;
+};
+
+export type AdminRegistrationChildContextType = {
+  data: AdminRegistrationChildType[] | undefined;
+  setData: Dispatch<SetStateAction<AdminRegistrationChildType[] | undefined>>;
+  isLoading: boolean;
+  error: unknown;
+  titlesTable: string[];
+  tooltips: {
+    content: string;
+    icon: LucideIcon;
+    type: string;
+    className: string;
+  }[];
+  currentPage: number;
+  setCurrentPage: Dispatch<SetStateAction<number>>;
+  perPage: string;
+  setPerPage: Dispatch<SetStateAction<string>>;
+};
+
+export type AddUserToCampaignType = {
+  name: string;
+  topic_name: string;
+  number_of_articles: number;
+  id: string;
+};

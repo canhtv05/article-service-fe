@@ -16,6 +16,8 @@ const routes = {
   admin: {
     chart: '/admin/chart',
     registrationPeriod: '/admin/registration-period',
+    registrationPeriodDetail: '/admin/registration-period/detail/:id',
+    registrationPeriodChild: '/admin/registration-period/child/:id',
   },
   user: {
     registerWrite: '/user/register-to-write',
@@ -23,7 +25,10 @@ const routes = {
   staff: {
     listArticles: '/staff/list-articles',
   },
-  viewArticle: '/view/articles/:id',
+  modals: {
+    viewArticle: '/view/articles/:id',
+    addUsersToCampaign: '/add/users-to-campaign/:id',
+  },
 };
 
 export default routes;

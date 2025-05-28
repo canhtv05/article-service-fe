@@ -1,0 +1,32 @@
+[
+  {
+    "id": "e7bb57a3-8b7e-4a2d-b99f-cb6c215a3c52",
+    "name": "Nguyễn Văn Hùng",
+    "topic_name": "Artificial Intelligence",
+    "number_of_articles": 18
+  },
+  {
+    "id": "1c3fd8b4-3d8d-475e-b8de-b9dc15e206e1",
+    "name": "Trần Thị Lan",
+    "topic_name": "Data Science",
+    "number_of_articles": 10
+  },
+  {
+    "id": "b27d2071-1c27-49e8-b2b5-f71ad90a6b92",
+    "name": "Lê Minh Tuấn",
+    "topic_name": "Web Development",
+    "number_of_articles": 27
+  },
+  {
+    "id": "19b4d95e-2ae3-4057-96ec-0f739cf84f79",
+    "name": "Phạm Hồng Nhung",
+    "topic_name": "Cybersecurity",
+    "number_of_articles": 12
+  },
+  {
+    "id": "a63ffad0-2465-49e9-8234-59b25579d728",
+    "name": "Hoàng Quốc Bảo",
+    "topic_name": "Cloud Computing",
+    "number_of_articles": 15
+  }
+]
