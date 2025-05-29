@@ -102,8 +102,8 @@ export const menusSidebar: MenuSidebarItemType[] = [
       },
       {
         label: 'Lịch sử phê duyệt',
-        to: '/admin/archive-history',
-        type: 'archive-history',
+        to: '/admin/approval-history',
+        type: 'approval-history',
         icon: ClockFading,
       },
     ],

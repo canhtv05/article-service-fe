@@ -406,3 +406,42 @@ export type AdminArchiveContextType = {
   valueFilter: AdminArchiveFilterType;
   setValueFilter: Dispatch<SetStateAction<AdminArchiveFilterType>>;
 };
+
+export type AdminApprovalHistoryType = {
+  id: string;
+  title: string;
+  author_name: string;
+  type: string;
+  created_at: string;
+  operation_date: string;
+  status: string;
+};
+
+export type AdminApprovalHistoryFilterType = {
+  title: string;
+  status: string;
+  start_date: string;
+  end_date: string;
+};
+
+export type AdminApprovalHistoryContextType = {
+  data: AdminApprovalHistoryType[] | undefined;
+  setData: Dispatch<SetStateAction<AdminApprovalHistoryType[] | undefined>>;
+  isLoading: boolean;
+  error: unknown;
+  titlesTable: string[];
+  tooltips: {
+    content: string;
+    icon: LucideIcon;
+    type: string;
+    className: string;
+  }[];
+  currentPage: number;
+  setCurrentPage: Dispatch<SetStateAction<number>>;
+  perPage: string;
+  setPerPage: Dispatch<SetStateAction<string>>;
+  handleClearFields: VoidFunction;
+  handleFilters: VoidFunction;
+  valueFilter: AdminApprovalHistoryFilterType;
+  setValueFilter: Dispatch<SetStateAction<AdminApprovalHistoryFilterType>>;
+};

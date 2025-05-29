@@ -1,0 +1,86 @@
+import { Fragment } from 'react';
+
+import { Label } from '../ui/label';
+import { Input } from '../ui/input';
+import FieldsSelect from '../FieldsSelect';
+import { DateRangePicker } from '../DateRangePicker';
+import { DateRange } from 'react-day-picker';
+import { parseISO } from 'date-fns';
+import { useAdminApprovalHistoryContext } from '@/contexts/context/admin/AdminApprovalHistoryContext';
+
+const AdminFilterApprovalHistoryComponent = () => {
+  const approvalHistory = useAdminApprovalHistoryContext();
+
+  if (!approvalHistory) return;
+
+  const { end_date, start_date, status, title } = approvalHistory.valueFilter;
+
+  const dateRange: DateRange | undefined =
+    start_date || end_date
+      ? {
+          from: start_date ? parseISO(start_date) : undefined,
+          to: end_date ? parseISO(end_date) : undefined,
+        }
+      : undefined;
+
+  const handleChangeDate = (range: DateRange | undefined) => {
+    approvalHistory?.setValueFilter((prev) => ({
+      ...prev,
+      start_date: range?.from ? range.from.toISOString() : '',
+      end_date: range?.to ? range.to.toISOString() : '',
+    }));
+  };
+
+  return (
+    <Fragment>
+      <div className="flex flex-col justify-end">
+        <Label htmlFor="title" className="font-bold mb-2 leading-5">
+          Tiêu đề bài viết:
+        </Label>
+        <Input
+          id="title"
+          type="text"
+          placeholder="Tìm kiếm theo tiêu đề bài viết"
+          value={title}
+          onChange={(e) => {
+            approvalHistory.setValueFilter((prev) => ({
+              ...prev,
+              title: e.target.value,
+            }));
+          }}
+        />
+      </div>
+      <div className="flex flex-col justify-end">
+        <Label htmlFor="status" className="font-bold mb-2 leading-5">
+          Trạng thái:
+        </Label>
+        <FieldsSelect
+          id="status"
+          placeholder="-- Chọn trạng thái --"
+          data={[
+            { label: 'Tất cả', value: 'ALL' },
+            { label: 'Đã phê duyệt', value: 'Đã phê duyệt' },
+            { label: 'Chưa phê duyệt', value: 'Chưa phê duyệt' },
+          ]}
+          label="Trạng thái"
+          defaultValue={'ALL'}
+          value={status}
+          setValue={(val) => {
+            if (typeof val === 'string' && approvalHistory && val !== status) {
+              approvalHistory.setValueFilter((prev) => ({
+                ...prev,
+                status: val,
+              }));
+            }
+          }}
+        />
+      </div>
+      <div className="flex flex-col justify-end">
+        <Label className="font-bold mb-2 leading-5">Ngày thao tác:</Label>
+        <DateRangePicker value={dateRange} onChange={handleChangeDate} />
+      </div>
+    </Fragment>
+  );
+};
+
+export default AdminFilterApprovalHistoryComponent;

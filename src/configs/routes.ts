@@ -20,6 +20,7 @@ const routes = {
     registrationPeriodChild: '/admin/registration-period/child/:id',
     approveArticle: '/admin/approve-article',
     archive: '/admin/archive',
+    history: '/admin/approval-history',
   },
   user: {
     registerWrite: '/user/register-to-write',
