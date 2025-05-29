@@ -20,6 +20,7 @@ const AdminRegistrationPeriodDetail = lazy(() => import('@/pages/admin/AdminRegi
 const AdminRegistrationPeriodChild = lazy(() => import('@/pages/admin/AdminRegistrationPeriodChild'));
 const AdminApproveArticle = lazy(() => import('@/pages/admin/AdminApproveArticle'));
 const AdminArchive = lazy(() => import('@/pages/admin/AdminArchive'));
+const AdminApprovalHistory = lazy(() => import('@/pages/admin/AdminApprovalHistory'));
 
 const RegisterWrite = lazy(() => import('@/pages/user/UserRegisterWrite'));
 
@@ -89,6 +90,10 @@ const privateRoutes = [
   {
     path: configs.routes.admin.archive,
     component: AdminArchive,
+  },
+  {
+    path: configs.routes.admin.history,
+    component: AdminApprovalHistory,
   },
   {
     path: configs.routes.user.registerWrite,

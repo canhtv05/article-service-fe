@@ -42,6 +42,7 @@ export enum StatusApproveArticle {
   PENDING = 'Chờ phê duyệt',
 }
 
-export enum StatusArchive {
+export enum StatusArchiveAndHistory {
   APPROVED = 'Đã phê duyệt',
+  NOT_APPROVED = 'Chưa phê duyệt',
 }

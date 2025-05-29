@@ -1,0 +1,47 @@
+[
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "title": "AI Overview",
+    "author_name": "Nguyễn Văn A",
+    "type": "Article",
+    "created_at": "01/05/2025 10:00:00",
+    "operation_date": "05/05/2025 14:30:00",
+    "status": "Đã phê duyệt"
+  },
+  {
+    "id": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+    "title": "Health Tips 2025",
+    "author_name": "Trần Thị B",
+    "type": "Report",
+    "created_at": "03/05/2025 09:15:00",
+    "operation_date": "07/05/2025 11:45:00",
+    "status": "Chưa phê duyệt"
+  },
+  {
+    "id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+    "title": "E-Learning Trends",
+    "author_name": "Lê Văn C",
+    "type": "Article",
+    "created_at": "10/05/2025 15:20:00",
+    "operation_date": "15/05/2025 16:10:00",
+    "status": "Đã phê duyệt"
+  },
+  {
+    "id": "8d9f778a-8536-42ef-a5cc-1128d30b2b29",
+    "title": "Green Living Guide",
+    "author_name": "Phạm Thị D",
+    "type": "Report",
+    "created_at": "18/05/2025 12:30:00",
+    "operation_date": "20/05/2025 09:00:00",
+    "status": "Chưa phê duyệt"
+  },
+  {
+    "id": "9eab889b-9647-43f0-b6dd-2239e41c3c3a",
+    "title": "Travel Destinations",
+    "author_name": "Hoàng Văn E",
+    "type": "Article",
+    "created_at": "25/05/2025 08:45:00",
+    "operation_date": "29/05/2025 11:00:00",
+    "status": "Đã phê duyệt"
+  }
+]

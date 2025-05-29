@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import useViewport from '@/hooks/useViewport';
 
 type DateRangePickerProps = {
   className?: string;
@@ -14,6 +15,8 @@ type DateRangePickerProps = {
 };
 
 export function DateRangePicker({ className, value, onChange }: DateRangePickerProps) {
+  const { width } = useViewport();
+
   return (
     <div className={cn('grid gap-2', className)}>
       <Popover>
@@ -37,7 +40,13 @@ export function DateRangePicker({ className, value, onChange }: DateRangePickerP
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0 mt-[100px]" align="start" side="bottom">
+        <PopoverContent
+          className="w-auto p-0"
+          align="end"
+          side="bottom"
+          sideOffset={width <= 640 ? -300 : 4}
+          alignOffset={width <= 640 ? -20 : 0}
+        >
           <Calendar
             initialFocus
             mode="range"
