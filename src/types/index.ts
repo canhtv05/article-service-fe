@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 import { LucideIcon } from 'lucide-react';
 import type { ComponentType, Dispatch, ReactElement, ReactNode, SetStateAction } from 'react';
 
 export type LayoutComponent = ComponentType<{ children: ReactNode }>;
 
-export type RouteComponent = ComponentType<unknown>;
+export type RouteComponent = ComponentType<{}>;
 
 export type DialogLinkProps = {
   children: React.ReactNode;
@@ -364,4 +365,44 @@ export type AdminApproveArticleContextType = {
   handleFilters: VoidFunction;
   valueFilter: AdminApproveArticleFilterType;
   setValueFilter: Dispatch<SetStateAction<AdminApproveArticleFilterType>>;
+};
+
+export type AdminArchiveType = {
+  id: string;
+  title: string;
+  topic_name: string;
+  author_name: string;
+  status: string;
+  campaign_name: number;
+  approval_date: string;
+};
+
+export type AdminArchiveFilterType = {
+  title: string;
+  id_author: string;
+  author_name: string;
+  campaign_period: string;
+  topic: string;
+};
+
+export type AdminArchiveContextType = {
+  data: AdminArchiveType[] | undefined;
+  setData: Dispatch<SetStateAction<AdminArchiveType[] | undefined>>;
+  isLoading: boolean;
+  error: unknown;
+  titlesTable: string[];
+  tooltips: {
+    content: string;
+    icon: LucideIcon;
+    type: string;
+    className: string;
+  }[];
+  currentPage: number;
+  setCurrentPage: Dispatch<SetStateAction<number>>;
+  perPage: string;
+  setPerPage: Dispatch<SetStateAction<string>>;
+  handleClearFields: VoidFunction;
+  handleFilters: VoidFunction;
+  valueFilter: AdminArchiveFilterType;
+  setValueFilter: Dispatch<SetStateAction<AdminArchiveFilterType>>;
 };

@@ -18,7 +18,8 @@ const AdminChart = lazy(() => import('@/pages/admin/AdminChart'));
 const AdminRegistrationPeriod = lazy(() => import('@/pages/admin/AdminRegistrationPeriod'));
 const AdminRegistrationPeriodDetail = lazy(() => import('@/pages/admin/AdminRegistrationPeriodDetail'));
 const AdminRegistrationPeriodChild = lazy(() => import('@/pages/admin/AdminRegistrationPeriodChild'));
-const ApproveArticle = lazy(() => import('@/pages/admin/ApproveArticle'));
+const AdminApproveArticle = lazy(() => import('@/pages/admin/AdminApproveArticle'));
+const AdminArchive = lazy(() => import('@/pages/admin/AdminArchive'));
 
 const RegisterWrite = lazy(() => import('@/pages/user/UserRegisterWrite'));
 
@@ -83,7 +84,11 @@ const privateRoutes = [
   },
   {
     path: configs.routes.admin.approveArticle,
-    component: ApproveArticle,
+    component: AdminApproveArticle,
+  },
+  {
+    path: configs.routes.admin.archive,
+    component: AdminArchive,
   },
   {
     path: configs.routes.user.registerWrite,
