@@ -12,11 +12,13 @@ const ViewArticle = lazy(() => import('@/components/pr/ViewArticle'));
 const PRStaffs = lazy(() => import('@/pages/pr/PRStaffs'));
 const PRAssignedStaff = lazy(() => import('@/components/pr/PRAssignedStaff'));
 
+const ModalAddUserToCampaign = lazy(() => import('@/components/admin/ModalAddUserToCampaign'));
+const AdminModalApproveArticle = lazy(() => import('@/components/admin/AdminModalApproveArticle'));
 const AdminChart = lazy(() => import('@/pages/admin/AdminChart'));
 const AdminRegistrationPeriod = lazy(() => import('@/pages/admin/AdminRegistrationPeriod'));
 const AdminRegistrationPeriodDetail = lazy(() => import('@/pages/admin/AdminRegistrationPeriodDetail'));
 const AdminRegistrationPeriodChild = lazy(() => import('@/pages/admin/AdminRegistrationPeriodChild'));
-const ModalAddUserToCampaign = lazy(() => import('@/components/admin/ModalAddUserToCampaign'));
+const ApproveArticle = lazy(() => import('@/pages/admin/ApproveArticle'));
 
 const RegisterWrite = lazy(() => import('@/pages/user/UserRegisterWrite'));
 
@@ -80,6 +82,10 @@ const privateRoutes = [
     component: AdminRegistrationPeriodChild,
   },
   {
+    path: configs.routes.admin.approveArticle,
+    component: ApproveArticle,
+  },
+  {
     path: configs.routes.user.registerWrite,
     component: RegisterWrite,
   },
@@ -93,6 +99,10 @@ const modals = [
   {
     path: configs.routes.modals.viewArticle,
     component: ViewArticle,
+  },
+  {
+    path: configs.routes.modals.approveArticle,
+    component: AdminModalApproveArticle,
   },
   {
     path: configs.routes.modals.addUsersToCampaign,

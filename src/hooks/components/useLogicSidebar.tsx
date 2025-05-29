@@ -10,7 +10,9 @@ const useLogicSidebar = () => {
 
   const [menus, setMenus] = useState<MenuSidebarChildType[]>([]);
   useEffect(() => {
-    const res = menusSidebar.find((menu) => pathname.includes(menu.type));
+    const res = menusSidebar.find((menu) => {
+      return pathname.startsWith(`/${menu.type}`);
+    });
     setMenus(res?.children ?? []);
   }, [pathname]);
 

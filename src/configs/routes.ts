@@ -18,6 +18,7 @@ const routes = {
     registrationPeriod: '/admin/registration-period',
     registrationPeriodDetail: '/admin/registration-period/detail/:id',
     registrationPeriodChild: '/admin/registration-period/child/:id',
+    approveArticle: '/admin/approve-article',
   },
   user: {
     registerWrite: '/user/register-to-write',
@@ -28,6 +29,7 @@ const routes = {
   modals: {
     viewArticle: '/view/articles/:id',
     addUsersToCampaign: '/add/users-to-campaign/:id',
+    approveArticle: '/approve-article/:id',
   },
 };
 

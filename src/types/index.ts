@@ -1,5 +1,5 @@
 import { LucideIcon } from 'lucide-react';
-import type { ComponentType, Dispatch, ReactNode, SetStateAction } from 'react';
+import type { ComponentType, Dispatch, ReactElement, ReactNode, SetStateAction } from 'react';
 
 export type LayoutComponent = ComponentType<{ children: ReactNode }>;
 
@@ -10,6 +10,7 @@ export type DialogLinkProps = {
   title: string;
   outline?: boolean;
   open: boolean;
+  component?: ReactElement;
 };
 
 export type MenuAuthorSwitchType = {
@@ -323,4 +324,44 @@ export type AddUserToCampaignType = {
   topic_name: string;
   number_of_articles: number;
   id: string;
+};
+
+export type AdminApproveArticleType = {
+  id: string;
+  title: string;
+  author_name: string;
+  topic_name: string;
+  created_at: string;
+  status: string;
+  campaign_period: string;
+};
+
+export type AdminApproveArticleFilterType = {
+  topic_name_and_author_name: string;
+  campaign_period: string;
+  start_date: string;
+  end_date: string;
+  topic_name: string;
+};
+
+export type AdminApproveArticleContextType = {
+  data: AdminApproveArticleType[] | undefined;
+  setData: Dispatch<SetStateAction<AdminApproveArticleType[] | undefined>>;
+  isLoading: boolean;
+  error: unknown;
+  titlesTable: string[];
+  tooltips: {
+    content: string;
+    icon: LucideIcon;
+    type: string;
+    className: string;
+  }[];
+  currentPage: number;
+  setCurrentPage: Dispatch<SetStateAction<number>>;
+  perPage: string;
+  setPerPage: Dispatch<SetStateAction<string>>;
+  handleClearFields: VoidFunction;
+  handleFilters: VoidFunction;
+  valueFilter: AdminApproveArticleFilterType;
+  setValueFilter: Dispatch<SetStateAction<AdminApproveArticleFilterType>>;
 };
