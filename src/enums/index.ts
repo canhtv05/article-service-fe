@@ -37,3 +37,7 @@ export enum StatusRegistration {
   OPEN = 'Mở đăng ký',
   CLOSE = 'Đóng đăng ký',
 }
+
+export enum StatusApproveArticle {
+  PENDING = 'Chờ phê duyệt',
+}

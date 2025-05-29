@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
 
-import { Status, StatusRegistration, StatusSend } from '@/enums';
+import { Status, StatusApproveArticle, StatusRegistration, StatusSend } from '@/enums';
 import RenderIf from './RenderIf';
 import { Badge } from './ui/badge';
 
@@ -42,6 +42,11 @@ const StatusBadge = ({ status }: { status: Status | string }) => {
       <RenderIf value={status === StatusRegistration.CLOSE}>
         <Badge className="bg-amber-600/10 dark:bg-amber-600/20 hover:bg-amber-600/10 text-amber-500 border-amber-600/60 shadow-none rounded-full">
           {StatusRegistration.CLOSE}
+        </Badge>
+      </RenderIf>
+      <RenderIf value={status === StatusApproveArticle.PENDING}>
+        <Badge className="bg-amber-600/10 dark:bg-amber-600/20 hover:bg-amber-600/10 text-amber-500 border-amber-600/60 shadow-none rounded-full">
+          {s}
         </Badge>
       </RenderIf>
     </Fragment>

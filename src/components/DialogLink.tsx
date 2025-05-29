@@ -4,7 +4,7 @@ import { memo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { DialogLinkProps } from '@/types';
 
-function DialogLink({ children, title, outline = false, open }: DialogLinkProps) {
+function DialogLink({ children, title, outline = false, open, component }: DialogLinkProps) {
   const navigate = useNavigate();
 
   const handleClose = () => {
@@ -20,7 +20,10 @@ function DialogLink({ children, title, outline = false, open }: DialogLinkProps)
         `}
       >
         <DialogHeader className="border-b-1 border-foreground/20 py-2">
-          <DialogTitle className="text-lg font-semibold text-foreground">{title}</DialogTitle>
+          <DialogTitle className="text-lg font-semibold text-foreground flex md:flex-row flex-col">
+            <span className="text-left">{title}</span>
+            {component}
+          </DialogTitle>
           <DialogDescription className="sr-only">Dialog for viewing article details</DialogDescription>
         </DialogHeader>
         <div className="px-4 overflow-auto max-h-[80vh]">{children}</div>

@@ -5,8 +5,9 @@ import MarkdownRenderer from '../MarkdownRender';
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 import RenderIf from '../RenderIf';
+import { ReactElement } from 'react';
 
-const ViewArticle = () => {
+const ViewArticle = ({ component }: { component?: ReactElement }) => {
   const { data, isLoading } = useQuery({
     queryKey: ['markdown'],
     queryFn: async () => {
@@ -16,10 +17,10 @@ const ViewArticle = () => {
   });
 
   return (
-    <DialogLink open={true} title="Xem bài viết" outline>
+    <DialogLink open={true} title="Xem bài viết" outline component={component}>
       <RenderIf value={!isLoading}>
-        <div className="flex justify-between items-start">
-          <div className="flex items-center gap-2">
+        <div className="flex md:flex-row flex-col justify-between items-start">
+          <div className="flex gap-2">
             <div className="flex justify-center">
               <Avatar className="size-[45px]">
                 <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
@@ -31,7 +32,7 @@ const ViewArticle = () => {
               <span className="font-medium text-foreground/60 text-[14px]">17/10/2005 17:10</span>
             </div>
           </div>
-          <div className="flex md:flex-row flex-col md:items-start items-end gap-2">
+          <div className="flex flex-col justify-end items-end gap-2 md:w-auto w-full md:mt-0 mt-2">
             <Badge className="bg-emerald-600/10 dark:bg-emerald-600/20 hover:bg-emerald-600/10 text-emerald-500 border-emerald-600/60 shadow-none rounded-full">
               Tháng 10 (01/10/2005 - 30/10/2005)
             </Badge>
