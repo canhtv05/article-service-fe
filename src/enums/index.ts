@@ -41,3 +41,7 @@ export enum StatusRegistration {
 export enum StatusApproveArticle {
   PENDING = 'Chờ phê duyệt',
 }
+
+export enum StatusArchive {
+  APPROVED = 'Đã phê duyệt',
+}

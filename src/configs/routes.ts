@@ -19,6 +19,7 @@ const routes = {
     registrationPeriodDetail: '/admin/registration-period/detail/:id',
     registrationPeriodChild: '/admin/registration-period/child/:id',
     approveArticle: '/admin/approve-article',
+    archive: '/admin/archive',
   },
   user: {
     registerWrite: '/user/register-to-write',

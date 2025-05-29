@@ -5,7 +5,7 @@ import useViewport from '@/hooks/useViewport';
 import { cn } from '@/lib/utils';
 import { useSelector } from 'react-redux';
 
-const ApproveArticle = () => {
+const AdminApproveArticle = () => {
   const { width } = useViewport();
   const open = useSelector((state: { sidebar: { isOpen: boolean } }) => state.sidebar.isOpen);
   const maxWidth = open || width < 768 ? '100%' : `${width - 300}px`;
@@ -27,4 +27,4 @@ const ApproveArticle = () => {
   );
 };
 
-export default ApproveArticle;
+export default AdminApproveArticle;
