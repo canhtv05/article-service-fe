@@ -22,7 +22,8 @@ const AdminApproveArticle = lazy(() => import('@/pages/admin/AdminApproveArticle
 const AdminArchive = lazy(() => import('@/pages/admin/AdminArchive'));
 const AdminApprovalHistory = lazy(() => import('@/pages/admin/AdminApprovalHistory'));
 
-const RegisterWrite = lazy(() => import('@/pages/user/UserRegisterWrite'));
+const UserRegisterWrite = lazy(() => import('@/pages/user/UserRegisterWrite'));
+const UserRegisterWriteDetail = lazy(() => import('@/pages/user/UserRegisterWriteDetail'));
 
 const StaffListArticles = lazy(() => import('@/pages/staff'));
 
@@ -97,7 +98,11 @@ const privateRoutes = [
   },
   {
     path: configs.routes.user.registerWrite,
-    component: RegisterWrite,
+    component: UserRegisterWrite,
+  },
+  {
+    path: configs.routes.user.registerWriteID,
+    component: UserRegisterWriteDetail,
   },
   {
     path: configs.routes.staff.listArticles,

@@ -445,3 +445,40 @@ export type AdminApprovalHistoryContextType = {
   valueFilter: AdminApprovalHistoryFilterType;
   setValueFilter: Dispatch<SetStateAction<AdminApprovalHistoryFilterType>>;
 };
+
+export type UserRegisterWriteType = {
+  id: string;
+  campaign_period: string;
+  time: string;
+  topic_registered: number;
+  status: string;
+};
+
+export type UserRegisterWriteFilterType = {
+  name_or_id: string;
+  status: string;
+  start_date: string;
+  end_date: string;
+};
+
+export type UserRegisterWriteContextType = {
+  data: UserRegisterWriteType[] | undefined;
+  setData: Dispatch<SetStateAction<UserRegisterWriteType[] | undefined>>;
+  isLoading: boolean;
+  error: unknown;
+  titlesTable: string[];
+  tooltips: {
+    content: string;
+    icon: LucideIcon;
+    type: string;
+    className: string;
+  }[];
+  currentPage: number;
+  setCurrentPage: Dispatch<SetStateAction<number>>;
+  perPage: string;
+  setPerPage: Dispatch<SetStateAction<string>>;
+  handleClearFields: VoidFunction;
+  handleFilters: VoidFunction;
+  valueFilter: UserRegisterWriteFilterType;
+  setValueFilter: Dispatch<SetStateAction<UserRegisterWriteFilterType>>;
+};

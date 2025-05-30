@@ -24,6 +24,7 @@ const routes = {
   },
   user: {
     registerWrite: '/user/register-to-write',
+    registerWriteID: '/user/register-to-write/:id',
   },
   staff: {
     listArticles: '/staff/list-articles',

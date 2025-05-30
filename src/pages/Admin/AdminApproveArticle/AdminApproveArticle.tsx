@@ -3,6 +3,7 @@ import AdminFilterApproveArticleProvider from '@/components/admin/AdminFilterApp
 import AdminApproveArticleProvider from '@/contexts/provider/admin/AdminApproveArticleProvider';
 import useViewport from '@/hooks/useViewport';
 import { cn } from '@/lib/utils';
+import { List } from 'lucide-react';
 import { useSelector } from 'react-redux';
 
 const AdminApproveArticle = () => {
@@ -20,7 +21,15 @@ const AdminApproveArticle = () => {
           )}
           style={{ maxWidth }}
         >
-          <AdminApproveArticleWithPagination />
+          <div className="flex flex-col gap-4 rounded-xl shadow-md p-5 text-foreground h-full">
+            <div className="flex gap-3 items-center justify-between mb-10">
+              <div className="flex gap-3 items-center">
+                <List />
+                <span className="text-foreground text-[18px]">Phê duyệt bài viết</span>
+              </div>
+            </div>
+            <AdminApproveArticleWithPagination />
+          </div>
         </div>
       </div>
     </AdminApproveArticleProvider>

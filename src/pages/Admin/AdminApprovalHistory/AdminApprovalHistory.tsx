@@ -3,6 +3,7 @@ import AdminFilterApprovalHistoryProvider from '@/components/admin/AdminFilterAp
 import AdminApprovalHistoryProvider from '@/contexts/provider/admin/AdminApprovalHistoryProvider';
 import useViewport from '@/hooks/useViewport';
 import { cn } from '@/lib/utils';
+import { List } from 'lucide-react';
 import { useSelector } from 'react-redux';
 
 const AdminApprovalHistory = () => {
@@ -20,7 +21,15 @@ const AdminApprovalHistory = () => {
           )}
           style={{ maxWidth }}
         >
-          <AdminApprovalHistoryWithPagination />
+          <div className="flex flex-col gap-4 rounded-xl shadow-md p-5 text-foreground h-full">
+            <div className="flex gap-3 items-center justify-between mb-10">
+              <div className="flex gap-3 items-center">
+                <List />
+                <span className="text-foreground text-[18px]">Lịch sử phê duyệt</span>
+              </div>
+            </div>
+            <AdminApprovalHistoryWithPagination />
+          </div>
         </div>
       </div>
     </AdminApprovalHistoryProvider>
