@@ -1,0 +1,37 @@
+[
+  {
+    "id": "f1a2b3c4-d5e6-4f78-a9b0-c1d2e3f4a5b6",
+    "campaign_period": "Đợt 01/10/2025 - 31/10/2025",
+    "time": "01/10/2025 00:00:00 - 31/10/2025 23:59:59",
+    "topic_registered": 8,
+    "status": "Mở đăng ký"
+  },
+  {
+    "id": "a2b3c4d5-e6f7-5a89-b0c1-d2e3f4a5b6c7",
+    "campaign_period": "Đợt 01/11/2025 - 30/11/2025",
+    "time": "01/11/2025 00:00:00 - 30/11/2025 23:59:59",
+    "topic_registered": 12,
+    "status": "Mở đăng ký"
+  },
+  {
+    "id": "b3c4d5e6-f7a8-6b90-c1d2-e3f4a5b6c7d8",
+    "campaign_period": "Đợt 01/12/2025 - 31/12/2025",
+    "time": "01/12/2025 00:00:00 - 31/12/2025 23:59:59",
+    "topic_registered": 6,
+    "status": "Mở đăng ký"
+  },
+  {
+    "id": "c4d5e6f7-a8b9-7c01-d2e3-f4a5b6c7d8e9",
+    "campaign_period": "Đợt 01/01/2026 - 31/01/2026",
+    "time": "01/01/2026 00:00:00 - 31/01/2026 23:59:59",
+    "topic_registered": 10,
+    "status": "Mở đăng ký"
+  },
+  {
+    "id": "d5e6f7a8-b9c0-8d12-e3f4-a5b6c7d8e9f0",
+    "campaign_period": "Đợt 01/02/2026 - 28/02/2026",
+    "time": "01/02/2026 00:00:00 - 28/02/2026 23:59:59",
+    "topic_registered": 15,
+    "status": "Mở đăng ký"
+  }
+]
