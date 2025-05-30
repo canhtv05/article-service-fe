@@ -71,10 +71,11 @@ const UserRegisterWriteDetail = () => {
               <label
                 key={name}
                 htmlFor={name}
-                className="flex items-center gap-2 p-3 bg-ring rounded-md cursor-pointer break-words"
+                className="flex items-center gap-2 p-3 bg-ring/20 rounded-md cursor-pointer break-words"
               >
                 <Checkbox
                   id={name}
+                  value={name}
                   checked={isChecked}
                   onCheckedChange={(checked) => {
                     if (checked) {

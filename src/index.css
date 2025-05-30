@@ -203,11 +203,28 @@
   }
 
   body {
-    @apply bg-background text-foreground font-geist !pointer-events-auto;
+    @apply bg-background text-foreground/50 font-geist font-normal !pointer-events-auto;
   }
 
   img {
     @apply rounded-sm object-contain;
+  }
+
+  body:not(.dark):not(.light) {
+    visibility: hidden;
+  }
+
+  .w-md-editor-toolbar {
+    background-color: var(--background) !important;
+  }
+
+  .w-md-editor-preview {
+    background-color: var(--background) !important;
+  }
+
+  .wmde-markdown.wmde-markdown-color {
+    padding: 10px !important;
+    border-radius: 8px !important;
   }
 
   * {

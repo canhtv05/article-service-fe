@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import useLocalStorage from './useLocalStorage';
 
 export default function useTheme() {
@@ -11,19 +10,16 @@ export default function useTheme() {
     document.body.classList.add(String(initialTheme));
   }
 
-  const [theme, setTheme] = useState(initialTheme);
-
   const toggleTheme = () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(newTheme);
+    const newTheme = initialTheme === 'dark' ? 'light' : 'dark';
+
     setStorage({ theme: newTheme });
 
-    document.body.classList.remove('light', 'dark');
-    document.body.classList.add(newTheme);
+    window.location.reload();
   };
 
   return {
-    theme,
+    theme: initialTheme,
     toggleTheme,
   };
 }
