@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import {
   Pagination,
@@ -20,6 +20,7 @@ import StatusBadge from '../StatusBadge';
 import { useAdminApprovalHistoryContext } from '@/contexts/context/admin/AdminApprovalHistoryContext';
 
 const AdminApprovalHistoryWithPagination = () => {
+  const location = useLocation();
   const adminApprovalHistory = useAdminApprovalHistoryContext();
 
   // Tính toán phân trang

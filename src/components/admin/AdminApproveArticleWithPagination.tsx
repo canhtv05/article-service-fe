@@ -110,18 +110,16 @@ const AdminApproveArticleWithPagination = () => {
                       <div className="flex gap-4">
                         {adminApproveArticle?.tooltips.map((item, idx) => (
                           <Fragment key={idx}>
-                            <RenderIf value={item.type === 'approve_article'}>
-                              <Link
-                                to={`/approve-article/${approve.id}`}
-                                className="cursor-pointer"
-                                state={{ background: location }}
-                              >
-                                <Tooltip
-                                  toolTipContent={item.content}
-                                  toolTipTrigger={<item.icon className={item.className} />}
-                                />
-                              </Link>
-                            </RenderIf>
+                            <Link
+                              to={`/approve-article/${approve.id}`}
+                              className="cursor-pointer"
+                              state={{ background: location }}
+                            >
+                              <Tooltip
+                                toolTipContent={item.content}
+                                toolTipTrigger={<item.icon className={item.className} />}
+                              />
+                            </Link>
                           </Fragment>
                         ))}
                       </div>
