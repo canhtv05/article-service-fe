@@ -1,0 +1,42 @@
+[
+  {
+    "id": "f1a2b3c4-d5e6-4f78-a9b0-c1d2e3f4a5b6",
+    "title": "AI Fundamentals",
+    "topic": "Technology",
+    "created_at": 1759286400000,
+    "campaign_period": "Đợt 01/10/2025 - 31/10/2025",
+    "status": "Đã đăng"
+  },
+  {
+    "id": "a2b3c4d5-e6f7-5a89-b0c1-d2e3f4a5b6c7",
+    "title": "Mental Health Awareness",
+    "topic": "Health",
+    "created_at": 1761964800000,
+    "campaign_period": "Đợt 01/11/2025 - 30/11/2025",
+    "status": "Đã đăng"
+  },
+  {
+    "id": "b3c4d5e6-f7a8-6b90-c1d2-e3f4a5b6c7d8",
+    "title": "Digital Learning Tools",
+    "topic": "Education",
+    "created_at": 1764556800000,
+    "campaign_period": "Đợt 01/12/2025 - 31/12/2025",
+    "status": "Đã đăng"
+  },
+  {
+    "id": "c4d5e6f7-a8b9-7c01-d2e3-f4a5b6c7d8e9",
+    "title": "Sustainable Practices",
+    "topic": "Lifestyle",
+    "created_at": 1767235200000,
+    "campaign_period": "Đợt 01/01/2026 - 31/01/2026",
+    "status": "Đã đăng"
+  },
+  {
+    "id": "d5e6f7a8-b9c0-8d12-e3f4-a5b6c7d8e9f0",
+    "title": "Hidden Gems in Asia",
+    "topic": "Travel",
+    "created_at": 1769827200000,
+    "campaign_period": "Đợt 01/02/2026 - 28/02/2026",
+    "status": "Đã đăng"
+  }
+]

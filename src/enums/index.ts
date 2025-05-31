@@ -46,3 +46,9 @@ export enum StatusArchiveAndHistory {
   APPROVED = 'Đã phê duyệt',
   NOT_APPROVED = 'Chưa phê duyệt',
 }
+
+export enum StatusArticle {
+  POSTED = 'Đã đăng',
+  PENDING = 'Chưa đăng',
+  NOT_POSTED = 'Không đăng',
+}

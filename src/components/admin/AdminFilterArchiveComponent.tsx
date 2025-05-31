@@ -70,7 +70,7 @@ const AdminFilterArchiveComponent = () => {
 
       <div className="flex flex-col justify-end">
         <Label htmlFor="campaign_period" className="font-bold mb-2 leading-5">
-          Chủ đề bài viết:
+          Đợt viết bài:
         </Label>
         <FieldsSelect
           id="campaign_period"

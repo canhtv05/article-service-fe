@@ -25,6 +25,7 @@ const AdminApprovalHistory = lazy(() => import('@/pages/admin/AdminApprovalHisto
 const UserRegisterWrite = lazy(() => import('@/pages/user/UserRegisterWrite'));
 const UserRegisterWriteDetail = lazy(() => import('@/pages/user/UserRegisterWriteDetail'));
 const UserCreateArticle = lazy(() => import('@/pages/user/UserCreateArticle'));
+const UserListArticles = lazy(() => import('@/pages/user/UserListArticles'));
 
 const StaffListArticles = lazy(() => import('@/pages/staff'));
 
@@ -108,6 +109,10 @@ const privateRoutes = [
   {
     path: configs.routes.user.createArticle,
     component: UserCreateArticle,
+  },
+  {
+    path: configs.routes.user.listArticle,
+    component: UserListArticles,
   },
   {
     path: configs.routes.staff.listArticles,

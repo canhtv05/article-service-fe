@@ -482,3 +482,42 @@ export type UserRegisterWriteContextType = {
   valueFilter: UserRegisterWriteFilterType;
   setValueFilter: Dispatch<SetStateAction<UserRegisterWriteFilterType>>;
 };
+
+export type UserListArticlesType = {
+  id: string;
+  title: string;
+  topic: string;
+  created_at: number;
+  campaign_period: string;
+  status: string;
+};
+
+export type UserListArticlesFilterType = Pick<
+  UserListArticlesType,
+  'title' | 'topic' | 'campaign_period' | 'status'
+> & {
+  start_date: string;
+  end_date: string;
+};
+
+export type UserListArticlesContextType = {
+  data: UserListArticlesType[] | undefined;
+  setData: Dispatch<SetStateAction<UserListArticlesType[] | undefined>>;
+  isLoading: boolean;
+  error: unknown;
+  titlesTable: string[];
+  tooltips: {
+    content: string;
+    icon: LucideIcon;
+    type: string;
+    className: string;
+  }[];
+  currentPage: number;
+  setCurrentPage: Dispatch<SetStateAction<number>>;
+  perPage: string;
+  setPerPage: Dispatch<SetStateAction<string>>;
+  handleClearFields: VoidFunction;
+  handleFilters: VoidFunction;
+  valueFilter: UserListArticlesFilterType;
+  setValueFilter: Dispatch<SetStateAction<UserListArticlesFilterType>>;
+};
