@@ -1,4 +1,9 @@
+import DialogCustom from '@/components/DialogCustom';
+import FieldsSelect from '@/components/FieldsSelect';
+import UploadImage from '@/components/UploadImage';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import useTheme from '@/hooks/useTheme';
 import useViewport from '@/hooks/useViewport';
 import { useQuery } from '@tanstack/react-query';
@@ -6,6 +11,72 @@ import MDEditor from '@uiw/react-md-editor';
 import axios from 'axios';
 import { List } from 'lucide-react';
 import { useEffect, useState } from 'react';
+
+const Example = () => {
+  // dependent select
+  const [selectedA, setSelectedA] = useState('');
+  const [selectedB, setSelectedB] = useState('');
+
+  const dataA = [
+    { label: 'Fruits', value: 'fruits' },
+    { label: 'Vehicles', value: 'vehicles' },
+  ];
+
+  const optionsMap: Record<string, { label: string; value: string }[]> = {
+    fruits: [
+      { label: 'Apple', value: 'apple' },
+      { label: 'Banana', value: 'banana' },
+    ],
+    vehicles: [
+      { label: 'Car', value: 'car' },
+      { label: 'Bike', value: 'bike' },
+    ],
+  };
+
+  const dataB = selectedA ? optionsMap[selectedA] || [] : [];
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col justify-end">
+        <Label htmlFor="title" className="font-bold mb-2 leading-5">
+          Tiêu đề bài viết:
+        </Label>
+        <Input id="title" type="text" placeholder="Tiêu đề bài viết" value={''} onChange={() => console.log(1)} />
+      </div>
+      <div className="flex flex-col justify-end">
+        <Label htmlFor="campaign_period" className="font-bold mb-2 leading-5">
+          Đợt viết bài:
+        </Label>
+        <FieldsSelect
+          id="campaign_period"
+          data={dataA}
+          placeholder="Chọn đợt viết bài"
+          label="Đợt viết bài"
+          value={selectedA}
+          setValue={(val) => {
+            setSelectedA(val);
+            setSelectedB('');
+          }}
+        />
+      </div>
+      <div className="flex flex-col justify-end">
+        <Label htmlFor="topic" className="font-bold mb-2 leading-5">
+          Chủ đề:
+        </Label>
+        <FieldsSelect
+          id="topic"
+          data={dataB}
+          placeholder="Chọn chủ đề"
+          label="Chủ đề"
+          value={selectedB}
+          setValue={setSelectedB}
+          resetValue={!selectedA}
+        />
+      </div>
+      <UploadImage />
+    </div>
+  );
+};
 
 const UserCreateArticle = () => {
   const { height } = useViewport();
@@ -43,9 +114,16 @@ const UserCreateArticle = () => {
         <span className="text-foreground/30 text-sm">Ký tự: {markdown.trim().length}</span>
         <div className="flex gap-2 flex-1 justify-end">
           <Button variant={'outline'}>Tải bài lên</Button>
-          <Button customize={'default'} disabled={markdown.trim().length < 20}>
-            Đăng bài
-          </Button>
+          <DialogCustom
+            onContinue={() => console.log(1)}
+            title="Đăng bài viết"
+            triggerComponent={
+              <Button customize={'default'} disabled={markdown.trim().length < 20}>
+                Đăng bài
+              </Button>
+            }
+            component={<Example />}
+          />
         </div>
       </div>
       <MDEditor
