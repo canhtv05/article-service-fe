@@ -18,6 +18,7 @@ import Tooltip from '../Tooltip';
 import { useAdminApproveArticleContext } from '@/contexts/context/admin/AdminApproveArticleContext';
 import StatusBadge from '../StatusBadge';
 import { formatDateTime } from '@/lib/utils';
+import { AdminApproveArticleFilterType } from '@/types';
 
 const AdminApproveArticleWithPagination = () => {
   const navigate = useNavigate();
@@ -58,8 +59,29 @@ const AdminApproveArticleWithPagination = () => {
   const handlePageChange = (page: number) => {
     if (adminApproveArticle?.setCurrentPage && page >= 1 && page <= totalPages) {
       adminApproveArticle.setCurrentPage(page);
-      navigate(`/admin/approve-article?page=${page}&size=${adminApproveArticle.perPage}`, { replace: true });
+
+      const queryString = buildSearchParamsWithFilters(
+        page,
+        Number(adminApproveArticle.perPage),
+        adminApproveArticle.valueFilter,
+      );
+
+      navigate(`/admin/approve-article?${queryString}`, { replace: true });
     }
+  };
+
+  const buildSearchParamsWithFilters = (page: number, size: number, filters: AdminApproveArticleFilterType) => {
+    const params = new URLSearchParams();
+
+    params.set('page', String(page));
+    params.set('size', String(size));
+
+    if (filters.titleAndAuthorName) params.set('titleAndAuthorName', filters.titleAndAuthorName);
+    if (filters.campaignName) params.set('campaignName', filters.campaignName);
+    if (filters.startDate) params.set('startDate', filters.startDate);
+    if (filters.endData) params.set('endDate', filters.endData);
+
+    return params.toString();
   };
 
   return (
@@ -169,7 +191,10 @@ const AdminApproveArticleWithPagination = () => {
                 if (adminApproveArticle?.setPerPage && adminApproveArticle?.setCurrentPage) {
                   adminApproveArticle.setPerPage(val);
                   adminApproveArticle.setCurrentPage(1);
-                  navigate(`/admin/approve-article?page=1&size=${val}`, {
+
+                  const queryString = buildSearchParamsWithFilters(1, Number(val), adminApproveArticle.valueFilter);
+
+                  navigate(`/admin/approve-article?${queryString}`, {
                     replace: true,
                   });
                 }
