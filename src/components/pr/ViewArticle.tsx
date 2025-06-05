@@ -2,16 +2,17 @@ import DialogLink from '../DialogLink';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Badge } from '../ui/badge';
 import MarkdownRenderer from '../MarkdownRender';
-import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 import RenderIf from '../RenderIf';
 import { ReactElement } from 'react';
+import { httpRequest } from '@/utils/httpRequest';
+import { formatDateTime } from '@/lib/utils';
 
-const ViewArticle = ({ component }: { component?: ReactElement }) => {
+const ViewArticle = ({ component, id }: { component?: ReactElement; id: string }) => {
   const { data, isLoading } = useQuery({
-    queryKey: ['markdown'],
+    queryKey: [`/admin/bai-viet/chi-tiet/${id}`],
     queryFn: async () => {
-      const response = await axios.get('/markdown.md');
+      const response = await httpRequest.get(`/admin/bai-viet/chi-tiet/${id}`);
       return response.data;
     },
   });
@@ -24,28 +25,32 @@ const ViewArticle = ({ component }: { component?: ReactElement }) => {
             <div className="flex justify-center">
               <Avatar className="size-[45px]">
                 <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                <AvatarFallback>CN</AvatarFallback>
+                <AvatarFallback>{data?.authorName}</AvatarFallback>
               </Avatar>
             </div>
             <div className="flex flex-col justify-center items-start">
-              <span className="font-semibold text-[14px] text-foreground/80">ShadCN PH123456</span>
-              <span className="font-medium text-foreground/60 text-[14px]">17/10/2005 17:10</span>
+              <span className="font-semibold text-[14px] text-foreground/80">{data?.authorName}</span>
+              <span className="font-medium text-foreground/60 text-[14px]">
+                {data?.createdAt && (
+                  <RenderIf value={true}>{formatDateTime(data.createdAt, 'dd/MM/yyyy HH:mm:ss')}</RenderIf>
+                )}
+              </span>
             </div>
           </div>
           <div className="flex flex-col justify-end items-end gap-2 md:w-auto w-full md:mt-0 mt-2">
             <Badge className="bg-emerald-600/10 dark:bg-emerald-600/20 hover:bg-emerald-600/10 text-emerald-500 border-emerald-600/60 shadow-none rounded-full">
-              Tháng 10 (01/10/2005 - 30/10/2005)
+              Tháng 10 (01/10/2025 - 30/10/2025)
             </Badge>
             <span className="text-[12px] border p-2 break-words max-w-[300px] bg-emerald-600/10 dark:bg-emerald-600/20 hover:bg-emerald-600/10 text-emerald-500 border-emerald-600/60 shadow-none rounded-lg">
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nisi rem quasi illum. Cupiditate maxime sint rem
+              {data?.campaignName}
             </span>
           </div>
         </div>
 
-        <div className="flex flex-col mt-5 font-bold">Tương Lai Công Nghệ Xanh</div>
+        <div className="flex flex-col mt-5 font-bold">{data?.title}</div>
 
         <div className="w-full mt-4">
-          <MarkdownRenderer>{data}</MarkdownRenderer>
+          <MarkdownRenderer>{data?.content}</MarkdownRenderer>
         </div>
       </RenderIf>
       <RenderIf value={isLoading}>
