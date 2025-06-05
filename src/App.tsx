@@ -9,10 +9,12 @@ import { modals, privateRoutes, publicRoutes } from './routers/router';
 import useTheme from './hooks/useTheme';
 import ScrollToTop from './components/ScrollToTop';
 import { Toaster } from '@/components/ui/sonner';
+import { useMyInfo } from './hooks/useMyInfo';
 // import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 function App() {
   useTheme();
+  useMyInfo();
   const location = useLocation();
   const background = location.state && location.state.background;
 
@@ -62,7 +64,7 @@ function App() {
         </Routes>
       )}
       <ScrollToTop />
-      <Toaster richColors position="top-right" closeButton />
+      <Toaster richColors position="top-right" closeButton theme="light" />
       {/* <ReactQueryDevtools /> */}
     </>
   );

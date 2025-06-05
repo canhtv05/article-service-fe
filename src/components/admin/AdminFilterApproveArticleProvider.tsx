@@ -10,7 +10,7 @@ const AdminFilterApproveArticleProvider = () => {
       onClear={adminApproveArticle?.handleClearFields}
       onSearch={adminApproveArticle?.handleFilters}
       filterComponent={<AdminFilterApproveArticleComponent />}
-      gridCols={2}
+      gridCols={3}
     />
   );
 };

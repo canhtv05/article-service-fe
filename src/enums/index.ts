@@ -49,6 +49,24 @@ export enum StatusArchiveAndHistory {
 
 export enum StatusArticle {
   POSTED = 'Đã đăng',
-  PENDING = 'Chưa đăng',
+  PENDING = 'Pending',
   NOT_POSTED = 'Không đăng',
+  APPROVED = 'Approved',
+  INACTIVE = 'Inactive',
+}
+
+export enum Gender {
+  UNKNOWN = 'UNKNOWN',
+  MALE = 'MALE',
+  FEMALE = 'FEMALE',
+}
+
+export enum Status {
+  UPDATE_SUCCESS = 'Cập nhật thành công',
+  UPDATE_FAILED = 'Cập nhật thất bại',
+  ADD_SUCCESS = 'Thêm thành công',
+  ADD_FAILED = 'Thêm thất bại',
+  REMOVE_SUCCESS = 'Xóa thành công',
+  REMOVE_FAILED = 'Xóa thất bại',
+  ERROR = 'Có lỗi xảy ra',
 }

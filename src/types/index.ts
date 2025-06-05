@@ -1,6 +1,40 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type */
+import { Gender } from '@/enums';
 import { LucideIcon } from 'lucide-react';
 import type { ComponentType, Dispatch, ReactElement, ReactNode, SetStateAction } from 'react';
+
+/* API RESPONSE */
+export interface TokenInfo {
+  accessToken: string;
+  accessTokenTTL: number;
+  refreshToken: string;
+  refreshTokenTTL: number;
+}
+
+export interface AbstractEntity {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ApiResponse<T> {
+  code: number;
+  message: string;
+  data: T;
+  meta?: {
+    tokenInfo?: TokenInfo;
+  };
+}
+
+/* ENTITY RESPONSE */
+export interface UserResponse extends AbstractEntity {
+  fullName: string;
+  gender: Gender;
+  dob: string;
+  email: string;
+  phoneNumber: string;
+  profilePicture: string;
+}
 
 export type LayoutComponent = ComponentType<{ children: ReactNode }>;
 
@@ -330,24 +364,37 @@ export type AddUserToCampaignType = {
 export type AdminApproveArticleType = {
   id: string;
   title: string;
-  author_name: string;
-  topic_name: string;
-  created_at: string;
+  authorName: string;
+  campaignName: string;
+  topic: string;
+  submittedAt: string;
+  approvedAt: string;
   status: string;
-  campaign_period: string;
+  campaignId: string;
+  subCampaignId: string;
+  createdAt: string;
+  updatedAt: string;
+  campaign: {
+    startDate: string;
+    endDate: string;
+  };
+};
+
+export type AdminApproveArticleResponseType = {
+  content: AdminApproveArticleType[];
+  totalPages: number;
 };
 
 export type AdminApproveArticleFilterType = {
-  topic_name_and_author_name: string;
-  campaign_period: string;
-  start_date: string;
-  end_date: string;
-  topic_name: string;
+  titleAndAuthorName: string;
+  campaignName: string;
+  startDate: string;
+  endData: string;
 };
 
 export type AdminApproveArticleContextType = {
-  data: AdminApproveArticleType[] | undefined;
-  setData: Dispatch<SetStateAction<AdminApproveArticleType[] | undefined>>;
+  data: AdminApproveArticleResponseType | undefined;
+  setData: Dispatch<SetStateAction<AdminApproveArticleResponseType | undefined>>;
   isLoading: boolean;
   error: unknown;
   titlesTable: string[];

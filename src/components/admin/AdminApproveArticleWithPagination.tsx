@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import {
   Pagination,
@@ -14,27 +14,19 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import FieldsSelect from '../FieldsSelect';
 import FallbackNoDataTable from '../FallbackNoDataTable';
 import RenderIf from '../RenderIf';
-import LoadingTable from '../LoadingTable';
 import Tooltip from '../Tooltip';
 import { useAdminApproveArticleContext } from '@/contexts/context/admin/AdminApproveArticleContext';
 import StatusBadge from '../StatusBadge';
+import { formatDateTime } from '@/lib/utils';
 
 const AdminApproveArticleWithPagination = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const adminApproveArticle = useAdminApproveArticleContext();
 
-  // Tính toán phân trang
-  const perPage = Number(adminApproveArticle?.perPage) || 10;
-  const currentPage = adminApproveArticle?.currentPage || 1;
-  const totalItems = adminApproveArticle?.data?.length || 0;
-  const totalPages = Math.ceil(totalItems / perPage);
+  const currentPage = Number(adminApproveArticle?.currentPage);
+  const totalPages = adminApproveArticle?.data?.totalPages || 0;
 
-  // Lấy dữ liệu cho trang hiện tại
-  const startIndex = (currentPage - 1) * perPage;
-  const endIndex = startIndex + perPage;
-  const currentData = adminApproveArticle?.data?.slice(startIndex, endIndex) || [];
-
-  // Tạo danh sách số trang
   const getPageNumbers = () => {
     const maxPagesToShow = 5;
     const pages: (number | string)[] = [];
@@ -66,6 +58,7 @@ const AdminApproveArticleWithPagination = () => {
   const handlePageChange = (page: number) => {
     if (adminApproveArticle?.setCurrentPage && page >= 1 && page <= totalPages) {
       adminApproveArticle.setCurrentPage(page);
+      navigate(`/admin/approve-article?page=${page}&size=${adminApproveArticle.perPage}`, { replace: true });
     }
   };
 
@@ -83,61 +76,52 @@ const AdminApproveArticleWithPagination = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <RenderIf value={!!adminApproveArticle?.isLoading}>
-              <TableRow className="h-[130px]">
-                <TableCell
-                  colSpan={adminApproveArticle?.titlesTable.length}
-                  className="flex my-auto justify-center items-center"
-                >
-                  <LoadingTable />
-                </TableCell>
-              </TableRow>
-            </RenderIf>
-            <RenderIf value={!adminApproveArticle?.isLoading}>
-              {Array.isArray(currentData) && currentData.length > 0 ? (
-                currentData.map((approve, index) => (
-                  <TableRow key={index} className="odd:bg-muted/50">
-                    <TableCell className="pl-4">{startIndex + index + 1}</TableCell>
-                    <TableCell className="font-medium">{approve.title}</TableCell>
-                    <TableCell className="font-medium">{approve.author_name}</TableCell>
-                    <TableCell className="font-medium">{approve.topic_name}</TableCell>
-                    <TableCell>{approve.created_at}</TableCell>
-                    <TableCell>
-                      <StatusBadge status={approve.status}></StatusBadge>
-                    </TableCell>
-                    <TableCell>{approve.campaign_period}</TableCell>
-                    <TableCell>
-                      <div className="flex gap-4">
-                        {adminApproveArticle?.tooltips.map((item, idx) => (
-                          <Fragment key={idx}>
-                            <Link
-                              to={`/approve-article/${approve.id}`}
-                              className="cursor-pointer"
-                              state={{ background: location }}
-                            >
-                              <Tooltip
-                                toolTipContent={item.content}
-                                toolTipTrigger={<item.icon className={item.className} />}
-                              />
-                            </Link>
-                          </Fragment>
-                        ))}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={adminApproveArticle?.titlesTable.length} className="text-center">
-                    <FallbackNoDataTable />
+            {Array.isArray(adminApproveArticle?.data?.content) && adminApproveArticle?.data?.content.length > 0 ? (
+              adminApproveArticle?.data?.content.map((approve, index) => (
+                <TableRow key={index} className="odd:bg-muted/50">
+                  <TableCell className="pl-4">{index + 1}</TableCell>
+                  <TableCell className="font-medium">{approve.title}</TableCell>
+                  <TableCell className="font-medium">{approve.authorName}</TableCell>
+                  <TableCell className="font-medium">{approve.topic || 'unknown'}</TableCell>
+                  <TableCell className="font-medium">{approve.campaignName}</TableCell>
+                  <TableCell>{formatDateTime(approve.createdAt)}</TableCell>
+                  <TableCell>
+                    <StatusBadge status={approve.status}></StatusBadge>
+                  </TableCell>
+                  <TableCell>{`${formatDateTime(approve.campaign.startDate)} - ${formatDateTime(
+                    approve.campaign.endDate,
+                  )}`}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-4">
+                      {adminApproveArticle?.tooltips.map((item, idx) => (
+                        <Fragment key={idx}>
+                          <Link
+                            to={`/approve-article/${approve.id}`}
+                            className="cursor-pointer"
+                            state={{ background: location }}
+                          >
+                            <Tooltip
+                              toolTipContent={item.content}
+                              toolTipTrigger={<item.icon className={item.className} />}
+                            />
+                          </Link>
+                        </Fragment>
+                      ))}
+                    </div>
                   </TableCell>
                 </TableRow>
-              )}
-            </RenderIf>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={adminApproveArticle?.titlesTable.length} className="text-center">
+                  <FallbackNoDataTable />
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
-      <RenderIf value={!!adminApproveArticle?.data && adminApproveArticle?.data?.length > 0}>
+      <RenderIf value={!!adminApproveArticle?.data && adminApproveArticle?.data?.content?.length > 0}>
         <div className="flex lg:flex-row flex-col gap-5 mt-4 items-center">
           <Pagination>
             <PaginationContent>
@@ -179,13 +163,15 @@ const AdminApproveArticleWithPagination = () => {
                 { label: '5 / trang', value: 5 },
                 { label: '10 / trang', value: 10 },
                 { label: '50 / trang', value: 50 },
-                { label: '100 / trang', value: 100 },
               ]}
-              value={adminApproveArticle?.perPage}
+              value={String(adminApproveArticle?.perPage ?? 5)}
               setValue={(val) => {
                 if (adminApproveArticle?.setPerPage && adminApproveArticle?.setCurrentPage) {
                   adminApproveArticle.setPerPage(val);
                   adminApproveArticle.setCurrentPage(1);
+                  navigate(`/admin/approve-article?page=1&size=${val}`, {
+                    replace: true,
+                  });
                 }
               }}
             />
