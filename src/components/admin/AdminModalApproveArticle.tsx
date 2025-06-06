@@ -52,7 +52,7 @@ const AdminModalApproveArticle = () => {
 
   return (
     <div>
-      <ViewArticle id={id ?? ''} component={<Comp id={id ?? ''} />} />
+      <ViewArticle component={<Comp id={id ?? ''} />} />
     </div>
   );
 };

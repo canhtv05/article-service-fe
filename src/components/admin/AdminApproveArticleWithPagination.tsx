@@ -79,7 +79,7 @@ const AdminApproveArticleWithPagination = () => {
     if (filters.titleAndAuthorName) params.set('titleAndAuthorName', filters.titleAndAuthorName);
     if (filters.campaignName) params.set('campaignName', filters.campaignName);
     if (filters.startDate) params.set('startDate', filters.startDate);
-    if (filters.endData) params.set('endDate', filters.endData);
+    if (filters.endDate) params.set('endDate', filters.endDate);
 
     return params.toString();
   };

@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import {
   Pagination,
@@ -14,27 +14,20 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import FieldsSelect from '../FieldsSelect';
 import FallbackNoDataTable from '../FallbackNoDataTable';
 import RenderIf from '../RenderIf';
-import LoadingTable from '../LoadingTable';
 import Tooltip from '../Tooltip';
 import StatusBadge from '../StatusBadge';
 import { useAdminApprovalHistoryContext } from '@/contexts/context/admin/AdminApprovalHistoryContext';
+import { AdminApprovalHistoryFilterType } from '@/types';
+import { formatDateTime } from '@/lib/utils';
 
 const AdminApprovalHistoryWithPagination = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const adminApprovalHistory = useAdminApprovalHistoryContext();
 
-  // Tính toán phân trang
-  const perPage = Number(adminApprovalHistory?.perPage) || 10;
-  const currentPage = adminApprovalHistory?.currentPage || 1;
-  const totalItems = adminApprovalHistory?.data?.length || 0;
-  const totalPages = Math.ceil(totalItems / perPage);
+  const currentPage = Number(adminApprovalHistory?.currentPage);
+  const totalPages = adminApprovalHistory?.data?.totalPages || 0;
 
-  // Lấy dữ liệu cho trang hiện tại
-  const startIndex = (currentPage - 1) * perPage;
-  const endIndex = startIndex + perPage;
-  const currentData = adminApprovalHistory?.data?.slice(startIndex, endIndex) || [];
-
-  // Tạo danh sách số trang
   const getPageNumbers = () => {
     const maxPagesToShow = 5;
     const pages: (number | string)[] = [];
@@ -66,7 +59,29 @@ const AdminApprovalHistoryWithPagination = () => {
   const handlePageChange = (page: number) => {
     if (adminApprovalHistory?.setCurrentPage && page >= 1 && page <= totalPages) {
       adminApprovalHistory.setCurrentPage(page);
+
+      const queryString = buildSearchParamsWithFilters(
+        page,
+        Number(adminApprovalHistory.perPage),
+        adminApprovalHistory.valueFilter,
+      );
+
+      navigate(`/admin/approval-history?${queryString}`, { replace: true });
     }
+  };
+
+  const buildSearchParamsWithFilters = (page: number, size: number, filters: AdminApprovalHistoryFilterType) => {
+    const params = new URLSearchParams();
+
+    params.set('page', String(page));
+    params.set('size', String(size));
+
+    if (filters.title) params.set('.title', filters.title);
+    if (filters.status) params.set('.status', filters.status);
+    if (filters.startDate) params.set('startDate', filters.startDate);
+    if (filters.endDate) params.set('endDate', filters.endDate);
+
+    return params.toString();
   };
 
   return (
@@ -83,61 +98,49 @@ const AdminApprovalHistoryWithPagination = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <RenderIf value={!!adminApprovalHistory?.isLoading}>
-              <TableRow className="h-[130px]">
-                <TableCell
-                  colSpan={adminApprovalHistory?.titlesTable.length}
-                  className="flex my-auto justify-center items-center"
-                >
-                  <LoadingTable />
-                </TableCell>
-              </TableRow>
-            </RenderIf>
-            <RenderIf value={!adminApprovalHistory?.isLoading}>
-              {Array.isArray(currentData) && currentData.length > 0 ? (
-                currentData.map((approve, index) => (
-                  <TableRow key={index} className="odd:bg-muted/50">
-                    <TableCell className="pl-4">{startIndex + index + 1}</TableCell>
-                    <TableCell className="font-medium">{approve.title}</TableCell>
-                    <TableCell className="font-medium">{approve.author_name}</TableCell>
-                    <TableCell className="font-medium">{approve.type}</TableCell>
-                    <TableCell>{approve.created_at}</TableCell>
-                    <TableCell>{approve.operation_date}</TableCell>
-                    <TableCell>
-                      <StatusBadge status={approve.status}></StatusBadge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-4">
-                        {adminApprovalHistory?.tooltips.map((item, idx) => (
-                          <Fragment key={idx}>
-                            <Link
-                              to={`/approve-article/${approve.id}`}
-                              className="cursor-pointer"
-                              state={{ background: location }}
-                            >
-                              <Tooltip
-                                toolTipContent={item.content}
-                                toolTipTrigger={<item.icon className={item.className} />}
-                              />
-                            </Link>
-                          </Fragment>
-                        ))}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={adminApprovalHistory?.titlesTable.length} className="text-center">
-                    <FallbackNoDataTable />
+            {Array.isArray(adminApprovalHistory?.data?.content) && adminApprovalHistory?.data?.content.length > 0 ? (
+              adminApprovalHistory?.data?.content.map((approve, index) => (
+                <TableRow key={index} className="odd:bg-muted/50">
+                  <TableCell className="pl-4">{index + 1}</TableCell>
+                  <TableCell className="font-medium">{approve.title}</TableCell>
+                  <TableCell className="font-medium">{approve.authorName}</TableCell>
+                  <TableCell className="font-medium">{approve.campaignName}</TableCell>
+                  <TableCell>{formatDateTime(approve.createdAt, 'dd/MM/yyyy HH:mm:ss')}</TableCell>
+                  <TableCell>{formatDateTime(approve.impactDate, 'dd/MM/yyyy HH:mm:ss')}</TableCell>
+                  <TableCell>
+                    <StatusBadge status={approve.status}></StatusBadge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-4">
+                      {adminApprovalHistory?.tooltips.map((item, idx) => (
+                        <Fragment key={idx}>
+                          <Link
+                            to={`/view/articles/${approve.id}`}
+                            className="cursor-pointer"
+                            state={{ background: location }}
+                          >
+                            <Tooltip
+                              toolTipContent={item.content}
+                              toolTipTrigger={<item.icon className={item.className} />}
+                            />
+                          </Link>
+                        </Fragment>
+                      ))}
+                    </div>
                   </TableCell>
                 </TableRow>
-              )}
-            </RenderIf>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={adminApprovalHistory?.titlesTable.length} className="text-center">
+                  <FallbackNoDataTable />
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
-      <RenderIf value={!!adminApprovalHistory?.data && adminApprovalHistory?.data?.length > 0}>
+      <RenderIf value={!!adminApprovalHistory?.data?.content && adminApprovalHistory?.data?.content.length > 0}>
         <div className="flex lg:flex-row flex-col gap-5 mt-4 items-center">
           <Pagination>
             <PaginationContent>
@@ -179,13 +182,18 @@ const AdminApprovalHistoryWithPagination = () => {
                 { label: '5 / trang', value: 5 },
                 { label: '10 / trang', value: 10 },
                 { label: '50 / trang', value: 50 },
-                { label: '100 / trang', value: 100 },
               ]}
               value={adminApprovalHistory?.perPage}
               setValue={(val) => {
                 if (adminApprovalHistory?.setPerPage && adminApprovalHistory?.setCurrentPage) {
                   adminApprovalHistory.setPerPage(val);
                   adminApprovalHistory.setCurrentPage(1);
+
+                  const queryString = buildSearchParamsWithFilters(1, Number(val), adminApprovalHistory.valueFilter);
+
+                  navigate(`/admin/approval-history?${queryString}`, {
+                    replace: true,
+                  });
                 }
               }}
             />

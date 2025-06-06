@@ -44,7 +44,7 @@ const AdminApproveArticleProvider = ({ children }: { children: ReactNode }) => {
   const [perPage, setPerPage] = useState<string>(sizeFromUrl.toString());
   const [valueFilter, setValueFilter] = useState<AdminApproveArticleFilterType>({
     titleAndAuthorName: '',
-    endData: '',
+    endDate: '',
     startDate: '',
     campaignName: '',
   });
@@ -54,7 +54,7 @@ const AdminApproveArticleProvider = ({ children }: { children: ReactNode }) => {
       titleAndAuthorName,
       campaignName,
       startDate,
-      endData: endDate,
+      endDate,
     });
     setCurrentPage(pageFromUrl);
     setPerPage(sizeFromUrl.toString());
@@ -98,7 +98,7 @@ const AdminApproveArticleProvider = ({ children }: { children: ReactNode }) => {
   const handleClearFields = () => {
     setValueFilter({
       titleAndAuthorName: '',
-      endData: '',
+      endDate: '',
       startDate: '',
       campaignName: '',
     });
@@ -115,7 +115,7 @@ const AdminApproveArticleProvider = ({ children }: { children: ReactNode }) => {
     if (valueFilter.titleAndAuthorName) query.titleAndAuthorName = valueFilter.titleAndAuthorName;
     if (valueFilter.campaignName) query.campaignName = valueFilter.campaignName;
     if (valueFilter.startDate) query.startDate = valueFilter.startDate;
-    if (valueFilter.endData) query.endDate = valueFilter.endData;
+    if (valueFilter.endDate) query.endDate = valueFilter.endDate;
 
     setSearchParams(query);
   };

@@ -7,8 +7,10 @@ import RenderIf from '../RenderIf';
 import { ReactElement } from 'react';
 import { httpRequest } from '@/utils/httpRequest';
 import { formatDateTime } from '@/lib/utils';
+import { useParams } from 'react-router-dom';
 
-const ViewArticle = ({ component, id }: { component?: ReactElement; id: string }) => {
+const ViewArticle = ({ component }: { component?: ReactElement }) => {
+  const { id } = useParams();
   const { data, isLoading } = useQuery({
     queryKey: [`/admin/bai-viet/chi-tiet/${id}`],
     queryFn: async () => {
