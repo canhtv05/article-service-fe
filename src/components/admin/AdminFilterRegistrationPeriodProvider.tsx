@@ -11,7 +11,7 @@ const AdminFilterRegistrationPeriodProvider = () => {
       onClear={registrationPeriod?.handleClearFields}
       onSearch={registrationPeriod?.handleFilters}
       filterComponent={<AdminFilterRegistrationPeriodComponent />}
-      gridCols={2}
+      gridCols={3}
     />
   );
 };

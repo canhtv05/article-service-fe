@@ -15,12 +15,12 @@ import { Checkbox } from '@/components/ui/checkbox';
 import FieldsSelect from '../FieldsSelect';
 import FallbackNoDataTable from '../FallbackNoDataTable';
 import RenderIf from '../RenderIf';
-import LoadingTable from '../LoadingTable';
 import StatusBadge from '../StatusBadge';
-import { AdminRegistrationPeriodType } from '@/types';
+import { AdminRegistrationPeriodFilterType, AdminRegistrationPeriodType } from '@/types';
 import { AdminRegistrationPeriodContext } from '@/contexts/context/admin/AdminRegistrationPeriodContext';
 import Tooltip from '../Tooltip';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { formatDateTime } from '@/lib/utils';
 
 type AdminRegistrationTableWithPaginationProps = {
   selectedRows: string[];
@@ -37,18 +37,13 @@ const AdminRegistrationTableWithPagination = ({
   handleSelectRow,
   isAllSelected,
 }: AdminRegistrationTableWithPaginationProps) => {
+  const navigate = useNavigate();
   const registrationPeriod = useContext(AdminRegistrationPeriodContext);
 
-  // Tính toán phân trang
-  const perPage = Number(registrationPeriod?.perPage) || 10;
-  const currentPage = registrationPeriod?.currentPage || 1;
-  const totalItems = registrationPeriod?.data?.length || 0;
-  const totalPages = Math.ceil(totalItems / perPage);
+  const currentPage = Number(registrationPeriod?.currentPage);
+  const totalPages = registrationPeriod?.data?.totalPages || 0;
 
-  // Lấy dữ liệu cho trang hiện tại
-  const startIndex = (currentPage - 1) * perPage;
-  const endIndex = startIndex + perPage;
-  const currentData = registrationPeriod?.data?.slice(startIndex, endIndex) || [];
+  const currentData = registrationPeriod?.data?.content || [];
 
   // Tạo danh sách số trang
   const getPageNumbers = () => {
@@ -82,13 +77,35 @@ const AdminRegistrationTableWithPagination = ({
   const handlePageChange = (page: number) => {
     if (registrationPeriod?.setCurrentPage && page >= 1 && page <= totalPages) {
       registrationPeriod.setCurrentPage(page);
+
+      const queryString = buildSearchParamsWithFilters(
+        page,
+        Number(registrationPeriod.perPage),
+        registrationPeriod.valueFilter,
+      );
+
+      navigate(`/admin/registration-period?${queryString}`, { replace: true });
     }
+  };
+
+  const buildSearchParamsWithFilters = (page: number, size: number, filters: AdminRegistrationPeriodFilterType) => {
+    const params = new URLSearchParams();
+
+    params.set('page', String(page));
+    params.set('size', String(size));
+
+    if (filters.endDate) params.set('.endDate', filters.endDate);
+    if (filters.status) params.set('status', filters.status);
+    if (filters.startDate) params.set('startDate', filters.startDate);
+    if (filters.endDate) params.set('endDate', filters.endDate);
+
+    return params.toString();
   };
 
   return (
     <div className="w-full">
       <div className="text-sm text-muted-foreground mb-2">
-        Đã chọn {selectedRows.length} / {totalItems} bài viết
+        Đã chọn {selectedRows.length} / {registrationPeriod?.data?.totalElements} bài viết
       </div>
       <div className="w-full border rounded-md overflow-hidden">
         <Table>
@@ -111,85 +128,77 @@ const AdminRegistrationTableWithPagination = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            <RenderIf value={!!registrationPeriod?.isLoading}>
-              <TableRow className="h-[130px]">
-                <TableCell
-                  colSpan={registrationPeriod?.titlesTable.length}
-                  className="flex my-auto justify-center items-center"
-                >
-                  <LoadingTable />
-                </TableCell>
-              </TableRow>
-            </RenderIf>
-            <RenderIf value={!registrationPeriod?.isLoading}>
-              {Array.isArray(currentData) && currentData.length > 0 ? (
-                currentData.map((registration, index) => (
-                  <TableRow key={registration.id} className="odd:bg-muted/50">
-                    <TableCell className="pl-4 w-12">
-                      <Checkbox
-                        checked={selectedRows.includes(registration.id)}
-                        onCheckedChange={(checked) => handleSelectRow(registration.id, !!checked)}
-                        aria-label="Select row"
-                        className="border-emerald-500 translate-y-[2px]"
-                      />
-                    </TableCell>
-                    <TableCell className="pl-4">{startIndex + index + 1}</TableCell>
-                    <TableCell className="pl-4">{registration.name}</TableCell>
-                    <TableCell className="font-medium">{registration.time}</TableCell>
-                    <TableCell>{registration.time_registration}</TableCell>
-                    <TableCell>{registration.campaign_period}</TableCell>
-                    <TableCell>
-                      <StatusBadge status={registration.status} />
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-4">
-                        {registrationPeriod?.tooltips.map((item, idx) => (
-                          <Fragment key={idx}>
-                            <RenderIf value={item.type === 'view'}>
-                              <Link
-                                to={`/admin/registration-period/detail/${registration.id}`}
-                                className="cursor-pointer"
-                              >
-                                <Tooltip
-                                  toolTipContent={item.content}
-                                  toolTipTrigger={<item.icon className={item.className} />}
-                                />
-                              </Link>
-                            </RenderIf>
-                            <RenderIf value={item.type === 'assign_topic'}>
-                              <div className="cursor-pointer">
-                                <Tooltip
-                                  toolTipContent={item.content}
-                                  toolTipTrigger={<item.icon className={item.className} />}
-                                />
-                              </div>
-                            </RenderIf>
-                            <RenderIf value={item.type === 'remove'}>
-                              <div className="cursor-pointer">
-                                <Tooltip
-                                  toolTipContent={item.content}
-                                  toolTipTrigger={<item.icon className={item.className} />}
-                                />
-                              </div>
-                            </RenderIf>
-                          </Fragment>
-                        ))}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={registrationPeriod?.titlesTable.length} className="text-center">
-                    <FallbackNoDataTable />
+            {Array.isArray(currentData) && currentData.length > 0 ? (
+              currentData.map((registration) => (
+                <TableRow key={registration.id} className="odd:bg-muted/50">
+                  <TableCell className="pl-4 w-12">
+                    <Checkbox
+                      checked={selectedRows.includes(registration.id)}
+                      onCheckedChange={(checked) => handleSelectRow(registration.id, !!checked)}
+                      aria-label="Select row"
+                      className="border-emerald-500 translate-y-[2px]"
+                    />
+                  </TableCell>
+                  <TableCell className="pl-4">{registration.name}</TableCell>
+                  <TableCell className="font-medium">{`${formatDateTime(
+                    registration.startDate,
+                    'dd/MM/yyyy',
+                  )} - ${formatDateTime(registration.endDate, 'dd/MM/yyyy')}`}</TableCell>
+                  <TableCell>{`${formatDateTime(registration.writingStartDate, 'dd/MM/yyyy')} - ${formatDateTime(
+                    registration.writingEndDate,
+                    'dd/MM/yyyy',
+                  )}`}</TableCell>
+                  <TableCell>
+                    <StatusBadge status={registration.status} />
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-4">
+                      {registrationPeriod?.tooltips.map((item, idx) => (
+                        <Fragment key={idx}>
+                          <RenderIf value={item.type === 'view'}>
+                            <Link
+                              to={`/admin/registration-period/detail/${registration.id}`}
+                              className="cursor-pointer"
+                            >
+                              <Tooltip
+                                toolTipContent={item.content}
+                                toolTipTrigger={<item.icon className={item.className} />}
+                              />
+                            </Link>
+                          </RenderIf>
+                          <RenderIf value={item.type === 'assign_topic'}>
+                            <div className="cursor-pointer">
+                              <Tooltip
+                                toolTipContent={item.content}
+                                toolTipTrigger={<item.icon className={item.className} />}
+                              />
+                            </div>
+                          </RenderIf>
+                          <RenderIf value={item.type === 'remove'}>
+                            <div className="cursor-pointer">
+                              <Tooltip
+                                toolTipContent={item.content}
+                                toolTipTrigger={<item.icon className={item.className} />}
+                              />
+                            </div>
+                          </RenderIf>
+                        </Fragment>
+                      ))}
+                    </div>
                   </TableCell>
                 </TableRow>
-              )}
-            </RenderIf>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={registrationPeriod?.titlesTable.length} className="text-center">
+                  <FallbackNoDataTable />
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
-      <RenderIf value={!!registrationPeriod?.data && registrationPeriod?.data?.length > 0}>
+      <RenderIf value={!!currentData.length && currentData.length > 0}>
         <div className="flex lg:flex-row flex-col gap-5 mt-4 items-center">
           <Pagination>
             <PaginationContent>
@@ -231,14 +240,19 @@ const AdminRegistrationTableWithPagination = ({
                 { label: '5 / trang', value: 5 },
                 { label: '10 / trang', value: 10 },
                 { label: '50 / trang', value: 50 },
-                { label: '100 / trang', value: 100 },
               ]}
               value={registrationPeriod?.perPage}
               setValue={(val) => {
                 if (registrationPeriod?.setPerPage && registrationPeriod?.setCurrentPage) {
                   registrationPeriod.setPerPage(val);
                   registrationPeriod.setCurrentPage(1);
-                  setSelectedRows([]); // Xóa lựa chọn khi thay đổi perPage
+                  setSelectedRows([]);
+
+                  const queryString = buildSearchParamsWithFilters(1, Number(val), registrationPeriod.valueFilter);
+
+                  navigate(`/admin/registration-period?${queryString}`, {
+                    replace: true,
+                  });
                 }
               }}
             />

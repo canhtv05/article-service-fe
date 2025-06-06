@@ -67,10 +67,7 @@ const AdminArchiveTable = () => {
 
   const sendToPrMutation = useMutation({
     mutationFn: async () => {
-      for (const id of selectedRows) {
-        await httpRequest.get(`/admin/bai-viet/day-bai-viet-pr/${id}`);
-        await sleep(1000);
-      }
+      await Promise.all(selectedRows.map((id) => httpRequest.get(`/admin/bai-viet/day-bai-viet-pr/${id}`)));
     },
     onSuccess: () => {
       setSelectedRows([]);
@@ -97,8 +94,6 @@ const AdminArchiveTable = () => {
 
     setSelectedRows([]);
   };
-
-  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
   return (
     <div className="flex flex-col gap-4 rounded-xl shadow-md p-5 text-foreground h-full">
