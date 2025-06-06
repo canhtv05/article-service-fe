@@ -1,12 +1,11 @@
-import { ReactNode, useCallback, useEffect, useState } from 'react';
-import axios from 'axios';
+import { ReactNode, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import _ from 'lodash';
-
-import { AdminRegistrationPeriodFilterType, AdminRegistrationPeriodType } from '@/types';
-import { Status, StatusSend } from '@/enums';
+import { useSearchParams } from 'react-router-dom';
 import { Eye, Pen, Trash } from 'lucide-react';
+
+import { AdminRegistrationPeriodFilterType, AdminRegistrationPeriodResponseType } from '@/types';
 import { AdminRegistrationPeriodContext } from '@/contexts/context/admin/AdminRegistrationPeriodContext';
+import { httpRequest } from '@/utils/httpRequest';
 
 const tooltips = [
   {
@@ -29,89 +28,94 @@ const tooltips = [
   },
 ];
 
-const titlesTable = ['#', 'Mã', 'Tên', 'Thời gian', 'Thời gian đăng ký', 'Đợt viết bài', 'Trạng thái', 'Hành động'];
+const titlesTable = ['#', 'Tên', 'Thời gian', 'Thời gian đăng ký', 'Trạng thái', 'Hành động'];
 
 const AdminRegistrationPeriodProvider = ({ children }: { children: ReactNode }) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const pageFromUrl = Number(searchParams.get('page')) || 1;
+  const sizeFromUrl = Number(searchParams.get('size')) || 5;
+  const name = searchParams.get('name') || '';
+  const status = searchParams.get('status') || '';
+  const startDate = searchParams.get('startDate') || '';
+  const endDate = searchParams.get('endDate') || '';
+
+  const [data, setData] = useState<AdminRegistrationPeriodResponseType | undefined>(undefined);
+  const [currentPage, setCurrentPage] = useState(pageFromUrl);
+  const [perPage, setPerPage] = useState<string>(sizeFromUrl.toString());
+  const [valueFilter, setValueFilter] = useState<AdminRegistrationPeriodFilterType>({
+    status,
+    name,
+    startDate,
+    endDate,
+  });
+
+  useEffect(() => {
+    setValueFilter({
+      status,
+      name,
+      startDate,
+      endDate,
+    });
+    setCurrentPage(pageFromUrl);
+    setPerPage(sizeFromUrl.toString());
+  }, [endDate, pageFromUrl, searchParams, sizeFromUrl, startDate, status, name]);
+
   const {
-    data: registrationPeriod,
+    data: approveArticle,
     isLoading,
     error,
-  } = useQuery<AdminRegistrationPeriodType[]>({
-    queryKey: ['list-registration-period'],
+  } = useQuery({
+    queryKey: ['/dot-bai-viet/danh-sanh-dot', currentPage, perPage, name, status, startDate, endDate],
     queryFn: async () => {
-      const response = await axios.get('/data_registration_period.json');
+      const params: Record<string, string> = {
+        page: currentPage.toString(),
+        size: perPage,
+      };
+      if (name) params.name = name;
+      if (status) params.status = status;
+      if (startDate) params.startDate = startDate;
+      if (endDate) params.endDate = endDate;
+
+      const response = await httpRequest.get('/dot-bai-viet/danh-sanh-dot', {
+        params,
+      });
+
       return response.data;
     },
   });
 
-  const [data, setData] = useState<AdminRegistrationPeriodType[] | undefined>(undefined);
-  const [valueFilter, setValueFilter] = useState<AdminRegistrationPeriodFilterType>({
-    status: Status.ALL,
-    id_or_name: '',
-    end_date: '',
-    start_date: '',
-  });
-
-  const [perPage, setPerPage] = useState<string>('5');
-  const [currentPage, setCurrentPage] = useState<number>(1);
-
   useEffect(() => {
-    if (registrationPeriod) {
-      setData(registrationPeriod);
-      setCurrentPage(1);
+    if (approveArticle) {
+      setData(approveArticle);
     }
-  }, [registrationPeriod]);
+  }, [approveArticle]);
 
   const handleClearFields = () => {
     setValueFilter({
-      status: Status.ALL,
-      id_or_name: '',
-      end_date: '',
-      start_date: '',
+      status: '',
+      name: '',
+      startDate: '',
+      endDate: '',
     });
-    if (!registrationPeriod) return;
-    setData(registrationPeriod);
+    setSearchParams({ page: '1', size: perPage });
     setCurrentPage(1);
   };
 
-  const handleFilters = useCallback(() => {
-    if (!registrationPeriod) return;
+  const handleFilters = () => {
+    const query: Record<string, string> = {
+      page: '1',
+      size: perPage,
+    };
 
-    const { status, end_date, id_or_name, start_date } = valueFilter;
+    if (valueFilter.name) query.name = valueFilter.name;
+    if (valueFilter.status) query.status = valueFilter.status;
+    if (valueFilter.startDate) query.startDate = valueFilter.startDate;
+    if (valueFilter.endDate) query.endDate = valueFilter.endDate;
 
-    if (_.isEmpty(end_date) && status === StatusSend.ALL && _.isEmpty(id_or_name) && _.isEmpty(start_date)) {
-      setData(registrationPeriod);
-      setCurrentPage(1);
-      return;
-    }
-
-    const filteredData = _.filter(registrationPeriod, (article) => {
-      if (!_.isEmpty(id_or_name)) {
-        if (!_.includes(article.id.toLowerCase() + ' ' + article.name.toLowerCase(), id_or_name.toLowerCase())) {
-          return false;
-        }
-      }
-
-      if (status !== StatusSend.ALL) {
-        if (article.status !== status) {
-          return false;
-        }
-      }
-
-      // if (!_.isEmpty(start_date)) {
-      //   if (!_.isEqual(article.campaign_period.toLowerCase(), campaign_period.toLowerCase())) {
-      //     return false;
-      //   }
-      // }
-
-      //chua loc start date and end date
-
-      return true;
-    });
-
-    setData(filteredData);
+    setSearchParams(query);
     setCurrentPage(1);
-  }, [registrationPeriod, valueFilter]);
+  };
 
   const values = {
     data,

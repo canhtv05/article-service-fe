@@ -267,22 +267,32 @@ export type StaffListArticleContextType = {
 export type AdminRegistrationPeriodType = {
   id: string;
   name: string;
-  time: string;
-  time_registration: string;
-  campaign_period: number;
+  description: string;
+  startDate: string;
+  endDate: string;
+  writingStartDate: string;
+  writingEndDate: string;
   status: string;
+  createAt: string;
+  updateAt: string;
+};
+
+export type AdminRegistrationPeriodResponseType = {
+  content: AdminRegistrationPeriodType[];
+  totalPages: number;
+  totalElements: number;
 };
 
 export type AdminRegistrationPeriodFilterType = {
-  id_or_name: string;
-  start_date: string;
+  name: string;
   status: string;
-  end_date: string;
+  startDate: string;
+  endDate: string;
 };
 
 export type AdminRegistrationPeriodContextType = {
-  data: AdminRegistrationPeriodType[] | undefined;
-  setData: Dispatch<SetStateAction<AdminRegistrationPeriodType[] | undefined>>;
+  data: AdminRegistrationPeriodResponseType | undefined;
+  setData: Dispatch<SetStateAction<AdminRegistrationPeriodResponseType | undefined>>;
   isLoading: boolean;
   error: unknown;
   titlesTable: string[];

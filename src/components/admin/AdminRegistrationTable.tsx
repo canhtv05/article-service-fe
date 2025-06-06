@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { Check, ClockFading, List, Plus, X } from 'lucide-react';
+import { Check, List, Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '../ui/button';
@@ -14,6 +14,10 @@ import { Input } from '../ui/input';
 import { DateRange } from 'react-day-picker';
 import { format, parseISO } from 'date-fns';
 import { DateRangePicker } from '../DateRangePicker';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { httpRequest } from '@/utils/httpRequest';
+
+type Assign = 'Open' | 'NotOpen';
 
 const AddCampaignPeriod = ({
   value,
@@ -59,6 +63,7 @@ interface ValueRegistration {
 const AdminRegistrationTable = () => {
   const registrationPeriod = useContext(AdminRegistrationPeriodContext);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const queryClient = useQueryClient();
 
   const [value, setValue] = useState<ValueRegistration>({
     campaign_deadline_end_date: '',
@@ -129,13 +134,35 @@ const AdminRegistrationTable = () => {
   const isAllSelected = (currentPageData: AdminRegistrationPeriodType[]) =>
     currentPageData.length > 0 && selectedRows.length === currentPageData.length;
 
-  const handleAssign = () => {
-    toast.success(Notice.UPDATE_SUCCESS);
-    setSelectedRows([]);
-    registrationPeriod?.setData((prev) => {
-      if (!prev) return [];
-      return prev.filter((article) => !selectedRows.includes(article.id));
-    });
+  const sendToPrMutation = useMutation({
+    mutationFn: async (type: Assign) => {
+      const data =
+        registrationPeriod?.data?.content.filter((c) => {
+          return c.status !== type;
+        }) ?? [];
+
+      const commonIds = selectedRows.filter((id) => data.some((item) => item.id === id));
+
+      const url = type === 'Open' ? 'dot-bai-viet/mo-dot-dk' : 'dot-bai-viet/dong-dot-dk';
+
+      await Promise.all(
+        commonIds.map((id) => {
+          return httpRequest.get(`/${url}/${id}`);
+        }),
+      );
+    },
+    onSuccess: () => {
+      // setSelectedRows([]);
+      queryClient.invalidateQueries({ queryKey: ['/dot-bai-viet/danh-sanh-dot'] });
+      toast.success('Cập nhật trạng thái thành công');
+    },
+    onError: (error) => {
+      toast.error(error.message ?? 'Có lỗi xảy ra');
+    },
+  });
+
+  const handleAssign = (type: Assign) => {
+    if (selectedRows.length !== 0) sendToPrMutation.mutate(type);
   };
 
   const handleOnContinue = () => {
@@ -192,6 +219,8 @@ const AdminRegistrationTable = () => {
     });
   };
 
+  // còn tạo đợt dăng ký xem sửa xóa
+
   return (
     <div className="flex flex-col gap-4 rounded-xl shadow-md p-5 text-foreground h-full">
       <div className="flex gap-3 items-center justify-between mb-10 lg:flex-row flex-col">
@@ -199,13 +228,9 @@ const AdminRegistrationTable = () => {
           <List />
           <span className="text-foreground text-[18px]">Danh sách đợt đăng ký</span>
         </div>
-        <div className="grid grid-cols-2 lg:flex lg:flex-row gap-2 w-full">
-          <Button customize={'default'} className="py-5 rounded-full">
-            <ClockFading />
-            Lịch sử
-          </Button>
+        <div className="grid grid-cols-2 lg:flex lg:flex-row justify-end gap-2 w-full">
           <ConfirmDialog
-            onContinue={handleAssign}
+            onContinue={() => handleAssign('Open')}
             typeTitle="mở đăng ký"
             triggerComponent={
               <Button customize={'default'} className="py-5 rounded-full" disabled={selectedRows.length === 0}>
@@ -215,7 +240,7 @@ const AdminRegistrationTable = () => {
             }
           />
           <ConfirmDialog
-            onContinue={handleAssign}
+            onContinue={() => handleAssign('NotOpen')}
             typeTitle="đóng đăng ký"
             triggerComponent={
               <Button customize={'default'} className="py-5 rounded-full" disabled={selectedRows.length === 0}>

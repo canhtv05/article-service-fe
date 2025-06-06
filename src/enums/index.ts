@@ -71,3 +71,9 @@ export enum Status {
   REMOVE_FAILED = 'Xóa thất bại',
   ERROR = 'Có lỗi xảy ra',
 }
+
+export enum StatusRegistration {
+  _OPEN = 'Open',
+  NOT_OPEN = 'NotOpen',
+  INACTIVE = 'Inactive',
+}
