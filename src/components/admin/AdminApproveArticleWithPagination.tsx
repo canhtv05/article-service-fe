@@ -98,48 +98,50 @@ const AdminApproveArticleWithPagination = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {Array.isArray(adminApproveArticle?.data?.content) && adminApproveArticle?.data?.content.length > 0 ? (
-              adminApproveArticle?.data?.content.map((approve, index) => (
-                <TableRow key={index} className="odd:bg-muted/50">
-                  <TableCell className="pl-4">{index + 1}</TableCell>
-                  <TableCell className="font-medium">{approve.title}</TableCell>
-                  <TableCell className="font-medium">{approve.authorName}</TableCell>
-                  <TableCell className="font-medium">{approve.topic || 'unknown'}</TableCell>
-                  <TableCell className="font-medium">{approve.campaignName}</TableCell>
-                  <TableCell>{formatDateTime(approve.createdAt)}</TableCell>
-                  <TableCell>
-                    <StatusBadge status={approve.status}></StatusBadge>
-                  </TableCell>
-                  <TableCell>{`${formatDateTime(approve.campaign.startDate)} - ${formatDateTime(
-                    approve.campaign.endDate,
-                  )}`}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-4">
-                      {adminApproveArticle?.tooltips.map((item, idx) => (
-                        <Fragment key={idx}>
-                          <Link
-                            to={`/approve-article/${approve.id}`}
-                            className="cursor-pointer"
-                            state={{ background: location }}
-                          >
-                            <Tooltip
-                              toolTipContent={item.content}
-                              toolTipTrigger={<item.icon className={item.className} />}
-                            />
-                          </Link>
-                        </Fragment>
-                      ))}
-                    </div>
+            <RenderIf value={!adminApproveArticle?.isLoading}>
+              {Array.isArray(adminApproveArticle?.data?.content) && adminApproveArticle?.data?.content.length > 0 ? (
+                adminApproveArticle?.data?.content.map((approve, index) => (
+                  <TableRow key={index} className="odd:bg-muted/50">
+                    <TableCell className="pl-4">{index + 1}</TableCell>
+                    <TableCell className="font-medium">{approve.title}</TableCell>
+                    <TableCell className="font-medium">{approve.authorName}</TableCell>
+                    <TableCell className="font-medium">{approve.topic || 'unknown'}</TableCell>
+                    <TableCell className="font-medium">{approve.campaignName}</TableCell>
+                    <TableCell>{formatDateTime(approve.createdAt)}</TableCell>
+                    <TableCell>
+                      <StatusBadge status={approve.status}></StatusBadge>
+                    </TableCell>
+                    <TableCell>{`${formatDateTime(approve.campaign.startDate)} - ${formatDateTime(
+                      approve.campaign.endDate,
+                    )}`}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-4">
+                        {adminApproveArticle?.tooltips.map((item, idx) => (
+                          <Fragment key={idx}>
+                            <Link
+                              to={`/approve-article/${approve.id}`}
+                              className="cursor-pointer"
+                              state={{ background: location }}
+                            >
+                              <Tooltip
+                                toolTipContent={item.content}
+                                toolTipTrigger={<item.icon className={item.className} />}
+                              />
+                            </Link>
+                          </Fragment>
+                        ))}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={adminApproveArticle?.titlesTable.length} className="text-center">
+                    <FallbackNoDataTable />
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={adminApproveArticle?.titlesTable.length} className="text-center">
-                  <FallbackNoDataTable />
-                </TableCell>
-              </TableRow>
-            )}
+              )}
+            </RenderIf>
           </TableBody>
         </Table>
       </div>

@@ -91,6 +91,11 @@ const StatusBadge = ({ status }: { status: Status | string }) => {
           {s}
         </Badge>
       </RenderIf>
+      <RenderIf value={status === StatusArticle.SendToPR}>
+        <Badge className="bg-emerald-600/10 dark:bg-emerald-600/20 hover:bg-emerald-600/10 text-emerald-500 border-emerald-600/60 shadow-none rounded-full">
+          Gửi cho PR
+        </Badge>
+      </RenderIf>
     </Fragment>
   );
 };

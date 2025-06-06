@@ -53,6 +53,7 @@ export enum StatusArticle {
   NOT_POSTED = 'Không đăng',
   APPROVED = 'Approved',
   INACTIVE = 'Inactive',
+  SendToPR = 'SendToPR',
 }
 
 export enum Gender {

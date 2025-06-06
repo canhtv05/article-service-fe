@@ -12,13 +12,13 @@ import { Checkbox } from '@/components/ui/checkbox';
 import FieldsSelect from '../FieldsSelect';
 import FallbackNoDataTable from '../FallbackNoDataTable';
 import RenderIf from '../RenderIf';
-import LoadingTable from '../LoadingTable';
 import StatusBadge from '../StatusBadge';
-import { AdminArchiveType } from '@/types';
+import { AdminArchiveFilterType, AdminArchiveType } from '@/types';
 import { useAdminArchiveContext } from '@/contexts/context/admin/AdminArchiveContext';
-import { Fragment } from 'react/jsx-runtime';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Tooltip from '../Tooltip';
+import { Badge } from '../ui/badge';
+import { formatDateTime } from '@/lib/utils';
 
 type AdminArchiveTableWithPaginationProps = {
   selectedRows: string[];
@@ -35,21 +35,15 @@ const AdminArchiveTableWithPagination = ({
   handleSelectRow,
   isAllSelected,
 }: AdminArchiveTableWithPaginationProps) => {
+  const navigate = useNavigate();
   const location = useLocation();
   const archive = useAdminArchiveContext();
 
-  // Tính toán phân trang
-  const perPage = Number(archive?.perPage) || 10;
-  const currentPage = archive?.currentPage || 1;
-  const totalItems = archive?.data?.length || 0;
-  const totalPages = Math.ceil(totalItems / perPage);
+  const currentPage = Number(archive?.currentPage);
+  const totalPages = archive?.data?.totalPages || 0;
 
-  // Lấy dữ liệu cho trang hiện tại
-  const startIndex = (currentPage - 1) * perPage;
-  const endIndex = startIndex + perPage;
-  const currentData = archive?.data?.slice(startIndex, endIndex) || [];
+  const currentData = archive?.data?.content || [];
 
-  // Tạo danh sách số trang
   const getPageNumbers = () => {
     const maxPagesToShow = 5;
     const pages: (number | string)[] = [];
@@ -81,13 +75,30 @@ const AdminArchiveTableWithPagination = ({
   const handlePageChange = (page: number) => {
     if (archive?.setCurrentPage && page >= 1 && page <= totalPages) {
       archive.setCurrentPage(page);
+
+      const queryString = buildSearchParamsWithFilters(page, Number(archive.perPage), archive.valueFilter);
+
+      navigate(`/admin/archive?${queryString}`, { replace: true });
     }
+  };
+
+  const buildSearchParamsWithFilters = (page: number, size: number, filters: AdminArchiveFilterType) => {
+    const params = new URLSearchParams();
+
+    params.set('page', String(page));
+    params.set('size', String(size));
+
+    if (filters.title) params.set('title', filters.title);
+    if (filters.campaignName) params.set('campaignName', filters.campaignName);
+    if (filters.authorName) params.set('authorName', filters.authorName);
+
+    return params.toString();
   };
 
   return (
     <div className="w-full">
       <div className="text-sm text-muted-foreground mb-2">
-        Đã chọn {selectedRows.length} / {totalItems} bài viết
+        Đã chọn {selectedRows.length} / {archive?.data?.totalElements} bài viết
       </div>
       <div className="w-full border rounded-md overflow-hidden">
         <Table>
@@ -110,67 +121,50 @@ const AdminArchiveTableWithPagination = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            <RenderIf value={!!archive?.isLoading}>
-              <TableRow className="h-[130px]">
-                <TableCell colSpan={archive?.titlesTable.length} className="flex my-auto justify-center items-center">
-                  <LoadingTable />
-                </TableCell>
-              </TableRow>
-            </RenderIf>
             <RenderIf value={!archive?.isLoading}>
               {Array.isArray(currentData) && currentData.length > 0 ? (
                 currentData.map((arc, index) => (
                   <TableRow key={arc.id} className="odd:bg-muted/50">
                     <TableCell className="pl-4 w-12">
-                      <Checkbox
-                        checked={selectedRows.includes(arc.id)}
-                        onCheckedChange={(checked) => handleSelectRow(arc.id, !!checked)}
-                        aria-label="Select row"
-                        className="border-emerald-500 translate-y-[2px]"
-                      />
+                      <RenderIf value={arc.status === 'Approved'}>
+                        <Checkbox
+                          checked={selectedRows.includes(arc.id)}
+                          onCheckedChange={(checked) => handleSelectRow(arc.id, !!checked)}
+                          aria-label="Select row"
+                          className="border-emerald-500 translate-y-[2px]"
+                        />
+                      </RenderIf>
                     </TableCell>
-                    <TableCell className="pl-4">{startIndex + index + 1}</TableCell>
+                    <TableCell className="pl-4">{index + 1}</TableCell>
                     <TableCell className="pl-4">{arc.title}</TableCell>
-                    <TableCell className="font-medium">{arc.topic_name}</TableCell>
-                    <TableCell>{arc.author_name}</TableCell>
+                    <TableCell className="font-medium">{arc.topic}</TableCell>
+                    <TableCell>{arc.authorName}</TableCell>
                     <TableCell>
                       <StatusBadge status={arc.status} />
                     </TableCell>
-                    <TableCell>{arc.campaign_name}</TableCell>
-                    <TableCell>{arc.approval_date}</TableCell>
+                    <TableCell>
+                      <Badge className="bg-cyan-600/10 dark:bg-cyan-600/20 hover:bg-cyan-600/10 text-cyan-500 border-cyan-600/60 shadow-none rounded-full">
+                        {arc.campaignRegistration.topic.royaltyFee}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{arc.campaignName}</TableCell>
+                    <TableCell>
+                      {arc.impactDate ? formatDateTime(arc.impactDate, 'dd/MM/yyyy HH:mm:ss') : 'Chưa phê duyệt'}
+                    </TableCell>
                     <TableCell>
                       <div className="flex gap-4">
                         {archive?.tooltips.map((item, idx) => (
-                          <Fragment key={idx}>
-                            <RenderIf value={item.type === 'view'}>
-                              <Link
-                                to={`/view/articles/${arc.id}`}
-                                className="cursor-pointer"
-                                state={{ background: location }}
-                              >
-                                <Tooltip
-                                  toolTipContent={item.content}
-                                  toolTipTrigger={<item.icon className={item.className} />}
-                                />
-                              </Link>
-                            </RenderIf>
-                            <RenderIf value={item.type === 'copy'}>
-                              <div className="cursor-pointer">
-                                <Tooltip
-                                  toolTipContent={item.content}
-                                  toolTipTrigger={<item.icon className={item.className} />}
-                                />
-                              </div>
-                            </RenderIf>
-                            <RenderIf value={item.type === 'download'}>
-                              <div className="cursor-pointer">
-                                <Tooltip
-                                  toolTipContent={item.content}
-                                  toolTipTrigger={<item.icon className={item.className} />}
-                                />
-                              </div>
-                            </RenderIf>
-                          </Fragment>
+                          <Link
+                            to={`/view/articles/${arc.id}`}
+                            className="cursor-pointer"
+                            state={{ background: location }}
+                            key={idx}
+                          >
+                            <Tooltip
+                              toolTipContent={item.content}
+                              toolTipTrigger={<item.icon className={item.className} />}
+                            />
+                          </Link>
                         ))}
                       </div>
                     </TableCell>
@@ -187,7 +181,7 @@ const AdminArchiveTableWithPagination = ({
           </TableBody>
         </Table>
       </div>
-      <RenderIf value={!!archive?.data && archive?.data?.length > 0}>
+      <RenderIf value={!!currentData.length && currentData.length > 0}>
         <div className="flex lg:flex-row flex-col gap-5 mt-4 items-center">
           <Pagination>
             <PaginationContent>
@@ -229,14 +223,19 @@ const AdminArchiveTableWithPagination = ({
                 { label: '5 / trang', value: 5 },
                 { label: '10 / trang', value: 10 },
                 { label: '50 / trang', value: 50 },
-                { label: '100 / trang', value: 100 },
               ]}
               value={archive?.perPage}
               setValue={(val) => {
                 if (archive?.setPerPage && archive?.setCurrentPage) {
                   archive.setPerPage(val);
                   archive.setCurrentPage(1);
-                  setSelectedRows([]); // Xóa lựa chọn khi thay đổi perPage
+                  setSelectedRows([]);
+
+                  const queryString = buildSearchParamsWithFilters(1, Number(val), archive.valueFilter);
+
+                  navigate(`/admin/archive?${queryString}`, {
+                    replace: true,
+                  });
                 }
               }}
             />

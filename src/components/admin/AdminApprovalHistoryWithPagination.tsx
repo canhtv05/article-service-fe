@@ -76,8 +76,8 @@ const AdminApprovalHistoryWithPagination = () => {
     params.set('page', String(page));
     params.set('size', String(size));
 
-    if (filters.title) params.set('.title', filters.title);
-    if (filters.status) params.set('.status', filters.status);
+    if (filters.title) params.set('title', filters.title);
+    if (filters.status) params.set('status', filters.status);
     if (filters.startDate) params.set('startDate', filters.startDate);
     if (filters.endDate) params.set('endDate', filters.endDate);
 
@@ -98,45 +98,47 @@ const AdminApprovalHistoryWithPagination = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {Array.isArray(adminApprovalHistory?.data?.content) && adminApprovalHistory?.data?.content.length > 0 ? (
-              adminApprovalHistory?.data?.content.map((approve, index) => (
-                <TableRow key={index} className="odd:bg-muted/50">
-                  <TableCell className="pl-4">{index + 1}</TableCell>
-                  <TableCell className="font-medium">{approve.title}</TableCell>
-                  <TableCell className="font-medium">{approve.authorName}</TableCell>
-                  <TableCell className="font-medium">{approve.campaignName}</TableCell>
-                  <TableCell>{formatDateTime(approve.createdAt, 'dd/MM/yyyy HH:mm:ss')}</TableCell>
-                  <TableCell>{formatDateTime(approve.impactDate, 'dd/MM/yyyy HH:mm:ss')}</TableCell>
-                  <TableCell>
-                    <StatusBadge status={approve.status}></StatusBadge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-4">
-                      {adminApprovalHistory?.tooltips.map((item, idx) => (
-                        <Fragment key={idx}>
-                          <Link
-                            to={`/view/articles/${approve.id}`}
-                            className="cursor-pointer"
-                            state={{ background: location }}
-                          >
-                            <Tooltip
-                              toolTipContent={item.content}
-                              toolTipTrigger={<item.icon className={item.className} />}
-                            />
-                          </Link>
-                        </Fragment>
-                      ))}
-                    </div>
+            <RenderIf value={!adminApprovalHistory?.isLoading}>
+              {Array.isArray(adminApprovalHistory?.data?.content) && adminApprovalHistory?.data?.content.length > 0 ? (
+                adminApprovalHistory?.data?.content.map((approve, index) => (
+                  <TableRow key={index} className="odd:bg-muted/50">
+                    <TableCell className="pl-4">{index + 1}</TableCell>
+                    <TableCell className="font-medium">{approve.title}</TableCell>
+                    <TableCell className="font-medium">{approve.authorName}</TableCell>
+                    <TableCell className="font-medium">{approve.campaignName}</TableCell>
+                    <TableCell>{formatDateTime(approve.createdAt, 'dd/MM/yyyy HH:mm:ss')}</TableCell>
+                    <TableCell>{formatDateTime(approve.impactDate, 'dd/MM/yyyy HH:mm:ss')}</TableCell>
+                    <TableCell>
+                      <StatusBadge status={approve.status}></StatusBadge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-4">
+                        {adminApprovalHistory?.tooltips.map((item, idx) => (
+                          <Fragment key={idx}>
+                            <Link
+                              to={`/view/articles/${approve.id}`}
+                              className="cursor-pointer"
+                              state={{ background: location }}
+                            >
+                              <Tooltip
+                                toolTipContent={item.content}
+                                toolTipTrigger={<item.icon className={item.className} />}
+                              />
+                            </Link>
+                          </Fragment>
+                        ))}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={adminApprovalHistory?.titlesTable.length} className="text-center">
+                    <FallbackNoDataTable />
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={adminApprovalHistory?.titlesTable.length} className="text-center">
-                  <FallbackNoDataTable />
-                </TableCell>
-              </TableRow>
-            )}
+              )}
+            </RenderIf>
           </TableBody>
         </Table>
       </div>

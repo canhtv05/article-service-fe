@@ -1,23 +1,21 @@
 import { useState } from 'react';
-import { Download, List, Send } from 'lucide-react';
+import { List, Send } from 'lucide-react';
 
 import { Button } from '../ui/button';
-import { AdminArchiveType } from '@/types';
+import { AdminArchiveFilterType, AdminArchiveType } from '@/types';
 // import { useAdminArchiveContext } from '@/contexts/context/admin/AdminArchiveContext';
 import AdminArchiveTableWithPagination from './AdminArchiveTableWithPagination';
+import { useNavigate } from 'react-router-dom';
+import { useAdminArchiveContext } from '@/contexts/context/admin/AdminArchiveContext';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { httpRequest } from '@/utils/httpRequest';
+import { toast } from 'sonner';
 
 const AdminArchiveTable = () => {
-  // const archive = useAdminArchiveContext();
+  const archive = useAdminArchiveContext();
+  const navigate = useNavigate();
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
-
-  // Xử lý chọn/tắt tất cả
-  const handleSelectAll = (checked: boolean, currentPageData: AdminArchiveType[]) => {
-    if (checked) {
-      setSelectedRows(currentPageData.map((item) => item.id));
-    } else {
-      setSelectedRows([]);
-    }
-  };
+  const queryClient = useQueryClient();
 
   // Xử lý chọn/tắt từng hàng
   const handleSelectRow = (id: string, checked: boolean) => {
@@ -28,18 +26,79 @@ const AdminArchiveTable = () => {
     }
   };
 
-  // Kiểm tra trạng thái chọn tất cả
-  const isAllSelected = (currentPageData: AdminArchiveType[]) =>
-    currentPageData.length > 0 && selectedRows.length === currentPageData.length;
+  const handleSelectAll = (checked: boolean, currentPageData: AdminArchiveType[]) => {
+    const approvedItems = currentPageData.filter((item) => item.status === 'Approved');
 
-  // const handleAssign = () => {
-  //   toast.success(Notice.UPDATE_SUCCESS);
-  //   setSelectedRows([]);
-  //   archive?.setData((prev) => {
-  //     if (!prev) return [];
-  //     return prev.filter((arc) => !selectedRows.includes(arc.id));
-  //   });
-  // };
+    if (checked) {
+      setSelectedRows(approvedItems.map((item) => item.id));
+    } else {
+      setSelectedRows([]);
+    }
+  };
+
+  const isAllSelected = (currentPageData: AdminArchiveType[]) => {
+    const approvedItems = currentPageData.filter((item) => item.status === 'Approved');
+    if (approvedItems.length === 0) return false;
+
+    return approvedItems.every((item) => selectedRows.includes(item.id));
+  };
+
+  type TypeStatus = 'Approved' | 'SendToPR' | 'Published' | 'Inactive' | 'AwaitingPublication';
+
+  const buildSearchParamsWithFilters = (
+    page: number,
+    size: number,
+    filters: AdminArchiveFilterType,
+    type: TypeStatus,
+  ) => {
+    const params = new URLSearchParams();
+
+    params.set('size', String(size));
+    params.set('page', String(page));
+
+    if (filters.title) params.set('title', filters.title);
+    if (filters.campaignName) params.set('campaignName', filters.campaignName);
+    if (filters.authorName) params.set('authorName', filters.authorName);
+
+    params.set('status', String(type));
+
+    return params.toString();
+  };
+
+  const sendToPrMutation = useMutation({
+    mutationFn: async () => {
+      for (const id of selectedRows) {
+        await httpRequest.get(`/admin/bai-viet/day-bai-viet-pr/${id}`);
+        await sleep(1000);
+      }
+    },
+    onSuccess: () => {
+      setSelectedRows([]);
+      queryClient.invalidateQueries({ queryKey: ['/admin/bai-viet/danh-sach-bai-viet'] });
+      toast.success('Gửi PR thành công!');
+    },
+    onError: (error) => {
+      toast.error(error.message ?? 'Có lỗi xảy ra');
+    },
+  });
+
+  const handleSendToPr = () => {
+    if (selectedRows.length === 0) return;
+    sendToPrMutation.mutate();
+  };
+
+  if (!archive) return;
+  const handleFilter = (type: TypeStatus) => {
+    const queryString = buildSearchParamsWithFilters(1, 5, archive.valueFilter, type);
+
+    navigate(`/admin/archive?${queryString}`, {
+      replace: true,
+    });
+
+    setSelectedRows([]);
+  };
+
+  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
   return (
     <div className="flex flex-col gap-4 rounded-xl shadow-md p-5 text-foreground h-full">
@@ -49,26 +108,26 @@ const AdminArchiveTable = () => {
           <span className="text-foreground text-[18px]">Danh sách đợt đăng ký</span>
         </div>
         <div className="grid grid-cols-3 xl:flex xl:flex-row xl:justify-end gap-2 w-full">
-          <Button customize={'default'} className="py-5 rounded-full">
+          <Button customize={'default'} className="py-5 rounded-full" onClick={() => handleFilter('Approved')}>
             Đã phê duyệt
           </Button>
 
-          <Button customize={'default'} className="py-5 rounded-full">
+          <Button customize={'default'} className="py-5 rounded-full" onClick={() => handleFilter('SendToPR')}>
             Đã gửi
           </Button>
-          <Button customize={'default'} className="py-5 rounded-full">
+          <Button customize={'default'} className="py-5 rounded-full" onClick={() => handleFilter('Published')}>
             Đã đăng
           </Button>
 
-          <Button customize={'default'} className="py-5 rounded-full">
+          <Button customize={'default'} className="py-5 rounded-full" onClick={() => handleFilter('Inactive')}>
             Không đăng
           </Button>
-          <Button customize={'default'} className="py-5 rounded-full">
-            <Download />
-            Tải bài viết
-          </Button>
-
-          <Button customize={'default'} className="py-5 rounded-full">
+          <Button
+            customize={'default'}
+            className="py-5 rounded-full"
+            disabled={selectedRows.length === 0}
+            onClick={handleSendToPr}
+          >
             <Send />
             Gửi PR
           </Button>

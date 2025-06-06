@@ -1,80 +1,119 @@
 import { ReactNode, useEffect, useState } from 'react';
-import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
+import { Eye } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 
-import { AdminArchiveFilterType, AdminArchiveType } from '@/types';
-import { Download, Eye, Clipboard } from 'lucide-react';
+import { AdminArchiveFilterType, AdminArchiveResponseType } from '@/types';
 import { AdminArchiveContext } from '@/contexts/context/admin/AdminArchiveContext';
+import { httpRequest } from '@/utils/httpRequest';
 
 const tooltips = [
-  {
-    content: 'Copy đường dẫn driver',
-    icon: Clipboard,
-    type: 'copy',
-    className: 'hover:stroke-yellow-500 size-5',
-  },
   {
     content: 'Xem',
     icon: Eye,
     type: 'view',
     className: 'hover:stroke-green-500 size-5',
   },
-  {
-    content: 'Tải bài viết',
-    icon: Download,
-    type: 'download',
-    className: 'hover:stroke-red-500 size-5',
-  },
 ];
 
-const titlesTable = ['', '#', 'Mã', 'Tên', 'Thời gian', 'Thời gian đăng ký', 'Đợt viết bài', 'Trạng thái', 'Hành động'];
+const titlesTable = [
+  '',
+  '#',
+  'Tiêu đề bài viết',
+  'Chủ đề',
+  'Giảng viên',
+  'Trạng thái',
+  'Nhuận bút',
+  'Tên đợt viết bài',
+  'Ngày phê duyệt',
+  'Hành động',
+];
 
 const AdminArchiveProvider = ({ children }: { children: ReactNode }) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const pageFromUrl = Number(searchParams.get('page')) || 1;
+  const sizeFromUrl = Number(searchParams.get('size')) || 5;
+  const title = searchParams.get('title') || '';
+  const authorName = searchParams.get('authorName') || '';
+  const campaignName = searchParams.get('campaignName') || '';
+  const status = searchParams.get('status') || '';
+
+  const [data, setData] = useState<AdminArchiveResponseType | undefined>(undefined);
+  const [currentPage, setCurrentPage] = useState(pageFromUrl);
+  const [perPage, setPerPage] = useState<string>(sizeFromUrl.toString());
+  const [valueFilter, setValueFilter] = useState<AdminArchiveFilterType>({
+    title,
+    authorName,
+    campaignName,
+    status,
+  });
+
+  useEffect(() => {
+    setValueFilter({
+      title,
+      authorName,
+      campaignName,
+      status,
+    });
+    setCurrentPage(pageFromUrl);
+    setPerPage(sizeFromUrl.toString());
+  }, [authorName, campaignName, pageFromUrl, searchParams, sizeFromUrl, status, title]);
+
   const {
-    data: registrationPeriod,
+    data: approveArticle,
     isLoading,
     error,
-  } = useQuery<AdminArchiveType[]>({
-    queryKey: ['data_admin_archive'],
+  } = useQuery({
+    queryKey: ['/admin/bai-viet/danh-sach-bai-viet', currentPage, perPage, title, authorName, campaignName, status],
     queryFn: async () => {
-      const response = await axios.get('/data_admin_archive.json');
+      const params: Record<string, string> = {
+        page: currentPage.toString(),
+        size: perPage,
+      };
+      if (title) params.title = title;
+      if (authorName) params.authorName = authorName;
+      if (campaignName) params.campaignName = campaignName;
+      if (status) params.status = status;
+
+      const response = await httpRequest.get('/admin/bai-viet/danh-sach-bai-viet', {
+        params,
+      });
+
       return response.data;
     },
   });
 
-  const [data, setData] = useState<AdminArchiveType[] | undefined>(undefined);
-  const [valueFilter, setValueFilter] = useState<AdminArchiveFilterType>({
-    author_name: '',
-    campaign_period: '',
-    id_author: '',
-    title: '',
-    topic: '',
-  });
-
-  const [perPage, setPerPage] = useState<string>('5');
-  const [currentPage, setCurrentPage] = useState<number>(1);
-
   useEffect(() => {
-    if (registrationPeriod) {
-      setData(registrationPeriod);
-      setCurrentPage(1);
+    if (approveArticle) {
+      setData(approveArticle);
     }
-  }, [registrationPeriod]);
+  }, [approveArticle]);
 
   const handleClearFields = () => {
     setValueFilter({
-      author_name: '',
-      campaign_period: '',
-      id_author: '',
       title: '',
-      topic: '',
+      authorName: '',
+      status: '',
+      campaignName: '',
     });
-    if (!registrationPeriod) return;
-    setData(registrationPeriod);
+    setSearchParams({ page: '1', size: perPage });
     setCurrentPage(1);
   };
 
-  const handleFilters = () => {};
+  const handleFilters = () => {
+    const query: Record<string, string> = {
+      page: '1',
+      size: perPage,
+    };
+
+    if (valueFilter.title) query.title = valueFilter.title;
+    if (valueFilter.campaignName) query.campaignName = valueFilter.campaignName;
+    if (valueFilter.authorName) query.authorName = valueFilter.authorName;
+
+    setSearchParams(query);
+    setCurrentPage(1);
+  };
 
   const values = {
     data,
