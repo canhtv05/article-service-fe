@@ -389,7 +389,7 @@ export type AdminApproveArticleFilterType = {
   titleAndAuthorName: string;
   campaignName: string;
   startDate: string;
-  endData: string;
+  endDate: string;
 };
 
 export type AdminApproveArticleContextType = {
@@ -457,23 +457,38 @@ export type AdminArchiveContextType = {
 export type AdminApprovalHistoryType = {
   id: string;
   title: string;
-  author_name: string;
-  type: string;
-  created_at: string;
-  operation_date: string;
+  authorName: string;
+  campaignName: string;
+  topic: string;
+  submittedAt: string;
+  approvedAt: string;
   status: string;
+  campaignId: string;
+  subCampaignId: string;
+  createdAt: string;
+  updatedAt: string;
+  impactDate: string;
+  campaign: {
+    startDate: string;
+    endDate: string;
+  };
+};
+
+export type AdminApproveHistoryResponseType = {
+  content: AdminApprovalHistoryType[];
+  totalPages: number;
 };
 
 export type AdminApprovalHistoryFilterType = {
   title: string;
   status: string;
-  start_date: string;
-  end_date: string;
+  startDate: string;
+  endDate: string;
 };
 
 export type AdminApprovalHistoryContextType = {
-  data: AdminApprovalHistoryType[] | undefined;
-  setData: Dispatch<SetStateAction<AdminApprovalHistoryType[] | undefined>>;
+  data: AdminApproveHistoryResponseType | undefined;
+  setData: Dispatch<SetStateAction<AdminApproveHistoryResponseType | undefined>>;
   isLoading: boolean;
   error: unknown;
   titlesTable: string[];

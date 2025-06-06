@@ -12,13 +12,13 @@ const AdminFilterApproveArticleComponent = () => {
 
   if (!approveArticle) return;
 
-  const { campaignName, endData, startDate, titleAndAuthorName } = approveArticle.valueFilter;
+  const { campaignName, endDate, startDate, titleAndAuthorName } = approveArticle.valueFilter;
 
   const dateRange: DateRange | undefined =
-    startDate || endData
+    startDate || endDate
       ? {
           from: startDate ? parseISO(startDate) : undefined,
-          to: endData ? parseISO(endData) : undefined,
+          to: endDate ? parseISO(endDate) : undefined,
         }
       : undefined;
 
@@ -26,7 +26,7 @@ const AdminFilterApproveArticleComponent = () => {
     approveArticle?.setValueFilter((prev) => ({
       ...prev,
       startDate: range?.from ? range.from.toISOString() : '',
-      endData: range?.to ? range.to.toISOString() : '',
+      endDate: range?.to ? range.to.toISOString() : '',
     }));
   };
 

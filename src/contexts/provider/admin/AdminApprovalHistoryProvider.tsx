@@ -1,16 +1,16 @@
 import { ReactNode, useEffect, useState } from 'react';
-import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
-import { SquarePen } from 'lucide-react';
+import { Eye } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 
-import { AdminApprovalHistoryType, AdminApprovalHistoryFilterType } from '@/types';
+import { AdminApprovalHistoryFilterType, AdminApproveHistoryResponseType } from '@/types';
 import { AdminApprovalHistoryContext } from '@/contexts/context/admin/AdminApprovalHistoryContext';
-import { Status } from '@/enums';
+import { httpRequest } from '@/utils/httpRequest';
 
 const tooltips = [
   {
-    content: 'Chỉnh sửa',
-    icon: SquarePen,
+    content: 'Xem',
+    icon: Eye,
     type: 'update',
     className: 'hover:stroke-yellow-500 size-5',
   },
@@ -19,49 +19,91 @@ const tooltips = [
 const titlesTable = ['#', 'Tiêu đề', 'Tác giả', 'Thể loại', 'Ngày tạo', 'Ngày thao tác', 'Trạng thái', 'Hành động'];
 
 const AdminApprovalHistoryProvider = ({ children }: { children: ReactNode }) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const pageFromUrl = Number(searchParams.get('page')) || 1;
+  const sizeFromUrl = Number(searchParams.get('size')) || 5;
+  const title = searchParams.get('title') || '';
+  const status = searchParams.get('status') || '';
+  const startDate = searchParams.get('startDate') || '';
+  const endDate = searchParams.get('endDate') || '';
+
+  const [data, setData] = useState<AdminApproveHistoryResponseType | undefined>(undefined);
+  const [currentPage, setCurrentPage] = useState(pageFromUrl);
+  const [perPage, setPerPage] = useState<string>(sizeFromUrl.toString());
+  const [valueFilter, setValueFilter] = useState<AdminApprovalHistoryFilterType>({
+    status,
+    title,
+    startDate,
+    endDate,
+  });
+
+  useEffect(() => {
+    setValueFilter({
+      status,
+      title,
+      startDate,
+      endDate,
+    });
+    setCurrentPage(pageFromUrl);
+    setPerPage(sizeFromUrl.toString());
+  }, [endDate, pageFromUrl, searchParams, sizeFromUrl, startDate, status, title]);
+
   const {
-    data: approvalHistory,
+    data: approveArticle,
     isLoading,
     error,
-  } = useQuery<AdminApprovalHistoryType[]>({
-    queryKey: ['data_approval_history'],
+  } = useQuery({
+    queryKey: ['/admin/bai-viet/lich-su-phe-duyet', currentPage, perPage, title, status, startDate, endDate],
     queryFn: async () => {
-      const response = await axios.get('/data_approval_history.json');
+      const params: Record<string, string> = {
+        page: currentPage.toString(),
+        size: perPage,
+      };
+      if (title) params.title = title;
+      if (status) params.status = status;
+      if (startDate) params.startDate = startDate;
+      if (endDate) params.endDate = endDate;
+
+      const response = await httpRequest.get('/admin/bai-viet/lich-su-phe-duyet', {
+        params,
+      });
+
       return response.data;
     },
   });
 
-  const [data, setData] = useState<AdminApprovalHistoryType[] | undefined>(undefined);
-  const [perPage, setPerPage] = useState<string>('5');
-  const [currentPage, setCurrentPage] = useState<number>(1);
-
-  const [valueFilter, setValueFilter] = useState<AdminApprovalHistoryFilterType>({
-    end_date: '',
-    start_date: '',
-    status: Status.ALL,
-    title: '',
-  });
-
   useEffect(() => {
-    if (approvalHistory) {
-      setData(approvalHistory);
-      setCurrentPage(1);
+    if (approveArticle) {
+      setData(approveArticle);
     }
-  }, [approvalHistory]);
+  }, [approveArticle]);
 
   const handleClearFields = () => {
     setValueFilter({
-      end_date: '',
-      start_date: '',
-      status: Status.ALL,
+      status: '',
       title: '',
+      startDate: '',
+      endDate: '',
     });
-    if (!approvalHistory) return;
-    setData(approvalHistory);
+    setSearchParams({ page: '1', size: perPage });
     setCurrentPage(1);
   };
 
-  const handleFilters = () => {};
+  const handleFilters = () => {
+    const query: Record<string, string> = {
+      page: '1',
+      size: perPage,
+    };
+
+    if (valueFilter.title) query.title = valueFilter.title;
+    if (valueFilter.status) query.status = valueFilter.status;
+    if (valueFilter.startDate) query.startDate = valueFilter.startDate;
+    if (valueFilter.endDate) query.endDate = valueFilter.endDate;
+
+    setSearchParams(query);
+    setCurrentPage(1);
+  };
 
   const values = {
     data,
@@ -79,6 +121,7 @@ const AdminApprovalHistoryProvider = ({ children }: { children: ReactNode }) => 
     setValueFilter,
     handleFilters,
   };
+
   return <AdminApprovalHistoryContext.Provider value={values}>{children}</AdminApprovalHistoryContext.Provider>;
 };
 

@@ -13,21 +13,21 @@ const AdminFilterApprovalHistoryComponent = () => {
 
   if (!approvalHistory) return;
 
-  const { end_date, start_date, status, title } = approvalHistory.valueFilter;
+  const { endDate, startDate, status, title } = approvalHistory.valueFilter;
 
   const dateRange: DateRange | undefined =
-    start_date || end_date
+    startDate || endDate
       ? {
-          from: start_date ? parseISO(start_date) : undefined,
-          to: end_date ? parseISO(end_date) : undefined,
+          from: startDate ? parseISO(startDate) : undefined,
+          to: endDate ? parseISO(endDate) : undefined,
         }
       : undefined;
 
   const handleChangeDate = (range: DateRange | undefined) => {
     approvalHistory?.setValueFilter((prev) => ({
       ...prev,
-      start_date: range?.from ? range.from.toISOString() : '',
-      end_date: range?.to ? range.to.toISOString() : '',
+      startDate: range?.from ? range.from.toISOString() : '',
+      endDate: range?.to ? range.to.toISOString() : '',
     }));
   };
 
@@ -58,12 +58,10 @@ const AdminFilterApprovalHistoryComponent = () => {
           id="status"
           placeholder="-- Chọn trạng thái --"
           data={[
-            { label: 'Tất cả', value: 'ALL' },
-            { label: 'Đã phê duyệt', value: 'Đã phê duyệt' },
-            { label: 'Chưa phê duyệt', value: 'Chưa phê duyệt' },
+            { label: 'Đã phê duyệt', value: 'Approved' },
+            { label: 'Từ chối', value: 'Inactive' },
           ]}
           label="Trạng thái"
-          defaultValue={'ALL'}
           value={status}
           setValue={(val) => {
             if (typeof val === 'string' && approvalHistory && val !== status) {
