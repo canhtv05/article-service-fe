@@ -417,24 +417,34 @@ export type AdminApproveArticleContextType = {
 export type AdminArchiveType = {
   id: string;
   title: string;
-  topic_name: string;
-  author_name: string;
+  topic: string;
+  authorName: string;
   status: string;
-  campaign_name: number;
-  approval_date: string;
+  campaignRegistration: {
+    topic: {
+      royaltyFee: number;
+    };
+  };
+  campaignName: string;
+  impactDate: string;
+};
+
+export type AdminArchiveResponseType = {
+  content: AdminArchiveType[];
+  totalPages: number;
+  totalElements: number;
 };
 
 export type AdminArchiveFilterType = {
   title: string;
-  id_author: string;
-  author_name: string;
-  campaign_period: string;
-  topic: string;
+  authorName: string;
+  campaignName: string;
+  status: string;
 };
 
 export type AdminArchiveContextType = {
-  data: AdminArchiveType[] | undefined;
-  setData: Dispatch<SetStateAction<AdminArchiveType[] | undefined>>;
+  data: AdminArchiveResponseType | undefined;
+  setData: Dispatch<SetStateAction<AdminArchiveResponseType | undefined>>;
   isLoading: boolean;
   error: unknown;
   titlesTable: string[];
