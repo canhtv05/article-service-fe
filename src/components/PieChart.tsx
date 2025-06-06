@@ -61,7 +61,7 @@ const PieChart = ({ chartData }: { chartData: ChartDataType[] }) => {
     <Card className="flex flex-col h-full border-none shadow-md bg-transparent">
       <CardHeader className="items-center pb-0">
         <CardDescription>
-          <div className="flex md:grid auto-rows-min gap-4 grid-cols-3">
+          {/* <div className="flex md:grid auto-rows-min gap-4 grid-cols-3">
             <FieldsSelect
               placeholder="-- Chọn đợt viết bài --"
               data={fakeDataChart}
@@ -69,7 +69,7 @@ const PieChart = ({ chartData }: { chartData: ChartDataType[] }) => {
               label="Đợt viết bài"
               setValue={setSelected}
             />
-          </div>
+          </div> */}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0 flex">
