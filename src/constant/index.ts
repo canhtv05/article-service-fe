@@ -219,10 +219,10 @@ export const chartData = (statistical: StatisticalItemType) => {
   const children = statistical.children || [];
 
   const colorVars = [
-    'var(--color-chrome)',
     'var(--color-safari)',
-    'var(--color-firefox)',
+    'var(--color-chrome)',
     'var(--color-edge)',
+    'var(--color-firefox)',
     'var(--color-other)',
   ];
 

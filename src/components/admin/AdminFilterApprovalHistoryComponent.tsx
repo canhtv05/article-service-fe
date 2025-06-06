@@ -60,6 +60,7 @@ const AdminFilterApprovalHistoryComponent = () => {
           data={[
             { label: 'Đã phê duyệt', value: 'Approved' },
             { label: 'Từ chối', value: 'Inactive' },
+            { label: 'Đã gửi cho PR', value: 'SendToPR' },
           ]}
           label="Trạng thái"
           value={status}
