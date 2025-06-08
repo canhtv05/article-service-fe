@@ -21,6 +21,11 @@ import { AdminRegistrationPeriodContext } from '@/contexts/context/admin/AdminRe
 import Tooltip from '../Tooltip';
 import { Link, useNavigate } from 'react-router-dom';
 import { formatDateTime } from '@/lib/utils';
+import ConfirmDialog from '../ConfirmDialog';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { httpRequest } from '@/utils/httpRequest';
+import { toast } from 'sonner';
+import { Notice } from '@/enums';
 
 type AdminRegistrationTableWithPaginationProps = {
   selectedRows: string[];
@@ -39,6 +44,7 @@ const AdminRegistrationTableWithPagination = ({
 }: AdminRegistrationTableWithPaginationProps) => {
   const navigate = useNavigate();
   const registrationPeriod = useContext(AdminRegistrationPeriodContext);
+  const queryClient = useQueryClient();
 
   const currentPage = Number(registrationPeriod?.currentPage);
   const totalPages = registrationPeriod?.data?.totalPages || 0;
@@ -100,6 +106,22 @@ const AdminRegistrationTableWithPagination = ({
     if (filters.endDate) params.set('endDate', filters.endDate);
 
     return params.toString();
+  };
+
+  const inactiveCampaignPeriod = useMutation({
+    mutationKey: ['inactive-campaign'],
+    mutationFn: async (id: string) => await httpRequest.get(`/dot-bai-viet/xoa-dot-dk/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/dot-bai-viet/danh-sanh-dot'] });
+      toast.success(Notice.UPDATE_SUCCESS);
+    },
+    onError: (error) => {
+      toast.error(error.message ?? 'Có lỗi xảy ra');
+    },
+  });
+
+  const handleInactive = (id: string) => {
+    inactiveCampaignPeriod.mutate(id);
   };
 
   return (
@@ -175,12 +197,19 @@ const AdminRegistrationTableWithPagination = ({
                             </div>
                           </RenderIf>
                           <RenderIf value={item.type === 'remove'}>
-                            <div className="cursor-pointer">
-                              <Tooltip
-                                toolTipContent={item.content}
-                                toolTipTrigger={<item.icon className={item.className} />}
-                              />
-                            </div>
+                            <ConfirmDialog
+                              key={idx}
+                              onContinue={() => handleInactive(registration.id)}
+                              typeTitle={'chỉnh sửa'}
+                              triggerComponent={
+                                <div className="cursor-pointer">
+                                  <Tooltip
+                                    toolTipContent={item.content}
+                                    toolTipTrigger={<item.icon className={item.className} />}
+                                  />
+                                </div>
+                              }
+                            />
                           </RenderIf>
                         </Fragment>
                       ))}

@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
-import { Eye, Pen, Trash } from 'lucide-react';
+import { Eye, Trash } from 'lucide-react';
 
 import { AdminRegistrationPeriodFilterType, AdminRegistrationPeriodResponseType } from '@/types';
 import { AdminRegistrationPeriodContext } from '@/contexts/context/admin/AdminRegistrationPeriodContext';
@@ -14,14 +14,14 @@ const tooltips = [
     type: 'view',
     className: 'hover:stroke-green-500 size-5',
   },
+  // {
+  //   content: 'Phân công chủ đề',
+  //   icon: Pen,
+  //   type: 'assign_topic',
+  //   className: 'hover:stroke-yellow-500 size-5',
+  // },
   {
-    content: 'Phân công chủ đề',
-    icon: Pen,
-    type: 'assign_topic',
-    className: 'hover:stroke-yellow-500 size-5',
-  },
-  {
-    content: 'Xóa',
+    content: 'Ngừng hoạt động',
     icon: Trash,
     type: 'remove',
     className: 'hover:stroke-red-500 size-5',
