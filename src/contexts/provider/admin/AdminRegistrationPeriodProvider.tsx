@@ -66,7 +66,16 @@ const AdminRegistrationPeriodProvider = ({ children }: { children: ReactNode }) 
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['/dot-bai-viet/danh-sanh-dot', currentPage, perPage, name, status, startDate, endDate],
+    queryKey: [
+      '/dot-bai-viet/danh-sanh-dot',
+      '/dot-bai-viet/chi-tiet',
+      currentPage,
+      perPage,
+      name,
+      status,
+      startDate,
+      endDate,
+    ],
     queryFn: async () => {
       const params: Record<string, string> = {
         page: currentPage.toString(),
