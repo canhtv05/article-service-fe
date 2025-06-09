@@ -4,7 +4,6 @@ import { toast } from 'sonner';
 
 import { Button } from '../ui/button';
 import ConfirmDialog from '../ConfirmDialog';
-import { Notice } from '@/enums';
 import { AdminRegistrationPeriodType } from '@/types';
 import { AdminRegistrationPeriodContext } from '@/contexts/context/admin/AdminRegistrationPeriodContext';
 import AdminRegistrationTableWithPagination from './AdminRegistrationTableWithPagination';
@@ -16,6 +15,7 @@ import { format, parseISO } from 'date-fns';
 import { DateRangePicker } from '../DateRangePicker';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { httpRequest } from '@/utils/httpRequest';
+import { Notice } from '@/enums';
 
 type Assign = 'Open' | 'NotOpen';
 
@@ -38,7 +38,7 @@ const AddCampaignPeriod = ({
         <Label htmlFor="title" className="font-bold mb-2 leading-5">
           Tên:
         </Label>
-        <Input id="title" type="text" placeholder="Tên đợt đăng ký" readOnly value={value.campaign_name} />
+        <Input id="title" type="text" placeholder="Tên đợt đăng ký" readOnly value={value.name} />
       </div>
       <div className="flex flex-col justify-end">
         <Label className="font-bold mb-2 leading-5">Đợt đăng ký:</Label>
@@ -53,11 +53,11 @@ const AddCampaignPeriod = ({
 };
 
 interface ValueRegistration {
-  campaign_name: string;
-  campaign_period_start_date: string;
-  campaign_period_end_date: string;
-  campaign_deadline_start_date: string;
-  campaign_deadline_end_date: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  writingStartDate: string;
+  writingEndDate: string;
 }
 
 const AdminRegistrationTable = () => {
@@ -66,49 +66,44 @@ const AdminRegistrationTable = () => {
   const queryClient = useQueryClient();
 
   const [value, setValue] = useState<ValueRegistration>({
-    campaign_deadline_end_date: '',
-    campaign_deadline_start_date: '',
-    campaign_name: '',
-    campaign_period_end_date: '',
-    campaign_period_start_date: '',
+    endDate: '',
+    name: '',
+    startDate: '',
+    writingEndDate: '',
+    writingStartDate: '',
   });
 
-  const {
-    campaign_deadline_end_date,
-    campaign_deadline_start_date,
-    campaign_period_end_date,
-    campaign_period_start_date,
-  } = value;
+  const { endDate, startDate, writingEndDate, writingStartDate } = value;
 
   const dateRangePeriod: DateRange | undefined =
-    campaign_period_start_date || campaign_period_end_date
+    startDate || endDate
       ? {
-          from: campaign_period_start_date ? parseISO(campaign_period_start_date) : undefined,
-          to: campaign_period_end_date ? parseISO(campaign_period_end_date) : undefined,
+          from: startDate ? parseISO(startDate) : undefined,
+          to: endDate ? parseISO(endDate) : undefined,
         }
       : undefined;
 
   const dateRangeDeadline: DateRange | undefined =
-    campaign_deadline_start_date || campaign_deadline_end_date
+    writingStartDate || writingEndDate
       ? {
-          from: campaign_deadline_start_date ? parseISO(campaign_deadline_start_date) : undefined,
-          to: campaign_deadline_end_date ? parseISO(campaign_deadline_end_date) : undefined,
+          from: writingStartDate ? parseISO(writingStartDate) : undefined,
+          to: writingEndDate ? parseISO(writingEndDate) : undefined,
         }
       : undefined;
 
   const handleChangeDatePeriod = (range: DateRange | undefined) => {
     setValue((prev) => ({
       ...prev,
-      campaign_period_start_date: range?.from ? range.from.toISOString() : '',
-      campaign_period_end_date: range?.to ? range.to.toISOString() : '',
+      startDate: range?.from ? range.from.toISOString() : '',
+      endDate: range?.to ? range.to.toISOString() : '',
     }));
   };
 
   const handleChangeDateDeadline = (range: DateRange | undefined) => {
     setValue((prev) => ({
       ...prev,
-      campaign_deadline_start_date: range?.from ? range.from.toISOString() : '',
-      campaign_deadline_end_date: range?.to ? range.to.toISOString() : '',
+      writingStartDate: range?.from ? range.from.toISOString() : '',
+      writingEndDate: range?.to ? range.to.toISOString() : '',
     }));
   };
 
@@ -165,57 +160,46 @@ const AdminRegistrationTable = () => {
     if (selectedRows.length !== 0) sendToPrMutation.mutate(type);
   };
 
+  const createWritingCampaign = useMutation({
+    mutationKey: ['create'],
+    mutationFn: async (data: ValueRegistration) => await httpRequest.post('/dot-bai-viet/tao-dot-bai-viet', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/dot-bai-viet/danh-sanh-dot'] });
+      toast.success(Notice.ADD_SUCCESS);
+    },
+    onError: (error) => {
+      toast.error(error.message ?? 'Có lỗi xảy ra');
+    },
+  });
+
   const handleOnContinue = () => {
-    const {
-      campaign_deadline_end_date,
-      campaign_deadline_start_date,
-      campaign_period_end_date,
-      campaign_period_start_date,
-    } = value;
-    if (
-      !campaign_deadline_end_date ||
-      !campaign_deadline_start_date ||
-      !campaign_period_end_date ||
-      !campaign_period_start_date
-    ) {
+    const { writingEndDate, writingStartDate, endDate, startDate } = value;
+    if (!writingEndDate || !writingStartDate || !endDate || !startDate) {
       toast.error('Vui lòng nhập đủ các trường');
       return;
     }
 
-    const formattedPeriodStart = format(parseISO(campaign_period_start_date), 'dd/MM/yyyy HH:mm:ss');
-    const formattedPeriodEnd = format(parseISO(campaign_period_end_date), 'dd/MM/yyyy HH:mm:ss');
-    const formattedDeadlineStart = format(parseISO(campaign_deadline_start_date), 'dd/MM/yyyy HH:mm:ss');
-    const formattedDeadlineEnd = format(parseISO(campaign_deadline_end_date), 'dd/MM/yyyy HH:mm:ss');
-
-    const campaignName = `Đợt ${format(parseISO(campaign_period_start_date), 'dd/MM/yyyy')} - ${format(
-      parseISO(campaign_period_end_date),
+    const campaignName = `Đợt ${format(parseISO(startDate), 'dd/MM/yyyy')} - ${format(
+      parseISO(endDate),
       'dd/MM/yyyy',
     )}`;
 
-    setValue((prev) => ({
-      ...prev,
-      campaign_name: campaignName,
-    }));
-
-    const now = new Date();
-    const id = `id-${format(now, 'yyyyMMdd-HHmmss-SSS')}`;
-
-    const data: AdminRegistrationPeriodType = {
-      id,
+    const data: ValueRegistration = {
       name: campaignName,
-      time: `${formattedPeriodStart} - ${formattedPeriodEnd}`,
-      time_registration: `${formattedDeadlineStart} - ${formattedDeadlineEnd}`,
-      campaign_period: 0,
-      status: 'Đóng đăng ký',
+      startDate,
+      endDate,
+      writingStartDate,
+      writingEndDate,
     };
 
-    registrationPeriod?.setData((prev) => [data, ...(prev || [])]);
+    createWritingCampaign.mutate(data);
+
     setValue({
-      campaign_deadline_end_date: '',
-      campaign_deadline_start_date: '',
-      campaign_name: '',
-      campaign_period_end_date: '',
-      campaign_period_start_date: '',
+      writingEndDate: '',
+      writingStartDate: '',
+      name: '',
+      endDate: '',
+      startDate: '',
     });
   };
 

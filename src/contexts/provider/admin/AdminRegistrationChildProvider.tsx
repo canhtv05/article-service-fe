@@ -5,6 +5,7 @@ import { SquarePen, Trash } from 'lucide-react';
 
 import { AdminRegistrationChildType } from '@/types';
 import { AdminRegistrationChildContext } from '@/contexts/context/admin/AdminRegistrationChildContext';
+import { useParams, useSearchParams } from 'react-router-dom';
 
 const tooltips = [
   {
@@ -24,6 +25,19 @@ const tooltips = [
 const titlesTable = ['#', 'Mã giảng viên', 'Tên giảng viên', 'Chủ đề', 'Số lượng bài viết', 'Hành động'];
 
 const AdminRegistrationChildProvider = ({ children }: { children: ReactNode }) => {
+  const [searchParams] = useSearchParams();
+
+  const pageFromUrl = Number(searchParams.get('page')) || 1;
+  const sizeFromUrl = Number(searchParams.get('size')) || 5;
+  const { id } = useParams();
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [perPage, setPerPage] = useState<string>('5');
+
+  useEffect(() => {
+    setCurrentPage(pageFromUrl);
+    setPerPage(sizeFromUrl.toString());
+  }, [pageFromUrl, sizeFromUrl]);
+
   const {
     data: registrationPeriodChild,
     isLoading,
@@ -37,15 +51,6 @@ const AdminRegistrationChildProvider = ({ children }: { children: ReactNode }) =
   });
 
   const [data, setData] = useState<AdminRegistrationChildType[] | undefined>(undefined);
-  const [perPage, setPerPage] = useState<string>('5');
-  const [currentPage, setCurrentPage] = useState<number>(1);
-
-  useEffect(() => {
-    if (registrationPeriodChild) {
-      setData(registrationPeriodChild);
-      setCurrentPage(1);
-    }
-  }, [registrationPeriodChild]);
 
   const values = {
     data,

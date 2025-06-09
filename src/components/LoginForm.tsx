@@ -27,6 +27,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
   const setIsLoading = useAuthStore((s) => s.setIsLoading);
 
   const loginMutation = useMutation({
+    mutationKey: ['login'],
     mutationFn: async (): Promise<ApiResponse<UserResponse>> => {
       const data = await httpRequest.post('/auth/login', { email: value.email, password: value.password });
       return data.data;

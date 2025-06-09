@@ -20,6 +20,7 @@ export enum Notice {
   REMOVE_FAILED = 'Xóa thất bại',
   UPDATE_SUCCESS = 'Cập nhật thành công',
   UPDATE_FAILED = 'Cập nhật thất bại',
+  ERROR = 'Có lỗi xảy ra',
 }
 
 export enum Assignment {

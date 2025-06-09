@@ -10,11 +10,21 @@ import useTheme from './hooks/useTheme';
 import ScrollToTop from './components/ScrollToTop';
 import { Toaster } from '@/components/ui/sonner';
 import { useMyInfo } from './hooks/useMyInfo';
+import { useMutationState } from '@tanstack/react-query';
+import RenderIf from './components/RenderIf';
+import LoadingTable from './components/LoadingTable';
 // import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 function App() {
   useTheme();
   useMyInfo();
+  const isMutating =
+    useMutationState({
+      filters: {
+        status: 'pending',
+      },
+    }).length > 0;
+
   const location = useLocation();
   const background = location.state && location.state.background;
 
@@ -54,6 +64,9 @@ function App() {
 
   return (
     <>
+      <RenderIf value={isMutating}>
+        <LoadingTable />
+      </RenderIf>
       <Routes location={background || location}>
         <Route element={<PublicRoute />}>{publicRoutes.map(loadRoute)}</Route>
         <Route element={<PrivateRoute />}>{privateRoutes.map(loadRoute)}</Route>

@@ -1,7 +1,7 @@
 'use client';
 
 import { Fragment, useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import {
   Pagination,
@@ -19,20 +19,17 @@ import RenderIf from '../RenderIf';
 import LoadingTable from '../LoadingTable';
 import Tooltip from '../Tooltip';
 import { AdminRegistrationDetailContext } from '@/contexts/context/admin/AdminRegistrationDetailContext';
+import { formatDateTime } from '@/lib/utils';
+import { toast } from 'sonner';
 
 const AdminRegistrationTableDetailWithPagination = () => {
+  const navigate = useNavigate();
   const registrationPeriod = useContext(AdminRegistrationDetailContext);
 
-  // Tính toán phân trang
-  const perPage = Number(registrationPeriod?.perPage) || 10;
-  const currentPage = registrationPeriod?.currentPage || 1;
-  const totalItems = registrationPeriod?.data?.length || 0;
-  const totalPages = Math.ceil(totalItems / perPage);
+  const currentPage = Number(registrationPeriod?.currentPage);
+  const totalPages = registrationPeriod?.dataChild?.totalPages || 0;
 
-  // Lấy dữ liệu cho trang hiện tại
-  const startIndex = (currentPage - 1) * perPage;
-  const endIndex = startIndex + perPage;
-  const currentData = registrationPeriod?.data?.slice(startIndex, endIndex) || [];
+  const currentData = registrationPeriod?.dataChild?.content || [];
 
   // Tạo danh sách số trang
   const getPageNumbers = () => {
@@ -66,7 +63,21 @@ const AdminRegistrationTableDetailWithPagination = () => {
   const handlePageChange = (page: number) => {
     if (registrationPeriod?.setCurrentPage && page >= 1 && page <= totalPages) {
       registrationPeriod.setCurrentPage(page);
+
+      const queryString = buildSearchParamsWithFilters(page, Number(registrationPeriod.perPage));
+
+      navigate(`/admin/registration-period/detail/${registrationPeriod.dataDetail?.id}?${queryString}`, {
+        replace: true,
+      });
     }
+  };
+
+  const buildSearchParamsWithFilters = (page: number, size: number) => {
+    const params = new URLSearchParams();
+
+    params.set('page', String(page));
+    params.set('size', String(size));
+    return params.toString();
   };
 
   return (
@@ -97,34 +108,64 @@ const AdminRegistrationTableDetailWithPagination = () => {
               {Array.isArray(currentData) && currentData.length > 0 ? (
                 currentData.map((registration, index) => (
                   <TableRow key={index} className="odd:bg-muted/50">
-                    <TableCell className="pl-4">{startIndex + index + 1}</TableCell>
-                    <TableCell className="font-medium">{registration.time}</TableCell>
-                    <TableCell className="font-medium">{registration.time_registration}</TableCell>
-                    <TableCell className="font-medium">{registration.time_registration}</TableCell>
-                    <TableCell>{registration.assigned_articles}</TableCell>
-                    <TableCell>{registration.assigned_people}</TableCell>
+                    <TableCell className="pl-4">{index + 1}</TableCell>
+                    <TableCell className="font-medium">{registration.subCampaignName}</TableCell>
+                    <TableCell className="font-medium">
+                      {registration.startDate && formatDateTime(registration.startDate, 'dd/MM/yyyy')}
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {registration.endDate && formatDateTime(registration.endDate, 'dd/MM/yyyy')}
+                    </TableCell>
+                    <TableCell>{registration.assignedArticleCount}</TableCell>
+                    <TableCell>{registration.assignedLecturerCount}</TableCell>
                     <TableCell>
                       <div className="flex gap-4">
                         {registrationPeriod?.tooltips.map((item, idx) => (
                           <Fragment key={idx}>
                             <RenderIf value={item.type === 'assign_topic'}>
-                              <Link
-                                to={`/admin/registration-period/child/${registration.id}`}
-                                className="cursor-pointer"
-                              >
-                                <Tooltip
-                                  toolTipContent={item.content}
-                                  toolTipTrigger={<item.icon className={item.className} />}
-                                />
-                              </Link>
+                              <RenderIf value={registrationPeriod.dataDetail?.status === 'Inactive'}>
+                                <div
+                                  className="cursor-pointer"
+                                  onClick={() => toast.error('Không thể phân công vì đợt đã ngưng hoạt động')}
+                                >
+                                  <Tooltip
+                                    toolTipContent={item.content}
+                                    toolTipTrigger={<item.icon className={item.className} />}
+                                  />
+                                </div>
+                              </RenderIf>
+                              <RenderIf value={registrationPeriod.dataDetail?.status !== 'Inactive'}>
+                                <Link
+                                  to={`/admin/registration-period/child/${registration.subCampaignId}`}
+                                  className="cursor-pointer"
+                                >
+                                  <Tooltip
+                                    toolTipContent={item.content}
+                                    toolTipTrigger={<item.icon className={item.className} />}
+                                  />
+                                </Link>
+                              </RenderIf>
                             </RenderIf>
                             <RenderIf value={item.type === 'remove'}>
-                              <div className="cursor-pointer">
-                                <Tooltip
-                                  toolTipContent={item.content}
-                                  toolTipTrigger={<item.icon className={item.className} />}
-                                />
-                              </div>
+                              <RenderIf value={registrationPeriod.dataDetail?.status === 'Inactive'}>
+                                <div
+                                  className="cursor-pointer"
+                                  onClick={() => toast.error('Không thể xóa vì đợt đã ngưng hoạt động')}
+                                >
+                                  <Tooltip
+                                    toolTipContent={item.content}
+                                    toolTipTrigger={<item.icon className={item.className} />}
+                                  />
+                                </div>
+                              </RenderIf>
+                              <RenderIf value={registrationPeriod.dataDetail?.status !== 'Inactive'}>
+                                <div className="cursor-pointer">
+                                  <Tooltip
+                                    toolTipContent={item.content}
+                                    toolTipTrigger={<item.icon className={item.className} />}
+                                  />
+                                </div>
+                              </RenderIf>
                             </RenderIf>
                           </Fragment>
                         ))}
@@ -143,7 +184,7 @@ const AdminRegistrationTableDetailWithPagination = () => {
           </TableBody>
         </Table>
       </div>
-      <RenderIf value={!!registrationPeriod?.data && registrationPeriod?.data?.length > 0}>
+      <RenderIf value={!!currentData.length && currentData.length > 0}>
         <div className="flex lg:flex-row flex-col gap-5 mt-4 items-center">
           <Pagination>
             <PaginationContent>
@@ -185,13 +226,18 @@ const AdminRegistrationTableDetailWithPagination = () => {
                 { label: '5 / trang', value: 5 },
                 { label: '10 / trang', value: 10 },
                 { label: '50 / trang', value: 50 },
-                { label: '100 / trang', value: 100 },
               ]}
               value={registrationPeriod?.perPage}
               setValue={(val) => {
                 if (registrationPeriod?.setPerPage && registrationPeriod?.setCurrentPage) {
                   registrationPeriod.setPerPage(val);
                   registrationPeriod.setCurrentPage(1);
+
+                  const queryString = buildSearchParamsWithFilters(1, Number(val));
+
+                  navigate(`/admin/registration-period/detail/${registrationPeriod.dataDetail?.id}?${queryString}`, {
+                    replace: true,
+                  });
                 }
               }}
             />

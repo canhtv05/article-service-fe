@@ -18,6 +18,7 @@ const Comp = ({ id }: { id: string }) => {
   };
 
   const handleApprovalArticle = useMutation({
+    mutationKey: ['approve-article'],
     mutationFn: (url: string) => handleConfirm(url),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/admin/bai-viet/bai-viet-cho-phe-duyet'] });

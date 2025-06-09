@@ -66,6 +66,7 @@ const AdminArchiveTable = () => {
   };
 
   const sendToPrMutation = useMutation({
+    mutationKey: ['sendToOPR'],
     mutationFn: async () => {
       await Promise.all(selectedRows.map((id) => httpRequest.get(`/admin/bai-viet/day-bai-viet-pr/${id}`)));
     },

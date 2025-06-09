@@ -61,6 +61,7 @@ const AdminFilterRegistrationPeriodComponent = () => {
           data={[
             { label: 'Mở đăng ký', value: 'Open' },
             { label: 'Đóng đăng ký', value: 'NotOpen' },
+            { label: 'Ngừng hoạt động', value: 'Inactive' },
           ]}
           label="Chủ đề"
           value={status}

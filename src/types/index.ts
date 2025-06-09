@@ -315,15 +315,33 @@ export type AdminRegistrationPeriodContextType = {
 export type AdminRegistrationDetailType = {
   id: string;
   name: string;
-  time: string;
-  time_registration: string;
-  assigned_articles: number;
-  assigned_people: number;
+  startDate: string;
+  endDate: string;
+  writingStartDate: string;
+  writingEndDate: string;
+  status: string;
+};
+
+export type AdminRegistrationDetailChildType = {
+  subCampaignId: string;
+  subCampaignName: string;
+  startDate: string;
+  endDate: string;
+  assignedArticleCount: number;
+  assignedLecturerCount: number;
+};
+
+export type AdminRegistrationDetailChildTResponseType = {
+  content: AdminRegistrationDetailChildType[];
+  totalPages: number;
+  totalElements: number;
 };
 
 export type AdminRegistrationDetailContextType = {
-  data: AdminRegistrationDetailType[] | undefined;
-  setData: Dispatch<SetStateAction<AdminRegistrationDetailType[] | undefined>>;
+  dataDetail: AdminRegistrationDetailType | undefined;
+  setDataDetail: Dispatch<SetStateAction<AdminRegistrationDetailType | undefined>>;
+  dataChild: AdminRegistrationDetailChildTResponseType | undefined;
+  setDataChild: Dispatch<SetStateAction<AdminRegistrationDetailChildTResponseType | undefined>>;
   isLoading: boolean;
   error: unknown;
   titlesTable: string[];
