@@ -12,35 +12,8 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart';
 import FieldsSelect from './FieldsSelect';
-import { ChartDataType } from '@/types';
-import { fakeDataChart } from '@/constant';
-import { useState } from 'react';
-
-const chartConfig = {
-  visitors: {
-    label: 'Visitors',
-  },
-  chrome: {
-    label: 'Chrome',
-    color: 'hsl(var(--chart-1))',
-  },
-  safari: {
-    label: 'Safari',
-    color: 'hsl(var(--chart-2))',
-  },
-  firefox: {
-    label: 'Firefox',
-    color: 'hsl(var(--chart-3))',
-  },
-  edge: {
-    label: 'Edge',
-    color: 'hsl(var(--chart-4))',
-  },
-  other: {
-    label: 'Other',
-    color: 'hsl(var(--chart-5))',
-  },
-} satisfies ChartConfig;
+import { ChartDataType, FieldsSelectType } from '@/types';
+import { Dispatch, SetStateAction } from 'react';
 
 const fallbackData: ChartDataType[] = [
   {
@@ -51,25 +24,39 @@ const fallbackData: ChartDataType[] = [
   },
 ];
 
-const PieChart = ({ chartData }: { chartData: ChartDataType[] }) => {
+const PieChart = ({
+  chartData,
+  select = false,
+  setSelected,
+  selected,
+  data,
+  chartConfig,
+}: {
+  chartData: ChartDataType[];
+  select?: boolean;
+  setSelected?: Dispatch<SetStateAction<string>>;
+  selected?: string;
+  data?: FieldsSelectType[];
+  chartConfig: ChartConfig;
+}) => {
   const isEmpty = chartData.every((chart) => chart.count === 0);
   const finalData = isEmpty ? fallbackData : chartData;
-
-  const [selected, setSelected] = useState<string>(fakeDataChart[0]?.value || '');
 
   return (
     <Card className="flex flex-col h-full border-none shadow-md bg-transparent">
       <CardHeader className="items-center pb-0">
         <CardDescription>
-          {/* <div className="flex md:grid auto-rows-min gap-4 grid-cols-3">
-            <FieldsSelect
-              placeholder="-- Chọn đợt viết bài --"
-              data={fakeDataChart}
-              value={selected}
-              label="Đợt viết bài"
-              setValue={setSelected}
-            />
-          </div> */}
+          {select && (
+            <div className="flex md:grid auto-rows-min gap-4 grid-cols-3">
+              <FieldsSelect
+                placeholder="-- Chọn đợt viết bài --"
+                data={data ?? []}
+                value={selected}
+                label="Đợt viết bài"
+                setValue={setSelected!}
+              />
+            </div>
+          )}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0 flex">
