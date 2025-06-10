@@ -20,20 +20,22 @@ import ConfirmDialog from '../ConfirmDialog';
 import RenderIf from '../RenderIf';
 import PRModalAddOrUpdate from './PRModalAddOrUpdate';
 import LoadingTable from '../LoadingTable';
+import { useNavigate } from 'react-router-dom';
+import { TopicFilterType } from '@/types';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { httpRequest } from '@/utils/httpRequest';
+import { toast } from 'sonner';
+import { Notice } from '@/enums';
 
 const PRTopicTableWithPagination = () => {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const topics = useContext(PRTopicManagementContext);
 
-  // Tính toán phân trang
-  const perPage = Number(topics?.perPage) || 10;
-  const currentPage = topics?.currentPage || 1;
-  const totalItems = topics?.data?.length || 0;
-  const totalPages = Math.ceil(totalItems / perPage);
+  const currentPage = Number(topics?.currentPage);
+  const totalPages = topics?.data?.totalPages || 0;
 
-  // Lấy dữ liệu cho trang hiện tại
-  const startIndex = (currentPage - 1) * perPage;
-  const endIndex = startIndex + perPage;
-  const currentData = topics?.data?.slice(startIndex, endIndex) || [];
+  const currentData = topics?.data?.content || [];
 
   // Tạo danh sách số trang
   const getPageNumbers = () => {
@@ -67,11 +69,41 @@ const PRTopicTableWithPagination = () => {
   const handlePageChange = (page: number) => {
     if (topics?.setCurrentPage && page >= 1 && page <= totalPages) {
       topics.setCurrentPage(page);
+
+      const queryString = buildSearchParamsWithFilters(page, Number(topics.perPage), topics.valueFilter);
+
+      navigate(`/pr/topic-management?${queryString}`, { replace: true });
     }
   };
 
-  const handleClick = (ma: string) => {
-    topics?.handleToggleStatus(ma);
+  const buildSearchParamsWithFilters = (page: number, size: number, filters: TopicFilterType) => {
+    const params = new URLSearchParams();
+
+    params.set('page', String(page));
+    params.set('size', String(size));
+
+    if (filters.name) params.set('name', filters.name);
+    if (filters.status) params.set('status', filters.status);
+    if (filters.maxFee) params.set('maxFee', String(filters.maxFee));
+    if (filters.minFee) params.set('minFee', String(filters.minFee));
+
+    return params.toString();
+  };
+
+  const changeStatusMutation = useMutation({
+    mutationKey: ['change-status'],
+    mutationFn: async (id: string) => await httpRequest.get(`/chu-de/doi-trang-thai/${id}`),
+    onSuccess: () => {
+      toast.success(Notice.UPDATE_SUCCESS);
+      queryClient.invalidateQueries({ queryKey: ['/chu-de/danh-sach-chu-de'] });
+    },
+    onError: () => {
+      toast.error(Notice.UPDATE_FAILED);
+    },
+  });
+
+  const handleClick = (id: string) => {
+    changeStatusMutation.mutate(id);
   };
 
   return (
@@ -98,11 +130,11 @@ const PRTopicTableWithPagination = () => {
             <RenderIf value={!topics?.isLoading}>
               {Array.isArray(currentData) && currentData.length > 0 ? (
                 currentData.map((topic, index) => (
-                  <TableRow key={topic.ma} className="odd:bg-muted/50">
-                    <TableCell className="pl-4">{startIndex + index + 1}</TableCell>
-                    <TableCell className="pl-4">{topic.ma}</TableCell>
-                    <TableCell className="font-medium">{topic.topic_name}</TableCell>
-                    <TableCell>{formatCurrencyVND(topic.royalty)}</TableCell>
+                  <TableRow key={topic.id} className="odd:bg-muted/50">
+                    <TableCell className="pl-4">{index + 1}</TableCell>
+                    <TableCell className="pl-4">{topic.id}</TableCell>
+                    <TableCell className="font-medium">{topic.name}</TableCell>
+                    <TableCell>{formatCurrencyVND(topic.royaltyFee)}</TableCell>
                     <TableCell>{topic.description}</TableCell>
                     <TableCell>
                       <StatusBadge status={topic.status} />
@@ -114,7 +146,7 @@ const PRTopicTableWithPagination = () => {
                             <RenderIf value={item.type === 'status_change'}>
                               <ConfirmDialog
                                 key={idx}
-                                onContinue={() => handleClick(topic.ma)}
+                                onContinue={() => handleClick(topic.id)}
                                 typeTitle={'chuyển đổi trạng thái'}
                                 triggerComponent={
                                   <div className="cursor-pointer">
@@ -129,7 +161,13 @@ const PRTopicTableWithPagination = () => {
                             <RenderIf value={item.type === 'update'}>
                               <PRModalAddOrUpdate
                                 type="update"
-                                ma={topic.ma}
+                                idUpdate={topic.id}
+                                data={{
+                                  name: topic.name,
+                                  description: topic.description,
+                                  royaltyFee: topic.royaltyFee,
+                                  status: topic.status,
+                                }}
                                 compTrigger={
                                   <div className="cursor-pointer">
                                     <Tooltip
@@ -157,7 +195,7 @@ const PRTopicTableWithPagination = () => {
           </TableBody>
         </Table>
       </div>
-      <RenderIf value={!!topics?.data && topics?.data?.length > 0}>
+      <RenderIf value={!!currentData.length && currentData.length > 0}>
         <div className="flex lg:flex-row flex-col gap-5 mt-4 items-center">
           <Pagination>
             <PaginationContent>
@@ -201,13 +239,18 @@ const PRTopicTableWithPagination = () => {
                 { label: '5 / trang', value: 5 },
                 { label: '10 / trang', value: 10 },
                 { label: '50 / trang', value: 50 },
-                { label: '100 / trang', value: 100 },
               ]}
               value={topics?.perPage}
               setValue={(val) => {
                 if (topics?.setPerPage && topics?.setCurrentPage) {
                   topics.setPerPage(val);
                   topics.setCurrentPage(1);
+
+                  const queryString = buildSearchParamsWithFilters(1, Number(val), topics.valueFilter);
+
+                  navigate(`/pr/topic-management?${queryString}`, {
+                    replace: true,
+                  });
                 }
               }}
             />

@@ -1,6 +1,4 @@
-import { ReactNode, useContext, useState } from 'react';
-import _ from 'lodash';
-import { toast } from 'sonner';
+import { FormEvent, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -15,84 +13,87 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '../ui/textarea';
-import { PRTopicManagementContext } from '@/contexts/context/pr/PRTopicManagementContext';
 import ConfirmDialog from '../ConfirmDialog';
+import { AddOrUpdateTopicType } from '@/types';
+import ConfirmDialogForm, { AlertDialogRef } from '../ConfirmDialogForm';
+import { useFormErrors } from '@/hooks/useFormErrrors';
+import { addOrUpdateTopicSchema } from '@/lib/validation';
+import { toast } from 'sonner';
+import { Notice, Status } from '@/enums';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { httpRequest } from '@/utils/httpRequest';
+import axios from 'axios';
+
+type AddOrUpdateTopic = AddOrUpdateTopicType & { id?: string; status?: string };
 
 const PRModalAddOrUpdate = ({
   compTrigger,
   type,
-  ma,
+  idUpdate,
+  data,
 }: {
   compTrigger: ReactNode;
   type: 'update' | 'add';
-  ma?: string;
+  idUpdate: string;
+  data?: AddOrUpdateTopic;
 }) => {
-  const topics = useContext(PRTopicManagementContext);
+  const queryClient = useQueryClient();
+  const dialogRef = useRef<AlertDialogRef>(null);
   const [open, setOpen] = useState<boolean>(false);
-  const [errors, setErrors] = useState<{ title?: boolean; royalty?: boolean; description?: boolean }>({});
 
-  const handleOpenChange = (isOpen: boolean) => {
-    setOpen(isOpen);
-    if (isOpen && topics) {
-      if (type === 'update' && ma && topics.data) {
-        const topic = topics.data.find((t) => t.ma === ma);
-        if (topic) {
-          topics.setDataAddOrUpdate({
-            title: topic.topic_name,
-            royalty: topic.royalty,
-            description: topic.description,
-          });
-        }
+  const [formData, setFormData] = useState<AddOrUpdateTopic>({
+    description: '',
+    name: '',
+    royaltyFee: undefined,
+  });
+
+  useEffect(() => {
+    if (data) {
+      setFormData(data);
+    }
+  }, [data]);
+
+  const handleShowDialog = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    dialogRef.current?.open();
+  };
+
+  const { errors, clearErrors, handleZodErrors } = useFormErrors<AddOrUpdateTopic>();
+
+  const addOrUpdateMutation = useMutation({
+    mutationKey: ['add-topic', 'update-topic'],
+    mutationFn: async (data: AddOrUpdateTopic) => {
+      const url = type === 'add' ? '/chu-de/them-chu-de' : `/chu-de/sua-chu-de/${data.id}`;
+      return await httpRequest[type === 'add' ? 'post' : 'put'](url, data);
+    },
+    onSuccess: () => {
+      toast.success(type === 'add' ? Notice.ADD_SUCCESS : Notice.UPDATE_SUCCESS);
+      queryClient.invalidateQueries({ queryKey: ['/chu-de/danh-sach-chu-de'] });
+    },
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message);
       } else {
-        topics.setDataAddOrUpdate({
-          title: '',
-          royalty: undefined,
-          description: '',
-        });
+        toast.error(Status.ERROR);
       }
+    },
+  });
+
+  const handleAddOrUpdate = useCallback(async () => {
+    try {
+      clearErrors();
+      if (!formData) return;
+
+      await addOrUpdateTopicSchema.parseAsync({ ...formData, id: idUpdate, status: data?.status });
+      addOrUpdateMutation.mutate({ ...formData, id: idUpdate, status: data?.status });
+      setOpen(false);
+    } catch (error) {
+      handleZodErrors(error);
     }
-  };
-
-  const validateData = () => {
-    const { description, royalty, title } = topics?.dataAddOrUpdate ?? {};
-    const newErrors: { title?: boolean; royalty?: boolean; description?: boolean } = {};
-
-    if (_.isEmpty(title)) newErrors.title = true;
-    if (_.isUndefined(royalty)) newErrors.royalty = true;
-    if (_.isEmpty(description)) newErrors.description = true;
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-
-      if (newErrors.title) {
-        toast.error('Vui lòng nhập tên chủ đề.', { id: 'title-error' });
-      } else if (newErrors.royalty) {
-        toast.error('Vui lòng nhập nhuận bút.', { id: 'royalty-error' });
-      } else if (newErrors.description) {
-        toast.error('Vui lòng nhập mô tả.', { id: 'description-error' });
-      }
-
-      return false;
-    }
-
-    setErrors({});
-    return true;
-  };
-
-  const handleSave = () => {
-    if (!validateData() || !topics) return;
-
-    if (type === 'add') {
-      topics.handleAdd();
-    } else if (type === 'update' && ma) {
-      topics.handleUpdate(ma, topics.dataAddOrUpdate);
-    }
-
-    setOpen(false);
-  };
+  }, [clearErrors, formData, idUpdate, data?.status, addOrUpdateMutation, handleZodErrors]);
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{compTrigger}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -101,21 +102,21 @@ const PRModalAddOrUpdate = ({
             Thực hiện {type === 'add' ? 'thêm' : 'chỉnh sửa'} chủ đề tại đây. Nhấp vào lưu khi bạn hoàn tất.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <form onSubmit={handleShowDialog} className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="topic-name" className="text-right">
               Tên chủ đề
             </Label>
             <Input
               id="topic-name"
-              value={topics?.dataAddOrUpdate.title ?? ''}
-              className={`col-span-3 ${errors.title ? 'border border-red-500' : ''}`}
-              onChange={(e) => {
-                topics?.setDataAddOrUpdate((prev) => ({
+              value={formData?.name ?? ''}
+              className={`col-span-3 ${errors.name ? 'border border-red-500' : ''}`}
+              onChange={(e) =>
+                setFormData((prev) => ({
                   ...prev,
-                  title: e.target.value,
-                }));
-              }}
+                  name: e.target.value,
+                }))
+              }
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
@@ -123,16 +124,16 @@ const PRModalAddOrUpdate = ({
               Nhuận bút
             </Label>
             <Input
+              value={formData?.royaltyFee ?? ''}
               id="royalty"
-              value={topics?.dataAddOrUpdate.royalty ?? ''}
               type="number"
-              className={`col-span-3 ${errors.royalty ? 'border border-red-500' : ''}`}
-              onChange={(e) => {
-                topics?.setDataAddOrUpdate((prev) => ({
+              className={`col-span-3 ${errors.royaltyFee ? 'border border-red-500' : ''}`}
+              onChange={(e) =>
+                setFormData((prev) => ({
                   ...prev,
-                  royalty: e.target.value ? Number(e.target.value) : undefined,
-                }));
-              }}
+                  royaltyFee: Number(e.target.value),
+                }))
+              }
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
@@ -140,37 +141,29 @@ const PRModalAddOrUpdate = ({
               Mô tả
             </Label>
             <Textarea
+              value={formData?.description ?? ''}
               id="description"
-              value={topics?.dataAddOrUpdate.description ?? ''}
               className={`col-span-3 max-h-[280px] ${errors.description ? 'border border-red-500' : ''}`}
-              onChange={(e) => {
-                topics?.setDataAddOrUpdate((prev) => ({
+              onChange={(e) =>
+                setFormData((prev) => ({
                   ...prev,
                   description: e.target.value,
-                }));
-              }}
+                }))
+              }
             />
           </div>
-        </div>
+        </form>
         <DialogFooter>
           <ConfirmDialog
-            onContinue={handleSave}
+            onContinue={handleAddOrUpdate}
             typeTitle={type === 'add' ? 'thêm' : 'chỉnh sửa'}
             triggerComponent={
-              <Button
-                type="button"
-                customize={'default'}
-                onClick={(e) => {
-                  if (!validateData()) {
-                    e.preventDefault();
-                    return;
-                  }
-                }}
-              >
+              <Button type="submit" customize={'default'}>
                 Lưu
               </Button>
             }
-          />
+          ></ConfirmDialog>
+          <ConfirmDialogForm typeTitle="chỉnh sửa" ref={dialogRef} onContinue={() => {}} />
         </DialogFooter>
       </DialogContent>
     </Dialog>
