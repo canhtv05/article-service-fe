@@ -111,9 +111,8 @@ const AdminRegistrationPeriodDetailUpdate = () => {
       queryClient.invalidateQueries({ queryKey: ['registration-detail'] });
       console.log(response);
     },
-    onError: (error) => {
+    onError: () => {
       toast.error(Notice.UPDATE_FAILED);
-      console.log(error);
     },
   });
 
@@ -122,8 +121,6 @@ const AdminRegistrationPeriodDetailUpdate = () => {
       toast.error(Notice.ERROR);
       return;
     }
-
-    console.log(context.dataDetail.status);
 
     const data = {
       id: context.dataDetail.id,

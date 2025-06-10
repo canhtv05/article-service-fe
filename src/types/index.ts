@@ -109,28 +109,35 @@ export type FieldsSelectType = {
 };
 
 export type TopicType = {
-  ma: string;
-  topic_name: string;
-  royalty: number;
+  id: string;
+  name: string;
+  royaltyFee: number;
   description: string;
   status: string;
 };
 
+export type TopicResponseType = {
+  content: TopicType[];
+  totalPages: number;
+  totalElements: number;
+};
+
 export type TopicFilterType = {
-  topic_name: string;
-  status: string | undefined;
-  from: number | undefined;
-  to: number | undefined;
+  name: string;
+  status: string;
+  minFee: number | undefined;
+  maxFee: number | undefined;
 };
 
 export type AddOrUpdateTopicType = {
-  title: string;
-  royalty: number | undefined;
+  name: string;
+  royaltyFee: number | undefined;
   description: string;
 };
 
 export type TopicContextType = {
-  data: TopicType[] | undefined;
+  data: TopicResponseType | undefined;
+  setData: Dispatch<SetStateAction<TopicResponseType | undefined>>;
   isLoading: boolean;
   error: unknown;
   titlesTable: string[];
@@ -145,13 +152,8 @@ export type TopicContextType = {
   setPerPage: Dispatch<SetStateAction<string>>;
   handleClearFields: VoidFunction;
   handleFilters: VoidFunction;
-  dataAddOrUpdate: AddOrUpdateTopicType;
-  setDataAddOrUpdate: Dispatch<SetStateAction<AddOrUpdateTopicType>>;
-  handleAdd: VoidFunction;
   currentPage: number;
   setCurrentPage: Dispatch<SetStateAction<number>>;
-  handleToggleStatus: (ma: string) => void;
-  handleUpdate: (ma: string, updatedTopic: AddOrUpdateTopicType) => void;
 };
 
 export type ArticleFilterType = {

@@ -12,6 +12,13 @@ const PRListArticles = () => {
           <span className="text-foreground text-[18px]">Danh sách chủ đề</span>
         </div>
         <PRModalAddOrUpdate
+          idUpdate=""
+          data={{
+            name: '',
+            royaltyFee: undefined,
+            description: '',
+            status: 'ACTIVE',
+          }}
           type="add"
           compTrigger={
             <Button customize={'default'} className="py-5 rounded-full">

@@ -4,14 +4,13 @@ import { PRTopicManagementContext } from '@/contexts/context/pr/PRTopicManagemen
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import FieldsSelect from '../FieldsSelect';
-import { Status } from '@/enums';
 
 const PRFilterTopicComponent = () => {
   const topics = useContext(PRTopicManagementContext);
 
   if (!topics) return;
 
-  const { topic_name, from, to, status } = topics.valueFilter;
+  const { maxFee, minFee, name, status } = topics.valueFilter;
 
   return (
     <Fragment>
@@ -22,12 +21,12 @@ const PRFilterTopicComponent = () => {
         <Input
           id="topic_name"
           type="text"
-          placeholder="Nhập mã hoặc tên chủ đề"
-          value={topic_name}
+          placeholder="Nhập tên chủ đề"
+          value={name}
           onChange={(e) => {
             topics.setValueFilter((prev) => ({
               ...prev,
-              topic_name: e.target.value,
+              name: e.target.value,
             }));
           }}
         />
@@ -39,14 +38,12 @@ const PRFilterTopicComponent = () => {
         </Label>
         <FieldsSelect
           id="status"
-          placeholder="Chọn trạng thái"
+          placeholder="-- Chọn trạng thái --"
           data={[
-            { label: 'Tất cả', value: Status.ALL },
-            { label: 'Hoạt động', value: Status.ACTIVE },
-            { label: 'Ngừng hoạt động', value: Status.INACTIVE },
+            { label: 'Hoạt động', value: 'ACTIVE' },
+            { label: 'Không hoạt động', value: 'INACTIVE' },
           ]}
           label="Trạng thái"
-          defaultValue={Status.ALL}
           value={status}
           setValue={(val) => {
             if (typeof val === 'string' && topics && val !== status) {
@@ -68,11 +65,11 @@ const PRFilterTopicComponent = () => {
             id="nhuan-but"
             type="number"
             placeholder="Từ"
-            value={from ?? ''}
+            value={minFee ?? ''}
             onChange={(e) => {
               topics.setValueFilter((prev) => ({
                 ...prev,
-                from: e.target.value ? Number(e.target.value) : undefined,
+                minFee: e.target.value ? Number(e.target.value) : undefined,
               }));
             }}
           />
@@ -85,11 +82,11 @@ const PRFilterTopicComponent = () => {
             id="den"
             type="number"
             placeholder="Đến"
-            value={to ?? ''}
+            value={maxFee ?? ''}
             onChange={(e) => {
               topics.setValueFilter((prev) => ({
                 ...prev,
-                to: e.target.value ? Number(e.target.value) : undefined,
+                maxFee: e.target.value ? Number(e.target.value) : undefined,
               }));
             }}
           />
