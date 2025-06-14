@@ -1,101 +1,78 @@
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
-import { ReactNode, useCallback, useEffect, useState } from 'react';
-import _ from 'lodash';
+import { ReactNode, useEffect, useState } from 'react';
 
 import { PRStaffsFilterType, PRStaffsType } from '@/types';
 import { PRStaffsContext } from '@/contexts/context/pr/PRStaffsContext';
+import { httpRequest } from '@/utils/httpRequest';
+import { useSearchParams } from 'react-router-dom';
 
-const titlesTable = [' ', '#', 'Tiêu đề', 'Chủ đề', 'Tác giả', 'Ngày tạo', 'Trạng thái'];
+const titlesTable = ['', '#', 'Tiêu đề', 'Chủ đề', 'Tác giả', 'Ngày tạo', 'Trạng thái'];
 
 const PRStaffsProvider = ({ children }: { children: ReactNode }) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const titleAndAuthorName = searchParams.get('titleAndAuthorName') || '';
+  const topicId = searchParams.get('topicId') || '';
+
+  const [data, setData] = useState<PRStaffsType[] | undefined>(undefined);
+  const [valueFilter, setValueFilter] = useState<PRStaffsFilterType>({
+    titleAndAuthorName: '',
+    topicId: '',
+  });
+
   const {
-    data: articles,
-    error,
+    data: staffsPR,
     isLoading,
-  } = useQuery<PRStaffsType[]>({
-    queryKey: ['articles'],
+    error,
+  } = useQuery({
+    queryKey: ['/chu-de/bai-viet-cho-phan-cong', titleAndAuthorName, topicId],
     queryFn: async () => {
-      const response = await axios.get('/data_list_articles.json');
+      const params: Record<string, string> = {};
+      if (titleAndAuthorName) params.titleAndAuthorName = titleAndAuthorName;
+      if (topicId) params.topicId = topicId;
+
+      const response = await httpRequest.get('/chu-de/bai-viet-cho-phan-cong', {
+        params,
+      });
+
       return response.data;
     },
   });
 
-  const [data, setData] = useState<PRStaffsType[] | undefined>(undefined);
-  const [valueFilter, setValueFilter] = useState<PRStaffsFilterType>({
-    title_and_author_name: '',
-    topic_name: '',
-  });
-
-  const [perPage, setPerPage] = useState<string>('5');
-  const [currentPage, setCurrentPage] = useState<number>(1);
-
   useEffect(() => {
-    if (articles) {
-      setData(articles);
+    if (staffsPR) {
+      setData(staffsPR);
     }
-  }, [articles]);
+  }, [staffsPR]);
 
   const handleClearFields = () => {
     setValueFilter({
-      title_and_author_name: '',
-      topic_name: '',
+      titleAndAuthorName: '',
+      topicId: '',
     });
-    if (!articles) return;
-    setData(articles);
-    setCurrentPage(1);
+
+    setSearchParams({});
   };
 
-  const handleFilters = useCallback(() => {
-    if (!articles) return;
+  const handleFilters = () => {
+    const query: Record<string, string> = {};
 
-    const { topic_name, title_and_author_name } = valueFilter;
+    if (valueFilter.titleAndAuthorName) query.titleAndAuthorName = valueFilter.titleAndAuthorName;
+    if (valueFilter.topicId) query.topicId = valueFilter.topicId;
 
-    if (_.isEmpty(topic_name) && _.isEmpty(title_and_author_name)) {
-      setData(articles);
-      setCurrentPage(1);
-      return;
-    }
-
-    const filteredData = _.filter(articles, (article) => {
-      if (!_.isEmpty(topic_name)) {
-        if (!_.includes(article.topic_name.toLowerCase(), topic_name.toLowerCase())) {
-          return false;
-        }
-      }
-
-      if (!_.isEmpty(title_and_author_name)) {
-        if (
-          !_.includes(
-            article.title.toLowerCase() + ' ' + article.author_name.toLowerCase(),
-            title_and_author_name.toLowerCase(),
-          )
-        ) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-
-    setData(filteredData);
-    setCurrentPage(1);
-  }, [articles, valueFilter]);
+    setSearchParams(query);
+  };
 
   const values = {
     data,
-    error,
+    setData,
     isLoading,
+    error,
     titlesTable,
+    handleFilters,
+    handleClearFields,
     valueFilter,
     setValueFilter,
-    setData,
-    perPage,
-    setPerPage,
-    currentPage,
-    setCurrentPage,
-    handleClearFields,
-    handleFilters,
   };
 
   return <PRStaffsContext.Provider value={values}>{children}</PRStaffsContext.Provider>;

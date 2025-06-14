@@ -1,57 +1,73 @@
-import { Fragment, useContext } from 'react';
+import { Fragment, useCallback, useContext } from 'react';
 
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import FieldsSelect from '../FieldsSelect';
 import { PRStaffsContext } from '@/contexts/context/pr/PRStaffsContext';
+import { useQuery } from '@tanstack/react-query';
+import { httpRequest } from '@/utils/httpRequest';
 
 const PRFilterAssignArticleComponent = () => {
   const staffs = useContext(PRStaffsContext);
 
+  const { data } = useQuery({
+    queryKey: ['/danh-sach-chu-de2'],
+    queryFn: async () => {
+      const response = await httpRequest.get('/chu-de/danh-sach-chu-de2');
+      console.log(response.data);
+      return response.data;
+    },
+  });
+
+  const mappedOptions = useCallback(
+    () =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      data?.map((item: any) => ({
+        value: item.id,
+        label: item.name,
+      })) ?? [],
+    [data],
+  );
+
   if (!staffs) return;
 
-  const { topic_name, title_and_author_name } = staffs.valueFilter;
+  const { titleAndAuthorName, topicId } = staffs.valueFilter;
 
   return (
     <Fragment>
       <div className="flex flex-col justify-end w-full">
-        <Label htmlFor="title_and_author_name" className="font-bold mb-2 leading-5">
+        <Label htmlFor="titleAndAuthorName" className="font-bold mb-2 leading-5">
           Tên tiêu đề và tên tác giả của bài viết:
         </Label>
         <Input
-          id="title_and_author_name"
+          id="titleAndAuthorName"
           type="text"
           placeholder="Tìm kiếm theo tiêu đề và tên tác giả của bài viết"
-          value={title_and_author_name}
+          value={titleAndAuthorName}
           onChange={(e) => {
             staffs.setValueFilter((prev) => ({
               ...prev,
-              title_and_author_name: e.target.value,
+              titleAndAuthorName: e.target.value,
             }));
           }}
         />
       </div>
 
       <div className="flex flex-col justify-end">
-        <Label htmlFor="topic_name" className="font-bold mb-2 leading-5">
+        <Label htmlFor="topicId" className="font-bold mb-2 leading-5">
           Chủ đề:
         </Label>
         <FieldsSelect
-          id="topic_name"
+          id="topicId"
           placeholder="-- Chọn chủ đề --"
-          data={[
-            { label: 'Công nghệ', value: 'Công nghệ' },
-            { label: 'Bền vững', value: 'Bền vững' },
-            { label: 'Nông nghiệp', value: 'Nông nghiệp' },
-          ]}
+          data={mappedOptions()}
           label="Chủ đề"
-          defaultValue={''}
-          value={topic_name}
+          value={topicId}
           setValue={(val) => {
-            if (typeof val === 'string' && staffs && val !== topic_name) {
+            if (typeof val === 'string' && staffs && val !== topicId) {
               staffs.setValueFilter((prev) => ({
                 ...prev,
-                topic_name: val,
+                topicId: val,
               }));
             }
           }}

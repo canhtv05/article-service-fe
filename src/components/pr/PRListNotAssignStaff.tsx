@@ -16,7 +16,7 @@ const PRListNotAssignStaff = () => {
   // Xử lý chọn/tắt tất cả
   const handleSelectAll = (checked: boolean, currentPageData: PRStaffsType[]) => {
     if (checked) {
-      setSelectedRows(currentPageData.map((item) => item.article_id));
+      setSelectedRows(currentPageData.map((item) => item.id));
     } else {
       setSelectedRows([]);
     }
@@ -40,7 +40,7 @@ const PRListNotAssignStaff = () => {
     setSelectedRows([]);
     articles?.setData((prev) => {
       if (!prev) return [];
-      return prev.filter((article) => !selectedRows.includes(article.article_id));
+      return prev.filter((article) => !selectedRows.includes(article.id));
     });
   };
 
@@ -63,11 +63,10 @@ const PRListNotAssignStaff = () => {
         />
       </div>
       <PRListNotAssignStaffTableWithPagination
-        selectedRows={selectedRows}
-        setSelectedRows={setSelectedRows}
         handleSelectAll={handleSelectAll}
         handleSelectRow={handleSelectRow}
         isAllSelected={isAllSelected}
+        selectedRows={selectedRows}
       />
     </div>
   );
