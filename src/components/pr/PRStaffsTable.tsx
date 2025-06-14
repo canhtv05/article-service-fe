@@ -1,6 +1,5 @@
 import { SquarePen } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
 
 import Tooltip from '../Tooltip';
@@ -8,9 +7,10 @@ import FallbackNoDataTable from '../FallbackNoDataTable';
 import RenderIf from '../RenderIf';
 import LoadingTable from '../LoadingTable';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import { httpRequest } from '@/utils/httpRequest';
 
 interface StaffType {
-  ma: string;
+  id: string;
   fullName: string;
   email: string;
 }
@@ -30,7 +30,7 @@ const PRStaffsTable = () => {
   const { data, isLoading } = useQuery<StaffType[]>({
     queryKey: ['staffs'],
     queryFn: async () => {
-      const response = await axios.get('/data_staffs.json');
+      const response = await httpRequest.get('/chu-de/danh-sach-nhan-vien');
       return response.data;
     },
   });
@@ -61,13 +61,13 @@ const PRStaffsTable = () => {
                 data.map((staff, index) => (
                   <TableRow key={index} className="odd:bg-muted/50">
                     <TableCell className="pl-4">{index + 1}</TableCell>
-                    <TableCell className="pl-4">{staff.ma}</TableCell>
+                    <TableCell className="pl-4">{staff.id}</TableCell>
                     <TableCell className="font-medium">{staff.fullName}</TableCell>
                     <TableCell>{staff.email}</TableCell>
                     <TableCell>
                       <div className="flex gap-4">
                         {tooltips.map((item, idx) => (
-                          <Link to={`/pr/staffs-pr/assigned-article/${staff.ma}`} className="cursor-pointer" key={idx}>
+                          <Link to={`/pr/staffs-pr/assigned-article/${staff.id}`} className="cursor-pointer" key={idx}>
                             <Tooltip
                               toolTipContent={item.content}
                               toolTipTrigger={<item.icon className={`size-5 ${item.className}`} />}

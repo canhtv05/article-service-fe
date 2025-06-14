@@ -199,17 +199,17 @@ export type PRListArticlesContextType = {
 };
 
 export type PRStaffsType = {
+  id: string;
   title: string;
-  topic_name: string;
-  author_name: string;
-  created_at: string;
+  topic: string;
+  authorName: string;
+  createdAt: string;
   status: string;
-  article_id: string;
 };
 
 export type PRStaffsFilterType = {
-  title_and_author_name: string;
-  topic_name: string;
+  titleAndAuthorName: string;
+  topicId: string;
 };
 
 export type PRStaffsContextType = {
@@ -218,10 +218,6 @@ export type PRStaffsContextType = {
   isLoading: boolean;
   error: unknown;
   titlesTable: string[];
-  currentPage: number;
-  setCurrentPage: Dispatch<SetStateAction<number>>;
-  perPage: string;
-  setPerPage: Dispatch<SetStateAction<string>>;
   handleClearFields: VoidFunction;
   handleFilters: VoidFunction;
   valueFilter: PRStaffsFilterType;
