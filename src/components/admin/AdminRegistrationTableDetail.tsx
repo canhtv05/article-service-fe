@@ -158,7 +158,7 @@ const AdminRegistrationTableDetail = () => {
               <Button
                 customize={'default'}
                 className="py-5 rounded-full"
-                disabled={context.dataDetail?.status === 'Inactive'}
+                disabled={context.dataDetail?.status !== 'Open'}
                 onClick={handleCreateSubCampaign}
               >
                 <Plus />

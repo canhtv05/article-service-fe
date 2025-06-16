@@ -1,38 +1,31 @@
-'use client';
-
 import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
-import FieldsSelect from '../FieldsSelect';
 import FallbackNoDataTable from '../FallbackNoDataTable';
-import RenderIf from '../RenderIf';
-import LoadingTable from '../LoadingTable';
 import { AddUserToCampaignType } from '@/types';
 import { Button } from '../ui/button';
 import { UserPlus } from 'lucide-react';
 import { Input } from '../ui/input';
+import { httpRequest } from '@/utils/httpRequest';
+import cookieUtil from '@/utils/cookieUtil';
+import ConfirmDialog from '../ConfirmDialog';
+import { handleMutationError } from '@/utils/handleMutationError';
+import { toast } from 'sonner';
 
 const titlesTable = ['', '#', 'Giảng viên', 'Chủ đề', 'Số lượng bài viết', 'Hành động'];
+type DataAssign = {
+  subCampaignId: string;
+  assignedArticleCount: number;
+  id: string;
+};
 
 type AddUserToCampaignWithPaginationProps = {
-  selectedRows: string[];
-  setSelectedRows: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedRows: Record<string, string>;
+  setSelectedRows: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   handleSelectAll: (checked: boolean, currentPageData: AddUserToCampaignType[]) => void;
-  handleSelectRow: (id: string, checked: boolean) => void;
-  isAllSelected: (currentPageData: AddUserToCampaignType[]) => boolean;
-  handleAssign: () => void;
+  handleSelectRow: (user: AddUserToCampaignType, index: number, checked: boolean) => void;
 };
 
 const AddUserToCampaignWithPagination = ({
@@ -40,72 +33,32 @@ const AddUserToCampaignWithPagination = ({
   setSelectedRows,
   handleSelectAll,
   handleSelectRow,
-  isAllSelected,
-}: // handleAssign,
-AddUserToCampaignWithPaginationProps) => {
-  const { data: users, isLoading } = useQuery<AddUserToCampaignType[]>({
-    queryKey: ['users_to_campaign'],
+}: AddUserToCampaignWithPaginationProps) => {
+  const queryClient = useQueryClient();
+
+  const { data: users } = useQuery<AddUserToCampaignType[]>({
+    queryKey: ['/dot-bai-viet/danh-sach-giang-vien-dk'],
     queryFn: async () => {
-      const response = await axios.get('/data_add_users_to_campaign.json');
+      const response = await httpRequest.get(
+        `/dot-bai-viet/danh-sach-giang-vien-dk/${cookieUtil.getStorage().parentId}`,
+      );
       return response.data;
     },
   });
 
   const [data, setData] = useState<AddUserToCampaignType[] | undefined>(undefined);
-  const [perPage, setPerPage] = useState<number>(5);
-  const [currentPage, setCurrentPage] = useState<number>(1);
   const [values, setValues] = useState<number[]>([]);
 
   useEffect(() => {
     if (users) {
       setData(users);
-      const articles = users.map((user) => Number(user.number_of_articles));
+      const articles = users.map((user) => Number(user.assignedArticleCount));
       setValues(articles);
     }
   }, [users]);
 
   const totalItems = data?.length || 0;
-  const totalPages = Math.ceil(totalItems / perPage);
-
-  // Lấy dữ liệu cho trang hiện tại
-  const startIndex = (currentPage - 1) * perPage;
-  const endIndex = startIndex + perPage;
-  const currentData = data?.slice(startIndex, endIndex) || [];
-
-  // Tạo danh sách số trang
-  const getPageNumbers = () => {
-    const maxPagesToShow = 5;
-    const pages: (number | string)[] = [];
-    let startPage = Math.max(1, currentPage - 2);
-    const endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
-
-    if (endPage - startPage < maxPagesToShow - 1) {
-      startPage = Math.max(1, endPage - maxPagesToShow + 1);
-    }
-
-    if (startPage > 1) {
-      pages.push(1);
-      if (startPage > 2) pages.push('ellipsis');
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
-    }
-
-    if (endPage < totalPages) {
-      if (endPage < totalPages - 1) pages.push('ellipsis');
-      pages.push(totalPages);
-    }
-
-    return pages;
-  };
-
-  // Xử lý chuyển trang
-  const handlePageChange = (page: number) => {
-    if (setCurrentPage && page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
+  const currentData = data || [];
 
   const handleChange = (value: number, index: number) => {
     setValues((prev) => prev.map((val, idx) => (idx === index ? value : val)));
@@ -113,7 +66,7 @@ AddUserToCampaignWithPaginationProps) => {
 
   const handleDivide = () => {
     if (users) {
-      const total = users.reduce((sum, user) => sum + Number(user.number_of_articles), 0);
+      const total = users.reduce((sum, user) => sum + Number(user.assignedArticleCount), 0);
       const n = users.length;
       const base = Math.floor(total / n);
       const extra = total % n;
@@ -123,10 +76,59 @@ AddUserToCampaignWithPaginationProps) => {
     }
   };
 
+  const assignMutation = useMutation({
+    mutationKey: ['assign_campaign'],
+    mutationFn: async (data: DataAssign) =>
+      await httpRequest.put(`/dot-bai-viet/phan-cong-giang-vien/${data.id}`, {
+        assignedArticleCount: data.assignedArticleCount,
+        subCampaignId: data.subCampaignId,
+      }),
+    onError: (error) => {
+      handleMutationError(error);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/dot-bai-viet/danh-sach-giang-vien-dk'] });
+    },
+  });
+
+  const handleAssign = async (data: DataAssign) => {
+    assignMutation.mutate(data, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['/dot-bai-viet/danh-sach-giang-vien-dk'] });
+        toast.success('Phân công thành công');
+      },
+    });
+  };
+
+  const handleAssignAll = async () => {
+    if (!data || Object.keys(selectedRows).length === 0) return;
+
+    const assignments: DataAssign[] = Object.entries(selectedRows).map(([index, userId]) => {
+      const user = data?.find((u) => u.id === userId);
+      return {
+        subCampaignId: user?.subCampaignId ?? '',
+        assignedArticleCount: values[Number(index)],
+        id: userId,
+      };
+    });
+
+    try {
+      for (const item of assignments) {
+        await assignMutation.mutateAsync(item);
+      }
+      console.log('Assigning all:', assignments);
+      queryClient.invalidateQueries({ queryKey: ['/dot-bai-viet/danh-sach-giang-vien-dk'] });
+      toast.success('Phân công thành công');
+      setSelectedRows({});
+    } catch (error) {
+      handleMutationError(error);
+    }
+  };
+
   return (
     <div className="w-full">
       <div className="text-sm text-muted-foreground mb-2">
-        Đã chọn {selectedRows.length} / {totalItems} bài viết
+        Đã chọn {Object.keys(selectedRows).length} / {totalItems} giảng viên
       </div>
       <div className="w-full border rounded-md overflow-hidden">
         <Table>
@@ -136,9 +138,9 @@ AddUserToCampaignWithPaginationProps) => {
                 <TableHead className={`${index <= 1 ? 'pl-4' : ''} ${index === 0 ? 'w-12' : ''}`} key={index}>
                   {index === 0 ? (
                     <Checkbox
-                      checked={isAllSelected(currentData)}
+                      checked={Object.keys(selectedRows).length === currentData.length && currentData.length > 0}
                       onCheckedChange={(checked) => handleSelectAll(!!checked, currentData)}
-                      aria-label="Select all"
+                      aria-label="Select all rows"
                       className="border-emerald-500 translate-y-[2px]"
                     />
                   ) : (
@@ -149,113 +151,73 @@ AddUserToCampaignWithPaginationProps) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <RenderIf value={!!isLoading}>
-              <TableRow className="h-[130px]">
-                <TableCell colSpan={titlesTable.length} className="flex my-auto justify-center items-center">
-                  <LoadingTable />
-                </TableCell>
-              </TableRow>
-            </RenderIf>
-            <RenderIf value={!isLoading}>
-              {Array.isArray(currentData) && currentData.length > 0 ? (
-                currentData.map((user, index) => (
-                  <TableRow key={index} className="odd:bg-muted/50">
-                    <TableCell className="pl-4 w-12">
-                      <Checkbox
-                        checked={selectedRows.includes(user.id)}
-                        onCheckedChange={(checked) => handleSelectRow(user.id, !!checked)}
-                        aria-label="Select row"
-                        className="border-emerald-500 translate-y-[2px]"
-                      />
-                    </TableCell>
-                    <TableCell className="pl-4">{startIndex + index + 1}</TableCell>
-                    <TableCell className="pl-4">{user.name}</TableCell>
-                    <TableCell className="font-medium">{user.topic_name}</TableCell>
-                    <TableCell>
-                      <Input
-                        value={values[index] + ''}
-                        type="number"
-                        onChange={(e) => handleChange(Number(e.target.value), index)}
-                      ></Input>
-                    </TableCell>
-                    <TableCell>
-                      <Button customize={'default'}>
-                        <UserPlus />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={titlesTable.length} className="text-center">
-                    <FallbackNoDataTable />
+            {Array.isArray(currentData) && currentData.length > 0 ? (
+              currentData.map((user, index) => (
+                <TableRow key={index} className="odd:bg-muted/50">
+                  <TableCell className="pl-4 w-12">
+                    <Checkbox
+                      checked={selectedRows[index.toString()] !== undefined}
+                      onCheckedChange={(checked) => handleSelectRow(user, index, !!checked)}
+                      aria-label="Select row"
+                      className="border-emerald-500 translate-y-[2px]"
+                    />
+                  </TableCell>
+                  <TableCell className="pl-4">{index + 1}</TableCell>
+                  <TableCell className="pl-4">{user.authorName}</TableCell>
+                  <TableCell className="font-medium">{user.topicName}</TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={values[index] + ''}
+                      onChange={(e) => handleChange(Number(e.target.value), index)}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <ConfirmDialog
+                      onContinue={() => {
+                        return handleAssign({
+                          assignedArticleCount: values[index],
+                          subCampaignId: user.subCampaignId,
+                          id: user.id,
+                        });
+                      }}
+                      typeTitle="phân công"
+                      triggerComponent={
+                        <Button customize={'default'}>
+                          <UserPlus />
+                        </Button>
+                      }
+                    />
                   </TableCell>
                 </TableRow>
-              )}
-            </RenderIf>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={titlesTable.length} className="text-center">
+                  <FallbackNoDataTable />
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
-      <RenderIf value={!!data && data?.length > 0}>
-        <div className="flex lg:flex-row flex-col gap-5 mt-4 items-center">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                />
-              </PaginationItem>
-              {getPageNumbers().map((page, index) => (
-                <PaginationItem key={index}>
-                  {page === 'ellipsis' ? (
-                    <PaginationEllipsis />
-                  ) : (
-                    <PaginationLink
-                      onClick={() => handlePageChange(page as number)}
-                      isActive={currentPage === page}
-                      className={currentPage === page ? '' : 'cursor-pointer'}
-                    >
-                      {page}
-                    </PaginationLink>
-                  )}
-                </PaginationItem>
-              ))}
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-          <div className="flex gap-3">
-            <FieldsSelect
-              placeholder="Số bản ghi mỗi trang"
-              defaultValue="5"
-              label="Số bản ghi mỗi trang"
-              data={[
-                { label: '5 / trang', value: 5 },
-                { label: '10 / trang', value: 10 },
-                { label: '50 / trang', value: 50 },
-                { label: '100 / trang', value: 100 },
-              ]}
-              value={perPage + ''}
-              setValue={(val) => {
-                if (setPerPage && setCurrentPage) {
-                  setPerPage(Number(val));
-                  setCurrentPage(1);
-                  setSelectedRows([]); // Xóa lựa chọn khi thay đổi perPage
-                }
-              }}
-            />
-            <Button customize={'default'} onClick={handleDivide}>
-              Chia đều
-            </Button>
-            <Button customize={'default'}>Thêm ngay</Button>
-          </div>
+      <div className="flex lg:flex-row flex-col justify-end gap-5 mt-4 items-center">
+        <div className="flex gap-3">
+          <Button customize={'default'} type="button" onClick={handleDivide}>
+            Chia đều
+          </Button>
+          <ConfirmDialog
+            onContinue={handleAssignAll}
+            typeTitle="đóng đăng ký"
+            triggerComponent={
+              <Button customize={'default'} type="button" disabled={Object.entries(selectedRows).length === 0}>
+                Thêm ngay
+              </Button>
+            }
+          />
         </div>
-      </RenderIf>
+      </div>
     </div>
   );
 };

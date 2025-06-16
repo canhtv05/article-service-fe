@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { SquarePen, Trash } from 'lucide-react';
+import { SquarePen } from 'lucide-react';
 import { useParams, useSearchParams } from 'react-router-dom';
 
 import { AdminRegistrationDetailType, AdminRegistrationDetailChildTResponseType } from '@/types';
@@ -13,12 +13,6 @@ const tooltips = [
     icon: SquarePen,
     type: 'assign_topic',
     className: 'hover:stroke-yellow-500 size-5',
-  },
-  {
-    content: 'Xóa',
-    icon: Trash,
-    type: 'remove',
-    className: 'hover:stroke-red-500 size-5',
   },
 ];
 

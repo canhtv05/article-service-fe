@@ -1,43 +1,31 @@
-import { useContext, useState } from 'react';
-import { toast } from 'sonner';
-
-import { Notice } from '@/enums';
 import { AddUserToCampaignType } from '@/types';
-import { PRStaffsContext } from '@/contexts/context/pr/PRStaffsContext';
 import AddUserToCampaignWithPagination from './AddUserToCampaignWithPagination';
+import { useState } from 'react';
 
 const AddUserToCampaign = () => {
-  const articles = useContext(PRStaffsContext);
-  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [selectedRows, setSelectedRows] = useState<Record<string, string>>({});
 
-  // Xử lý chọn/tắt tất cả
   const handleSelectAll = (checked: boolean, currentPageData: AddUserToCampaignType[]) => {
     if (checked) {
-      setSelectedRows(currentPageData.map((item) => item.id));
+      const newSelected: Record<string, string> = {};
+      currentPageData.forEach((item, index) => {
+        newSelected[index.toString()] = item.id;
+      });
+      setSelectedRows((prev) => ({ ...prev, ...newSelected }));
     } else {
-      setSelectedRows([]);
+      setSelectedRows({});
     }
   };
 
-  // Xử lý chọn/tắt từng hàng
-  const handleSelectRow = (id: string, checked: boolean) => {
-    if (checked) {
-      setSelectedRows((prev) => [...prev, id]);
-    } else {
-      setSelectedRows((prev) => prev.filter((rowId) => rowId !== id));
-    }
-  };
-
-  // Kiểm tra trạng thái chọn tất cả
-  const isAllSelected = (currentPageData: AddUserToCampaignType[]) =>
-    currentPageData.length > 0 && selectedRows.length === currentPageData.length;
-
-  const handleAssign = () => {
-    toast.success(Notice.UPDATE_SUCCESS);
-    setSelectedRows([]);
-    articles?.setData((prev) => {
-      if (!prev) return [];
-      return prev.filter((article) => !selectedRows.includes(article.article_id));
+  const handleSelectRow = (user: AddUserToCampaignType, index: number, checked: boolean) => {
+    setSelectedRows((prev) => {
+      const newSelected = { ...prev };
+      if (checked) {
+        newSelected[index.toString()] = user.id;
+      } else {
+        delete newSelected[index.toString()];
+      }
+      return newSelected;
     });
   };
 
@@ -48,8 +36,6 @@ const AddUserToCampaign = () => {
         setSelectedRows={setSelectedRows}
         handleSelectAll={handleSelectAll}
         handleSelectRow={handleSelectRow}
-        isAllSelected={isAllSelected}
-        handleAssign={handleAssign}
       />
     </div>
   );
