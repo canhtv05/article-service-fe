@@ -13,7 +13,7 @@ import { DateRange } from 'react-day-picker';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { DateRangePicker } from '../DateRangePicker';
-import { parseISO } from 'date-fns';
+import { parseISO, isBefore, isAfter } from 'date-fns';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { httpRequest } from '@/utils/httpRequest';
 import { Notice } from '@/enums';
@@ -104,18 +104,30 @@ const AdminRegistrationTableDetail = () => {
 
   const handleOnContinue = useCallback(() => {
     if (!context?.dataDetail) return;
-    if (!value.startDate || !value.endDate) {
+
+    const { startDate, endDate } = value;
+
+    if (!startDate || !endDate) {
       toast.error('Vui lòng nhập đủ trường');
       return;
     }
 
-    let subName = value.name;
+    const parentStart = parseISO(context.dataDetail.startDate);
+    const parentEnd = parseISO(context.dataDetail.endDate);
+    const subStart = parseISO(startDate);
+    const subEnd = parseISO(endDate);
 
-    if (!value.name) {
-      const startDate = formatDateTime(value.startDate, 'dd/MM/yyyy');
-      const endDate = formatDateTime(value.endDate, 'dd/MM/yyyy');
-      const name = Number(startDate.substring(3, 5));
-      subName = `Tháng ${String(name)} (${startDate} - ${endDate})`;
+    if (isBefore(subStart, parentStart) || isAfter(subEnd, parentEnd)) {
+      toast.error('Thời gian đợt con phải nằm trong khoảng của đợt cha');
+      return;
+    }
+
+    let subName = value.name;
+    if (!subName) {
+      const formattedStart = formatDateTime(startDate, 'dd/MM/yyyy');
+      const formattedEnd = formatDateTime(endDate, 'dd/MM/yyyy');
+      const month = Number(formattedStart.substring(3, 5));
+      subName = `Tháng ${month} (${formattedStart} - ${formattedEnd})`;
     }
 
     const data = {
@@ -125,6 +137,7 @@ const AdminRegistrationTableDetail = () => {
     };
 
     createSubCampaign.mutate(data);
+
     setValue({
       endDate: '',
       name: '',
