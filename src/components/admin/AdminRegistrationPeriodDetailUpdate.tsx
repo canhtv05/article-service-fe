@@ -106,10 +106,9 @@ const AdminRegistrationPeriodDetailUpdate = () => {
         writingEndDate: data.writingEndDate,
         status: data.status,
       }),
-    onSuccess: (response) => {
+    onSuccess: () => {
       toast.success(Notice.UPDATE_SUCCESS);
       queryClient.invalidateQueries({ queryKey: ['registration-detail'] });
-      console.log(response);
     },
     onError: () => {
       toast.error(Notice.UPDATE_FAILED);

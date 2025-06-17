@@ -1,17 +1,25 @@
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { List, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '../ui/button';
 import PRListNotAssignStaffTableWithPagination from './PRListNotAssignStaffTableWithPagination';
 import ConfirmDialog from '../ConfirmDialog';
-import { Notice } from '@/enums';
 import { PRStaffsType } from '@/types';
-import { PRStaffsContext } from '@/contexts/context/pr/PRStaffsContext';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { httpRequest } from '@/utils/httpRequest';
+import { useParams } from 'react-router-dom';
+import { handleMutationError } from '@/utils/handleMutationError';
+
+interface ValueAssign {
+  articleId: string;
+  assigneeId: string;
+}
 
 const PRListNotAssignStaff = () => {
-  const articles = useContext(PRStaffsContext);
+  const { id } = useParams();
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const queryClient = useQueryClient();
 
   // Xử lý chọn/tắt tất cả
   const handleSelectAll = (checked: boolean, currentPageData: PRStaffsType[]) => {
@@ -31,17 +39,34 @@ const PRListNotAssignStaff = () => {
     }
   };
 
-  // Kiểm tra trạng thái chọn tất cả
   const isAllSelected = (currentPageData: PRStaffsType[]) =>
     currentPageData.length > 0 && selectedRows.length === currentPageData.length;
 
+  const assignMutation = useMutation({
+    mutationKey: ['assign'],
+    mutationFn: async (data: ValueAssign) => await httpRequest.post('/admin/bai-viet/phan-cong-nhan-vien', data),
+  });
+
   const handleAssign = () => {
-    toast.success(Notice.UPDATE_SUCCESS);
-    setSelectedRows([]);
-    articles?.setData((prev) => {
-      if (!prev) return [];
-      return prev.filter((article) => !selectedRows.includes(article.id));
-    });
+    if (!id) return;
+
+    try {
+      Promise.all(
+        selectedRows.map((s) => {
+          const data: ValueAssign = {
+            assigneeId: id,
+            articleId: s,
+          };
+
+          assignMutation.mutateAsync(data);
+        }),
+      );
+      queryClient.invalidateQueries({ queryKey: ['/chu-de/bai-viet-cho-phan-cong'] });
+      toast.success('Phân công thành công');
+      setSelectedRows([]);
+    } catch (error) {
+      handleMutationError(error);
+    }
   };
 
   return (
