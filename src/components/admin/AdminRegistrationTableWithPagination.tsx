@@ -26,6 +26,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { httpRequest } from '@/utils/httpRequest';
 import { toast } from 'sonner';
 import { Notice } from '@/enums';
+import cookieUtil from '@/utils/cookieUtil';
 
 type AdminRegistrationTableWithPaginationProps = {
   selectedRows: string[];
@@ -181,6 +182,7 @@ const AdminRegistrationTableWithPagination = ({
                             <Link
                               to={`/admin/registration-period/detail/${registration.id}`}
                               className="cursor-pointer"
+                              onClick={() => cookieUtil.setStorage({ parentId: registration.id })}
                             >
                               <Tooltip
                                 toolTipContent={item.content}

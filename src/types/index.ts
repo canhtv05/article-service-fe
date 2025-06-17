@@ -357,16 +357,12 @@ export type AdminRegistrationDetailContextType = {
 
 export type AdminRegistrationChildType = {
   id: string;
-  name: string;
-  topic_name: string;
-  total_articles: number;
+  authorName: string;
+  topicName: string;
+  assignedArticleCount: number;
 };
 
 export type AdminRegistrationChildContextType = {
-  data: AdminRegistrationChildType[] | undefined;
-  setData: Dispatch<SetStateAction<AdminRegistrationChildType[] | undefined>>;
-  isLoading: boolean;
-  error: unknown;
   titlesTable: string[];
   tooltips: {
     content: string;
@@ -381,10 +377,12 @@ export type AdminRegistrationChildContextType = {
 };
 
 export type AddUserToCampaignType = {
-  name: string;
-  topic_name: string;
-  number_of_articles: number;
   id: string;
+  authorName: string;
+  topicName: string;
+  assignedArticleCount: number;
+  subCampaignId: string;
+  userid: string;
 };
 
 export type AdminApproveArticleType = {
