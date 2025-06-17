@@ -14,7 +14,6 @@ const PRFilterAssignArticleComponent = () => {
     queryKey: ['/danh-sach-chu-de2'],
     queryFn: async () => {
       const response = await httpRequest.get('/chu-de/danh-sach-chu-de2');
-      console.log(response.data);
       return response.data;
     },
   });

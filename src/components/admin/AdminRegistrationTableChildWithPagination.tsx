@@ -16,8 +16,6 @@ const AdminRegistrationTableChildWithPagination = () => {
     queryKey: ['/dot-bai-viet/danh-sach-giang-vien-da-phan'],
     queryFn: async () => {
       const response = await httpRequest.get(`/dot-bai-viet/danh-sach-giang-vien-da-phan/${id}`);
-      console.log(response.data);
-
       return response.data;
     },
   });
