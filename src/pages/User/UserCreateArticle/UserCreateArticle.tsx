@@ -10,7 +10,8 @@ import { useQuery } from '@tanstack/react-query';
 import MDEditor from '@uiw/react-md-editor';
 import axios from 'axios';
 import { List } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import mammoth from 'mammoth';
+import { useEffect, useRef, useState } from 'react';
 
 const Example = () => {
   // dependent select
@@ -81,6 +82,7 @@ const Example = () => {
 const UserCreateArticle = () => {
   const { height } = useViewport();
   const { theme } = useTheme();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const { data } = useQuery({
     queryKey: ['markdown'],
@@ -102,6 +104,31 @@ const UserCreateArticle = () => {
     setMarkdown(value as string);
   };
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.name.endsWith('.docx')) {
+      alert('Chỉ hỗ trợ file .docx. Vui lòng chuyển file .doc sang .docx');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const arrayBuffer = e.target?.result;
+      if (arrayBuffer instanceof ArrayBuffer) {
+        try {
+          const result = await mammoth.extractRawText({ arrayBuffer });
+          setMarkdown(result.value);
+        } catch (err) {
+          console.error('Lỗi khi đọc file:', err);
+          alert('Không thể đọc nội dung file .docx');
+        }
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
   return (
     <div className="h-full">
       <div className="flex gap-3 items-center justify-between my-2">
@@ -113,7 +140,10 @@ const UserCreateArticle = () => {
       <div className="flex my-5 items-center">
         <span className="text-foreground/30 text-sm">Ký tự: {markdown.trim().length}</span>
         <div className="flex gap-2 flex-1 justify-end">
-          <Button variant={'outline'}>Tải bài lên</Button>
+          <input type="file" accept=".docx" onChange={handleFileChange} ref={inputRef} className="hidden" />
+          <Button variant={'outline'} onClick={() => inputRef.current?.click()}>
+            Tải bài lên
+          </Button>
           <DialogCustom
             onContinue={() => console.log(1)}
             title="Đăng bài viết"
