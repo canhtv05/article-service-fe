@@ -34,7 +34,7 @@ const AdminRegistrationTableChild = () => {
             <Link to={`/add/users-to-campaign/${path}`} state={{ background: location }}>
               <Button customize={'default'} className="py-5 rounded-full">
                 <Plus />
-                Thêm giảng viên vào đợt
+                Thêm / sửa giảng viên vào đợt
               </Button>
             </Link>
           </div>

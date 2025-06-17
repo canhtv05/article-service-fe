@@ -13,10 +13,10 @@ import cookieUtil from '@/utils/cookieUtil';
 import ConfirmDialog from '../ConfirmDialog';
 import { handleMutationError } from '@/utils/handleMutationError';
 import { toast } from 'sonner';
+import { useParams } from 'react-router-dom';
 
 const titlesTable = ['', '#', 'Giảng viên', 'Chủ đề', 'Số lượng bài viết', 'Hành động'];
 type DataAssign = {
-  subCampaignId: string;
   assignedArticleCount: number;
   id: string;
 };
@@ -36,6 +36,7 @@ const AddUserToCampaignWithPagination = ({
 }: AddUserToCampaignWithPaginationProps) => {
   const queryClient = useQueryClient();
 
+  const { id } = useParams();
   const { data: users } = useQuery<AddUserToCampaignType[]>({
     queryKey: ['/dot-bai-viet/danh-sach-giang-vien-dk'],
     queryFn: async () => {
@@ -65,13 +66,13 @@ const AddUserToCampaignWithPagination = ({
   };
 
   const handleDivide = () => {
-    if (users) {
-      const total = users.reduce((sum, user) => sum + Number(user.assignedArticleCount), 0);
-      const n = users.length;
+    if (values) {
+      const total = values.reduce((sum, val) => sum + val, 0);
+      const n = values.length;
       const base = Math.floor(total / n);
       const extra = total % n;
 
-      const result = users.map((_, index) => (index < extra ? base + 1 : base));
+      const result = values.map((_, index) => (index < extra ? base + 1 : base));
       setValues(result);
     }
   };
@@ -81,13 +82,14 @@ const AddUserToCampaignWithPagination = ({
     mutationFn: async (data: DataAssign) =>
       await httpRequest.put(`/dot-bai-viet/phan-cong-giang-vien/${data.id}`, {
         assignedArticleCount: data.assignedArticleCount,
-        subCampaignId: data.subCampaignId,
+        subCampaignId: id,
       }),
     onError: (error) => {
       handleMutationError(error);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/dot-bai-viet/danh-sach-giang-vien-dk'] });
+      queryClient.invalidateQueries({ queryKey: ['/dot-bai-viet/chi-tiet-dot-con'] });
     },
   });
 
@@ -116,7 +118,6 @@ const AddUserToCampaignWithPagination = ({
       for (const item of assignments) {
         await assignMutation.mutateAsync(item);
       }
-      console.log('Assigning all:', assignments);
       queryClient.invalidateQueries({ queryKey: ['/dot-bai-viet/danh-sach-giang-vien-dk'] });
       toast.success('Phân công thành công');
       setSelectedRows({});
@@ -178,7 +179,6 @@ const AddUserToCampaignWithPagination = ({
                       onContinue={() => {
                         return handleAssign({
                           assignedArticleCount: values[index],
-                          subCampaignId: user.subCampaignId,
                           id: user.id,
                         });
                       }}

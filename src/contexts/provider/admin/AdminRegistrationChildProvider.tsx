@@ -13,7 +13,7 @@ const tooltips = [
   },
 ];
 
-const titlesTable = ['#', 'Tên giảng viên', 'Chủ đề', 'Số lượng bài viết', 'Hành động'];
+const titlesTable = ['#', 'Tên giảng viên', 'Chủ đề', 'Số lượng bài viết'];
 
 const AdminRegistrationChildProvider = ({ children }: { children: ReactNode }) => {
   const [searchParams] = useSearchParams();

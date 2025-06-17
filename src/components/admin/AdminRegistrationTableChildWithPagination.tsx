@@ -1,12 +1,7 @@
-'use client';
-
-import { Fragment, useContext } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useContext } from 'react';
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import FallbackNoDataTable from '../FallbackNoDataTable';
-import RenderIf from '../RenderIf';
-import Tooltip from '../Tooltip';
 import { AdminRegistrationChildContext } from '@/contexts/context/admin/AdminRegistrationChildContext';
 import cookieUtil from '@/utils/cookieUtil';
 import { AdminRegistrationChildType } from '@/types';
@@ -14,7 +9,6 @@ import { httpRequest } from '@/utils/httpRequest';
 import { useQuery } from '@tanstack/react-query';
 
 const AdminRegistrationTableChildWithPagination = () => {
-  const location = useLocation();
   const registrationPeriodChild = useContext(AdminRegistrationChildContext);
 
   const { data: users } = useQuery<AdminRegistrationChildType[]>({
@@ -48,7 +42,7 @@ const AdminRegistrationTableChildWithPagination = () => {
                   <TableCell className="font-medium">{registration.authorName}</TableCell>
                   <TableCell className="font-medium">{registration.topicName}</TableCell>
                   <TableCell>{registration.assignedArticleCount || 'Chưa phân công'}</TableCell>
-                  <TableCell>
+                  {/* <TableCell>
                     <div className="flex gap-4">
                       {registrationPeriodChild?.tooltips.map((item, idx) => (
                         <Fragment key={idx}>
@@ -67,7 +61,7 @@ const AdminRegistrationTableChildWithPagination = () => {
                         </Fragment>
                       ))}
                     </div>
-                  </TableCell>
+                  </TableCell> */}
                 </TableRow>
               ))
             ) : (
