@@ -90,6 +90,7 @@ const AddUserToCampaignWithPagination = ({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/dot-bai-viet/danh-sach-giang-vien-dk'] });
       queryClient.invalidateQueries({ queryKey: ['/dot-bai-viet/chi-tiet-dot-con'] });
+      queryClient.invalidateQueries({ queryKey: ['/dot-bai-viet/danh-sach-giang-vien-da-phan'] });
     },
   });
 
@@ -97,6 +98,8 @@ const AddUserToCampaignWithPagination = ({
     assignMutation.mutate(data, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['/dot-bai-viet/danh-sach-giang-vien-dk'] });
+        queryClient.invalidateQueries({ queryKey: ['/dot-bai-viet/chi-tiet-dot-con'] });
+        queryClient.invalidateQueries({ queryKey: ['/dot-bai-viet/danh-sach-giang-vien-da-phan'] });
         toast.success('Phân công thành công');
       },
     });

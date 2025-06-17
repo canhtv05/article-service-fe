@@ -3,20 +3,21 @@ import { useContext } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import FallbackNoDataTable from '../FallbackNoDataTable';
 import { AdminRegistrationChildContext } from '@/contexts/context/admin/AdminRegistrationChildContext';
-import cookieUtil from '@/utils/cookieUtil';
 import { AdminRegistrationChildType } from '@/types';
 import { httpRequest } from '@/utils/httpRequest';
 import { useQuery } from '@tanstack/react-query';
+import { useParams } from 'react-router-dom';
 
 const AdminRegistrationTableChildWithPagination = () => {
   const registrationPeriodChild = useContext(AdminRegistrationChildContext);
+  const { id } = useParams();
 
   const { data: users } = useQuery<AdminRegistrationChildType[]>({
-    queryKey: ['/dot-bai-viet/danh-sach-giang-vien-dk'],
+    queryKey: ['/dot-bai-viet/danh-sach-giang-vien-da-phan'],
     queryFn: async () => {
-      const response = await httpRequest.get(
-        `/dot-bai-viet/danh-sach-giang-vien-dk/${cookieUtil.getStorage().parentId}`,
-      );
+      const response = await httpRequest.get(`/dot-bai-viet/danh-sach-giang-vien-da-phan/${id}`);
+      console.log(response.data);
+
       return response.data;
     },
   });
