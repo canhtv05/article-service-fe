@@ -1,19 +1,9 @@
-'use client';
-
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '@/components/ui/sidebar';
 import { NavHeader } from './nav-header';
 import { NavMain } from './nav-main';
 import { NavUser } from './nav-user';
 import useLogicSidebar from '@/hooks/components/useLogicSidebar';
 import { Separator } from '@/components/ui/separator';
-
-const data = {
-  user: {
-    name: 'shadcn',
-    email: 'm@example.com',
-    avatar: '/avatars/shadcn.jpg',
-  },
-};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const items = useLogicSidebar();
@@ -28,7 +18,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <Separator />
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

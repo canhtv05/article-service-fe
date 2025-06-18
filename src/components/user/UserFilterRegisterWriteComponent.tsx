@@ -2,8 +2,6 @@ import { Fragment } from 'react';
 
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
-import FieldsSelect from '../FieldsSelect';
-import { Status, StatusRegistration } from '@/enums';
 import { useUserRegisterWriteContext } from '@/contexts/context/user/UserRegisterWriteContext';
 import { parseISO } from 'date-fns';
 import { DateRange } from 'react-day-picker';
@@ -14,66 +12,40 @@ const UserFilterRegisterWriteComponent = () => {
 
   if (!context) return;
 
-  const { end_date, name_or_id, start_date, status } = context.valueFilter;
+  const { campaignName, endDate, startDate } = context.valueFilter;
 
   const dateRange: DateRange | undefined =
-    start_date || end_date
+    startDate || endDate
       ? {
-          from: start_date ? parseISO(start_date) : undefined,
-          to: end_date ? parseISO(end_date) : undefined,
+          from: startDate ? parseISO(startDate) : undefined,
+          to: endDate ? parseISO(endDate) : undefined,
         }
       : undefined;
 
   const handleChangeDate = (range: DateRange | undefined) => {
     context?.setValueFilter((prev) => ({
       ...prev,
-      start_date: range?.from ? range.from.toISOString() : '',
-      end_date: range?.to ? range.to.toISOString() : '',
+      startDate: range?.from ? range.from.toISOString() : '',
+      endDate: range?.to ? range.to.toISOString() : '',
     }));
   };
 
   return (
     <Fragment>
       <div className="flex flex-col justify-end">
-        <Label htmlFor="name_or_id" className="font-bold mb-2 leading-5">
+        <Label htmlFor="campaignName" className="font-bold mb-2 leading-5">
           Tên hoặc mã:
         </Label>
         <Input
-          id="name_or_id"
+          id="campaignName"
           type="text"
           placeholder="Tìm kiếm theo tên hoặc mã"
-          value={name_or_id}
+          value={campaignName}
           onChange={(e) => {
             context.setValueFilter((prev) => ({
               ...prev,
-              name_or_id: e.target.value,
+              campaignName: e.target.value,
             }));
-          }}
-        />
-      </div>
-
-      <div className="flex flex-col justify-end">
-        <Label htmlFor="status" className="font-bold mb-2 leading-5">
-          Trạng thái:
-        </Label>
-        <FieldsSelect
-          id="status"
-          placeholder="-- Chọn trạng thái --"
-          data={[
-            { label: 'Tất cả', value: Status.ALL },
-            { label: 'Mở đăng ký', value: StatusRegistration.OPEN },
-            { label: 'Đóng đăng ký', value: StatusRegistration.CLOSE },
-          ]}
-          label="Trạng thái"
-          defaultValue={Status.ALL}
-          value={status}
-          setValue={(val) => {
-            if (typeof val === 'string' && context && val !== status) {
-              context.setValueFilter((prev) => ({
-                ...prev,
-                status: val,
-              }));
-            }
           }}
         />
       </div>

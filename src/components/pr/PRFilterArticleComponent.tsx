@@ -1,77 +1,115 @@
-import { Fragment, useContext } from 'react';
+import { Fragment, useCallback, useContext } from 'react';
 
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import FieldsSelect from '../FieldsSelect';
-import { StatusSend } from '@/enums';
+import { StatusArticle, StatusSend } from '@/enums';
 import { PRListArticlesContext } from '@/contexts/context/pr/PRListArticlesContext';
+import { useQuery } from '@tanstack/react-query';
+import { httpRequest } from '@/utils/httpRequest';
+
+type Campaign = {
+  name: string;
+};
+
+type CampaignListResponse = Campaign[];
 
 const PRFilterArticleComponent = () => {
   const articles = useContext(PRListArticlesContext);
 
-  if (!articles) return;
+  const { data } = useQuery({
+    queryKey: ['/danh-sach-chu-de2'],
+    queryFn: async () => {
+      const response = await httpRequest.get('/chu-de/danh-sach-chu-de2');
+      return response.data;
+    },
+  });
 
-  const { assigned_name_and_assigned_id, campaign_period, status, topic_name, title_and_author_name } =
-    articles.valueFilter;
+  const { data: campaigns } = useQuery<CampaignListResponse>({
+    queryKey: ['/admin/bai-viet/danh-sach-bai-viet'],
+    queryFn: async () => {
+      const response = await httpRequest.get('/dot-bai-viet/danh-sach-dot-bai-viet');
+      return response.data;
+    },
+  });
+
+  const mappedOptions = useCallback(
+    () =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      data?.map((item: any) => ({
+        value: item.id,
+        label: item.name,
+      })) ?? [],
+    [data],
+  );
+
+  const mappedOptionCampaignName = useCallback(
+    () =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      campaigns?.map((item: any) => ({
+        value: item.id,
+        label: item.name,
+      })) ?? [],
+    [campaigns],
+  );
+
+  if (!articles || !campaigns) return;
+
+  const { assignerName, status, titleAndAuthorName, topicId, writingCampaignId } = articles.valueFilter;
 
   return (
     <Fragment>
       <div className="flex flex-col justify-end">
-        <Label htmlFor="title_and_author_name" className="font-bold mb-2 leading-5">
+        <Label htmlFor="titleAndAuthorName" className="font-bold mb-2 leading-5">
           Tên tiêu đề và tên tác giả của bài viết:
         </Label>
         <Input
-          id="title_and_author_name"
+          id="titleAndAuthorName"
           type="text"
           placeholder="Tìm kiếm theo tiêu đề và tên tác giả của bài viết"
-          value={title_and_author_name}
+          value={titleAndAuthorName}
           onChange={(e) => {
             articles.setValueFilter((prev) => ({
               ...prev,
-              title_and_author_name: e.target.value,
+              titleAndAuthorName: e.target.value,
             }));
           }}
         />
       </div>
 
       <div className="flex flex-col justify-end">
-        <Label htmlFor="assigned_name_and_assigned_id" className="font-bold mb-2 leading-5">
-          Tên và mã người phân công:
+        <Label htmlFor="assignerName" className="font-bold mb-2 leading-5">
+          Tên người phân công:
         </Label>
         <Input
-          id="assigned_name_and_assigned_id"
+          id="assignerName"
           type="text"
-          placeholder="Tìm kiếm theo tên và mã người phân công"
-          value={assigned_name_and_assigned_id}
+          placeholder="Tìm kiếm theo tên người phân công"
+          value={assignerName}
           onChange={(e) => {
             articles.setValueFilter((prev) => ({
               ...prev,
-              assigned_name_and_assigned_id: e.target.value,
+              assignerName: e.target.value,
             }));
           }}
         />
       </div>
 
       <div className="flex flex-col justify-end">
-        <Label htmlFor="topic_name" className="font-bold mb-2 leading-5">
+        <Label htmlFor="topicId" className="font-bold mb-2 leading-5">
           Chủ đề:
         </Label>
         <FieldsSelect
-          id="topic_name"
+          id="topicId"
           placeholder="-- Chọn chủ đề --"
-          data={[
-            { label: 'Công nghệ', value: 'Công nghệ' },
-            { label: 'Bền vững', value: 'Bền vững' },
-            { label: 'Nông nghiệp', value: 'Nông nghiệp' },
-          ]}
+          data={mappedOptions()}
           label="Chủ đề"
-          defaultValue={''}
-          value={topic_name}
+          value={topicId}
           setValue={(val) => {
-            if (typeof val === 'string' && articles && val !== topic_name) {
+            if (typeof val === 'string' && articles && val !== topicId) {
               articles.setValueFilter((prev) => ({
                 ...prev,
-                topic_name: val,
+                topicId: val,
               }));
             }
           }}
@@ -86,12 +124,10 @@ const PRFilterArticleComponent = () => {
           id="status"
           placeholder="Chọn trạng thái"
           data={[
-            { label: 'Tất cả', value: StatusSend.ALL },
-            { label: 'Đã gửi cho PR', value: StatusSend.SENT },
+            { label: 'Đã gửi cho PR', value: StatusArticle.SendToPR },
             { label: 'Chưa gửi cho PR', value: StatusSend.NOT_SENT },
           ]}
           label="Trạng thái"
-          defaultValue={StatusSend.ALL}
           value={status}
           setValue={(val) => {
             if (typeof val === 'string' && articles && val !== status) {
@@ -105,24 +141,21 @@ const PRFilterArticleComponent = () => {
       </div>
 
       <div className="flex flex-col justify-end">
-        <Label htmlFor="campaign_period" className="font-bold mb-2 leading-5">
+        <Label htmlFor="writingCampaignId" className="font-bold mb-2 leading-5">
           Đợt viết bài:
         </Label>
         <FieldsSelect
-          id="campaign_period"
+          id="writingCampaignId"
           placeholder="-- Chọn đợt viết bài --"
-          data={[
-            { label: 'Tháng 10 (01/10/2005 - 30/10/2005)', value: 'Tháng 10 (01/10/2005 - 30/10/2005)' },
-            { label: 'Tháng 9 (08/09/2005 - 30/09/2005)', value: 'Tháng 9 (08/09/2005 - 30/09/2005)' },
-          ]}
+          data={mappedOptionCampaignName()}
           label="Đợt viết bài"
           defaultValue={''}
-          value={campaign_period}
+          value={writingCampaignId}
           setValue={(val) => {
-            if (typeof val === 'string' && articles && val !== campaign_period) {
+            if (typeof val === 'string' && articles && val !== writingCampaignId) {
               articles.setValueFilter((prev) => ({
                 ...prev,
-                campaign_period: val,
+                writingCampaignId: val,
               }));
             }
           }}
