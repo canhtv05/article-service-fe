@@ -1,5 +1,5 @@
 import { Fragment, useContext } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import {
@@ -18,25 +18,21 @@ import Tooltip from '../Tooltip';
 import FallbackNoDataTable from '../FallbackNoDataTable';
 import ConfirmDialog from '../ConfirmDialog';
 import RenderIf from '../RenderIf';
-import LoadingTable from '../LoadingTable';
 import { PRListArticlesContext } from '@/contexts/context/pr/PRListArticlesContext';
 import { Badge } from '../ui/badge';
 import { Notice } from '@/enums';
+import { ArticleFilterType } from '@/types';
+import { formatDateTime } from '@/lib/utils';
 
 const PRArticleTableWithPagination = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const articles = useContext(PRListArticlesContext);
 
-  // Tính toán phân trang
-  const perPage = Number(articles?.perPage) || 10;
-  const currentPage = articles?.currentPage || 1;
-  const totalItems = articles?.data?.length || 0;
-  const totalPages = Math.ceil(totalItems / perPage);
+  const currentPage = Number(articles?.currentPage);
+  const totalPages = articles?.data?.totalPages || 0;
 
-  // Lấy dữ liệu cho trang hiện tại
-  const startIndex = (currentPage - 1) * perPage;
-  const endIndex = startIndex + perPage;
-  const currentData = articles?.data?.slice(startIndex, endIndex) || [];
+  const currentData = articles?.data?.content || [];
 
   // Tạo danh sách số trang
   const getPageNumbers = () => {
@@ -70,7 +66,26 @@ const PRArticleTableWithPagination = () => {
   const handlePageChange = (page: number) => {
     if (articles?.setCurrentPage && page >= 1 && page <= totalPages) {
       articles.setCurrentPage(page);
+
+      const queryString = buildSearchParamsWithFilters(page, Number(articles.perPage), articles.valueFilter);
+
+      navigate(`/pr/list-articles?${queryString}`, { replace: true });
     }
+  };
+
+  const buildSearchParamsWithFilters = (page: number, size: number, filters: ArticleFilterType) => {
+    const params = new URLSearchParams();
+
+    params.set('page', String(page));
+    params.set('size', String(size));
+
+    if (filters.assignerName) params.set('assignerName', filters.assignerName);
+    if (filters.status) params.set('status', filters.status);
+    if (filters.titleAndAuthorName) params.set('titleAndAuthorName', String(filters.titleAndAuthorName));
+    if (filters.topicId) params.set('topicId', String(filters.topicId));
+    if (filters.writingCampaignId) params.set('writingCampaignId', String(filters.writingCampaignId));
+
+    return params.toString();
   };
 
   const handleClick = () => {
@@ -91,85 +106,76 @@ const PRArticleTableWithPagination = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <RenderIf value={!!articles?.isLoading}>
-              <TableRow className="h-[130px]">
-                <TableCell colSpan={articles?.titlesTable.length} className="flex my-auto justify-center items-center">
-                  <LoadingTable />
-                </TableCell>
-              </TableRow>
-            </RenderIf>
-            <RenderIf value={!articles?.isLoading}>
-              {Array.isArray(currentData) && currentData.length > 0 ? (
-                currentData.map((article, index) => (
-                  <TableRow key={index} className="odd:bg-muted/50">
-                    <TableCell className="pl-4">{startIndex + index + 1}</TableCell>
-                    <TableCell className="pl-4">{article.title}</TableCell>
-                    <TableCell className="font-medium">{article.author_name}</TableCell>
-                    <TableCell>{article.topic_name}</TableCell>
-                    <TableCell className="pl-4">{article.created_at}</TableCell>
-                    <TableCell>{article.campaign_period}</TableCell>
-                    <TableCell>
-                      <StatusBadge status={article.status} />
-                    </TableCell>
-                    <TableCell className="flex justify-center">
-                      <RenderIf value={article.assignee_id !== null}>
-                        <span className="font-medium">{`${article.assignee_id} - ${article.assignee_name}`}</span>
-                      </RenderIf>
-                      <RenderIf value={article.assignee_id === null}>
-                        <Badge className="bg-amber-600/10 dark:bg-amber-600/20 hover:bg-amber-600/10 text-amber-500 border-amber-600/60 shadow-none rounded-full">
-                          <div>Chưa phân công</div>
-                        </Badge>
-                      </RenderIf>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-4">
-                        {articles?.tooltips.map((item, idx) => (
-                          <Fragment key={idx}>
-                            <RenderIf value={item.type !== 'view'}>
-                              <ConfirmDialog
-                                key={idx}
-                                onContinue={handleClick}
-                                typeTitle={'chỉnh sửa'}
-                                triggerComponent={
-                                  <div className="cursor-pointer">
-                                    <Tooltip
-                                      toolTipContent={item.content}
-                                      toolTipTrigger={<item.icon className={`size-5 ${item.className}`} />}
-                                    />
-                                  </div>
-                                }
+            {Array.isArray(currentData) && currentData.length > 0 ? (
+              currentData.map((article, index) => (
+                <TableRow key={index} className="odd:bg-muted/50">
+                  <TableCell className="pl-4">{index + 1}</TableCell>
+                  <TableCell className="pl-4">{article.title}</TableCell>
+                  <TableCell className="font-medium">{article.authorName}</TableCell>
+                  <TableCell>{article.topic}</TableCell>
+                  <TableCell className="pl-4">{formatDateTime(article.createdAt, 'dd/MM/yyyy')}</TableCell>
+                  <TableCell>{article.campaignName}</TableCell>
+                  <TableCell>
+                    <StatusBadge status={article.status} />
+                  </TableCell>
+                  <TableCell className="flex justify-center">
+                    <RenderIf value={!!article.assignee_name}>
+                      <span className="font-medium">{`${article.assignee_name}`}</span>
+                    </RenderIf>
+                    <RenderIf value={!article.assignee_name}>
+                      <Badge className="bg-amber-600/10 dark:bg-amber-600/20 hover:bg-amber-600/10 text-amber-500 border-amber-600/60 shadow-none rounded-full">
+                        <div>Chưa phân công</div>
+                      </Badge>
+                    </RenderIf>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-4">
+                      {articles?.tooltips.map((item, idx) => (
+                        <Fragment key={idx}>
+                          <RenderIf value={item.type !== 'view'}>
+                            <ConfirmDialog
+                              key={idx}
+                              onContinue={handleClick}
+                              typeTitle={'chỉnh sửa'}
+                              triggerComponent={
+                                <div className="cursor-pointer">
+                                  <Tooltip
+                                    toolTipContent={item.content}
+                                    toolTipTrigger={<item.icon className={`size-5 ${item.className}`} />}
+                                  />
+                                </div>
+                              }
+                            />
+                          </RenderIf>
+                          <RenderIf value={item.type === 'view'}>
+                            <Link
+                              to={`/view/articles/${article.id}`}
+                              state={{ background: location }}
+                              className="cursor-pointer"
+                            >
+                              <Tooltip
+                                toolTipContent={item.content}
+                                toolTipTrigger={<item.icon className={`size-5 ${item.className}`} />}
                               />
-                            </RenderIf>
-                            <RenderIf value={item.type === 'view'}>
-                              <Link
-                                to={`/view/articles/${article.article_id}`}
-                                state={{ background: location }}
-                                className="cursor-pointer"
-                              >
-                                <Tooltip
-                                  toolTipContent={item.content}
-                                  toolTipTrigger={<item.icon className={`size-5 ${item.className}`} />}
-                                />
-                              </Link>
-                            </RenderIf>
-                          </Fragment>
-                        ))}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={articles?.titlesTable.length} className="text-center">
-                    <FallbackNoDataTable />
+                            </Link>
+                          </RenderIf>
+                        </Fragment>
+                      ))}
+                    </div>
                   </TableCell>
                 </TableRow>
-              )}
-            </RenderIf>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={articles?.titlesTable.length} className="text-center">
+                  <FallbackNoDataTable />
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
-      <RenderIf value={!!articles?.data && articles?.data?.length > 0}>
+      <RenderIf value={!!currentData.length && currentData.length > 0}>
         <div className="flex lg:flex-row flex-col gap-5 mt-4 items-center">
           <Pagination>
             <PaginationContent>
@@ -213,13 +219,18 @@ const PRArticleTableWithPagination = () => {
                 { label: '5 / trang', value: 5 },
                 { label: '10 / trang', value: 10 },
                 { label: '50 / trang', value: 50 },
-                { label: '100 / trang', value: 100 },
               ]}
               value={articles?.perPage}
               setValue={(val) => {
                 if (articles?.setPerPage && articles?.setCurrentPage) {
                   articles.setPerPage(val);
                   articles.setCurrentPage(1);
+
+                  const queryString = buildSearchParamsWithFilters(1, Number(val), articles.valueFilter);
+
+                  navigate(`/pr/list-articles?${queryString}`, {
+                    replace: true,
+                  });
                 }
               }}
             />

@@ -1,17 +1,16 @@
-import { useContext } from 'react';
 import DataFilters from '../DataFilters';
-import { StaffListArticlesContext } from '@/contexts/context/staff/StaffListArticlesContext';
 import UserFilterRegisterWriteComponent from './UserFilterRegisterWriteComponent';
+import { useUserRegisterWriteContext } from '@/contexts/context/user/UserRegisterWriteContext';
 
 const UserFilterRegisterWriteProvider = () => {
-  const articles = useContext(StaffListArticlesContext);
+  const context = useUserRegisterWriteContext();
 
   return (
     <DataFilters
-      onClear={articles?.handleClearFields}
-      onSearch={articles?.handleFilters}
+      onClear={context?.handleClearFields}
+      onSearch={context?.handleFilters}
       filterComponent={<UserFilterRegisterWriteComponent />}
-      gridCols={3}
+      gridCols={2}
     />
   );
 };

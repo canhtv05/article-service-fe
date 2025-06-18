@@ -24,7 +24,7 @@ const tooltips = [
   },
 ];
 
-const titlesTable = ['#', 'Mã', 'Tên', 'Email', 'Hành động'];
+const titlesTable = ['#', 'Tên', 'Email', 'Hành động'];
 
 const PRStaffsTable = () => {
   const { data, isLoading } = useQuery<StaffType[]>({
@@ -61,7 +61,6 @@ const PRStaffsTable = () => {
                 data.map((staff, index) => (
                   <TableRow key={index} className="odd:bg-muted/50">
                     <TableCell className="pl-4">{index + 1}</TableCell>
-                    <TableCell className="pl-4">{staff.id}</TableCell>
                     <TableCell className="font-medium">{staff.fullName}</TableCell>
                     <TableCell>{staff.email}</TableCell>
                     <TableCell>

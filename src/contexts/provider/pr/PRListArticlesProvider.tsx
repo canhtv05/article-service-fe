@@ -1,12 +1,11 @@
-import { ReactNode, useCallback, useEffect, useState } from 'react';
-import axios from 'axios';
+import { ReactNode, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import _ from 'lodash';
 
-import { ArticleFilterType, ListArticlesType } from '@/types';
+import { ArticleFilterType, ListArticlesResponseType } from '@/types';
 import { PRListArticlesContext } from '@/contexts/context/pr/PRListArticlesContext';
-import { StatusSend } from '@/enums';
 import { CircleX, CloudUpload, Eye } from 'lucide-react';
+import { httpRequest } from '@/utils/httpRequest';
+import { useSearchParams } from 'react-router-dom';
 
 const tooltips = [
   {
@@ -42,116 +41,110 @@ const titlesTable = [
 ];
 
 const PRListArticlesProvider = ({ children }: { children: ReactNode }) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const pageFromUrl = Number(searchParams.get('page')) || 1;
+  const sizeFromUrl = Number(searchParams.get('size')) || 5;
+  const status = searchParams.get('status') || '';
+  const titleAndAuthorName = searchParams.get('titleAndAuthorName') || '';
+  const writingCampaignId = searchParams.get('writingCampaignId') || '';
+  const topicId = searchParams.get('topicId') || '';
+  const assignerName = searchParams.get('assignerName') || '';
+
+  const [data, setData] = useState<ListArticlesResponseType | undefined>(undefined);
+  const [currentPage, setCurrentPage] = useState(pageFromUrl);
+  const [perPage, setPerPage] = useState<string>(sizeFromUrl.toString());
+  const [valueFilter, setValueFilter] = useState<ArticleFilterType>({
+    assignerName,
+    status,
+    titleAndAuthorName,
+    topicId,
+    writingCampaignId,
+  });
+
+  useEffect(() => {
+    setValueFilter({
+      assignerName,
+      status,
+      titleAndAuthorName,
+      topicId,
+      writingCampaignId,
+    });
+    setCurrentPage(pageFromUrl);
+    setPerPage(sizeFromUrl.toString());
+  }, [assignerName, pageFromUrl, sizeFromUrl, status, titleAndAuthorName, topicId, writingCampaignId]);
+
   const {
-    data: articles,
+    data: listArticles,
     isLoading,
     error,
-  } = useQuery<ListArticlesType[]>({
-    queryKey: ['list-articles'],
+  } = useQuery({
+    queryKey: [
+      '/chu-de/danh-sach-bai-viet-PR',
+      currentPage,
+      perPage,
+      titleAndAuthorName,
+      topicId,
+      writingCampaignId,
+      assignerName,
+      status,
+    ],
     queryFn: async () => {
-      const response = await axios.get('/data_list_articles.json');
+      const params: Record<string, string> = {
+        page: currentPage.toString(),
+        size: perPage,
+      };
+      if (titleAndAuthorName) params.titleAndAuthorName = titleAndAuthorName;
+      if (writingCampaignId) params.writingCampaignId = writingCampaignId;
+      if (topicId) params.topicId = topicId;
+      if (status) params.status = status;
+      if (assignerName) params.assignerName = assignerName;
+
+      const response = await httpRequest.get('/chu-de/danh-sach-bai-viet-PR', {
+        params,
+      });
+
       return response.data;
     },
   });
 
-  const [data, setData] = useState<ListArticlesType[] | undefined>(undefined);
-  const [valueFilter, setValueFilter] = useState<ArticleFilterType>({
-    title_and_author_name: '',
-    assigned_name_and_assigned_id: '',
-    topic_name: '',
-    status: StatusSend.ALL,
-    campaign_period: '',
-  });
-
-  const [perPage, setPerPage] = useState<string>('5');
-  const [currentPage, setCurrentPage] = useState<number>(1);
-
   useEffect(() => {
-    if (articles) {
-      setData(articles);
-      setCurrentPage(1);
+    if (listArticles) {
+      setData(listArticles);
     }
-  }, [articles]);
+  }, [listArticles]);
 
   const handleClearFields = () => {
     setValueFilter({
-      title_and_author_name: '',
-      assigned_name_and_assigned_id: '',
-      topic_name: '',
-      status: StatusSend.ALL,
-      campaign_period: '',
+      assignerName: '',
+      status: '',
+      titleAndAuthorName: '',
+      topicId: '',
+      writingCampaignId: '',
     });
-    if (!articles) return;
-    setData(articles);
+    setSearchParams({ page: '1', size: perPage });
     setCurrentPage(1);
   };
 
-  const handleFilters = useCallback(() => {
-    if (!articles) return;
+  const handleFilters = () => {
+    const query: Record<string, string> = {
+      page: '1',
+      size: perPage,
+    };
 
-    const { assigned_name_and_assigned_id, campaign_period, status, topic_name, title_and_author_name } = valueFilter;
+    if (valueFilter.assignerName) query.assignerName = valueFilter.assignerName;
+    if (valueFilter.titleAndAuthorName) query.titleAndAuthorName = String(valueFilter.titleAndAuthorName);
+    if (valueFilter.topicId) query.topicId = String(valueFilter.topicId);
+    if (valueFilter.status) query.status = String(valueFilter.status);
+    if (valueFilter.writingCampaignId) query.writingCampaignId = String(valueFilter.writingCampaignId);
 
-    if (
-      _.isEmpty(topic_name) &&
-      status === StatusSend.ALL &&
-      _.isEmpty(assigned_name_and_assigned_id) &&
-      _.isEmpty(campaign_period) &&
-      _.isEmpty(title_and_author_name)
-    ) {
-      setData(articles);
-      setCurrentPage(1);
-      return;
-    }
-
-    const filteredData = _.filter(articles, (article) => {
-      if (!_.isEmpty(topic_name)) {
-        if (!_.includes(article.topic_name.toLowerCase(), topic_name.toLowerCase())) {
-          return false;
-        }
-      }
-
-      if (status !== StatusSend.ALL) {
-        if (article.status !== status) {
-          return false;
-        }
-      }
-
-      if (!_.isEmpty(campaign_period)) {
-        if (!_.isEqual(article.campaign_period.toLowerCase(), campaign_period.toLowerCase())) {
-          return false;
-        }
-      }
-
-      if (!_.isEmpty(title_and_author_name)) {
-        if (
-          !_.includes(
-            article.title.toLowerCase() + ' ' + article.author_name.toLowerCase(),
-            title_and_author_name.toLowerCase(),
-          )
-        ) {
-          return false;
-        }
-      }
-
-      if (!_.isEmpty(assigned_name_and_assigned_id)) {
-        const assigneeId = article.assignee_id?.trim().toLowerCase() || '';
-        const assigneeName = article.assignee_name?.trim().toLowerCase() || '';
-        const target = assigned_name_and_assigned_id.trim().toLowerCase();
-
-        if (!_.includes(`${assigneeId} ${assigneeName}`, target)) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-
-    setData(filteredData);
+    setSearchParams(query);
     setCurrentPage(1);
-  }, [articles, valueFilter]);
+  };
 
   const values = {
     data,
+    setData,
     isLoading,
     error,
     tooltips,

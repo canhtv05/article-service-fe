@@ -43,6 +43,7 @@ const AddUserToCampaignWithPagination = ({
       const response = await httpRequest.get(
         `/dot-bai-viet/danh-sach-giang-vien-dk/${cookieUtil.getStorage().parentId}`,
       );
+
       return response.data;
     },
   });

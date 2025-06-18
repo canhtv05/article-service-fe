@@ -157,28 +157,38 @@ export type TopicContextType = {
 };
 
 export type ArticleFilterType = {
-  title_and_author_name: string;
-  assigned_name_and_assigned_id: string;
-  topic_name: string;
+  titleAndAuthorName: string;
+  writingCampaignId: string;
+  assignerName: string;
   status: string;
-  campaign_period: string;
+  topicId: string;
 };
 
 export type ListArticlesType = {
-  article_id: string;
+  id: string;
   title: string;
-  author_name: string;
-  topic_name: string;
-  campaign_period: string;
+  authorName: string;
+  topic: string;
+  campaignName: string;
   status: string;
-  assignment: string;
-  assignee_id: string;
   assignee_name: string;
-  created_at: string;
+  createdAt: string;
+  campaignRegistration: {
+    topic: {
+      id: string;
+    };
+  };
+};
+
+export type ListArticlesResponseType = {
+  content: ListArticlesType[];
+  totalPages: number;
+  totalElements: number;
 };
 
 export type PRListArticlesContextType = {
-  data: ListArticlesType[] | undefined;
+  data: ListArticlesResponseType | undefined;
+  setData: Dispatch<SetStateAction<ListArticlesResponseType | undefined>>;
   isLoading: boolean;
   error: unknown;
   titlesTable: string[];
@@ -544,22 +554,28 @@ export type AdminApprovalHistoryContextType = {
 
 export type UserRegisterWriteType = {
   id: string;
-  campaign_period: string;
-  time: string;
-  topic_registered: number;
+  campaignName: string;
+  countTopicId: string;
+  startDate: string;
+  endDate: string;
   status: string;
 };
 
 export type UserRegisterWriteFilterType = {
-  name_or_id: string;
-  status: string;
-  start_date: string;
-  end_date: string;
+  campaignName: string;
+  startDate: string;
+  endDate: string;
+};
+
+export type UserRegisterWriteResponseType = {
+  content: UserRegisterWriteType[];
+  totalPages: number;
+  totalElements: number;
 };
 
 export type UserRegisterWriteContextType = {
-  data: UserRegisterWriteType[] | undefined;
-  setData: Dispatch<SetStateAction<UserRegisterWriteType[] | undefined>>;
+  data: UserRegisterWriteResponseType | undefined;
+  setData: Dispatch<SetStateAction<UserRegisterWriteResponseType | undefined>>;
   isLoading: boolean;
   error: unknown;
   titlesTable: string[];

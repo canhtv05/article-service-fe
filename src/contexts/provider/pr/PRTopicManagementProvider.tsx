@@ -20,7 +20,7 @@ const tooltips = [
   },
 ];
 
-const titlesTable = ['#', 'Mã', 'Tên chủ đề', 'Nhuận bút', 'Mô tả', 'Trạng thái', 'Hành động'];
+const titlesTable = ['#', 'Tên chủ đề', 'Nhuận bút', 'Mô tả', 'Trạng thái', 'Hành động'];
 
 const PRTopicManagementProvider = ({ children }: { children: ReactNode }) => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -114,6 +114,7 @@ const PRTopicManagementProvider = ({ children }: { children: ReactNode }) => {
     if (valueFilter.name) query.name = valueFilter.name;
     if (valueFilter.maxFee) query.maxFee = String(valueFilter.maxFee);
     if (valueFilter.minFee) query.minFee = String(valueFilter.minFee);
+    if (valueFilter.status) query.status = String(valueFilter.status);
 
     setSearchParams(query);
     setCurrentPage(1);

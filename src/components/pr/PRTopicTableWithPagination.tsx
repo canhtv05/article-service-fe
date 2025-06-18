@@ -132,7 +132,6 @@ const PRTopicTableWithPagination = () => {
                 currentData.map((topic, index) => (
                   <TableRow key={topic.id} className="odd:bg-muted/50">
                     <TableCell className="pl-4">{index + 1}</TableCell>
-                    <TableCell className="pl-4">{topic.id}</TableCell>
                     <TableCell className="font-medium">{topic.name}</TableCell>
                     <TableCell>{formatCurrencyVND(topic.royaltyFee)}</TableCell>
                     <TableCell>{topic.description}</TableCell>
