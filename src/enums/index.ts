@@ -49,7 +49,7 @@ export enum StatusArchiveAndHistory {
 }
 
 export enum StatusArticle {
-  POSTED = 'Đã đăng',
+  POSTED = 'Published',
   PENDING = 'Pending',
   NOT_POSTED = 'Không đăng',
   APPROVED = 'Approved',

@@ -1,6 +1,6 @@
 import DialogLink from '../DialogLink';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { Badge } from '../ui/badge';
+// import { Badge } from '../ui/badge';
 import MarkdownRenderer from '../MarkdownRender';
 import { useQuery } from '@tanstack/react-query';
 import RenderIf from '../RenderIf';
@@ -40,9 +40,9 @@ const ViewArticle = ({ component }: { component?: ReactElement }) => {
             </div>
           </div>
           <div className="flex flex-col justify-end items-end gap-2 md:w-auto w-full md:mt-0 mt-2">
-            <Badge className="bg-emerald-600/10 dark:bg-emerald-600/20 hover:bg-emerald-600/10 text-emerald-500 border-emerald-600/60 shadow-none rounded-full">
+            {/* <Badge className="bg-emerald-600/10 dark:bg-emerald-600/20 hover:bg-emerald-600/10 text-emerald-500 border-emerald-600/60 shadow-none rounded-full">
               Tháng 10 (01/10/2025 - 30/10/2025)
-            </Badge>
+            </Badge> */}
             <span className="text-[12px] border p-2 break-words max-w-[300px] bg-emerald-600/10 dark:bg-emerald-600/20 hover:bg-emerald-600/10 text-emerald-500 border-emerald-600/60 shadow-none rounded-lg">
               {data?.campaignName}
             </span>

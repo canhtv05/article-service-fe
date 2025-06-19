@@ -15,24 +15,20 @@ import StatusBadge from '../StatusBadge';
 import Tooltip from '../Tooltip';
 import FallbackNoDataTable from '../FallbackNoDataTable';
 import RenderIf from '../RenderIf';
-import LoadingTable from '../LoadingTable';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useUserListArticlesContext } from '@/contexts/context/user/UserListArticlesContext';
+import { UserListArticlesFilterType } from '@/types';
+import { formatDateTime } from '@/lib/utils';
 
 const UserListArticlesTableWithPagination = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const context = useUserListArticlesContext();
 
-  // Tính toán phân trang
-  const perPage = Number(context?.perPage) || 10;
-  const currentPage = context?.currentPage || 1;
-  const totalItems = context?.data?.length || 0;
-  const totalPages = Math.ceil(totalItems / perPage);
+  const currentPage = Number(context?.currentPage);
+  const totalPages = context?.data?.totalPages || 0;
 
-  // Lấy dữ liệu cho trang hiện tại
-  const startIndex = (currentPage - 1) * perPage;
-  const endIndex = startIndex + perPage;
-  const currentData = context?.data?.slice(startIndex, endIndex) || [];
+  const currentData = context?.data?.content || [];
 
   // Tạo danh sách số trang
   const getPageNumbers = () => {
@@ -66,12 +62,28 @@ const UserListArticlesTableWithPagination = () => {
   const handlePageChange = (page: number) => {
     if (context?.setCurrentPage && page >= 1 && page <= totalPages) {
       context.setCurrentPage(page);
+
+      const queryString = buildSearchParamsWithFilters(page, Number(context.perPage), context.valueFilter);
+
+      navigate(`/user/list-articles?${queryString}`, { replace: true });
     }
   };
 
-  // const handleClick = () => {
-  //   toast.success(Notice.UPDATE_SUCCESS);
-  // };
+  const buildSearchParamsWithFilters = (page: number, size: number, filters: UserListArticlesFilterType) => {
+    const params = new URLSearchParams();
+
+    params.set('page', String(page));
+    params.set('size', String(size));
+
+    if (filters.campaignId) params.set('campaignId', filters.campaignId);
+    if (filters.status) params.set('status', filters.status);
+    if (filters.endDate) params.set('endDate', String(filters.endDate));
+    if (filters.startDate) params.set('startDate', String(filters.startDate));
+    if (filters.title) params.set('title', String(filters.title));
+    if (filters.topicName) params.set('topicName', String(filters.topicName));
+
+    return params.toString();
+  };
 
   return (
     <div className="w-full">
@@ -87,55 +99,46 @@ const UserListArticlesTableWithPagination = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <RenderIf value={!!context?.isLoading}>
-              <TableRow className="h-[130px]">
-                <TableCell colSpan={context?.titlesTable.length} className="flex my-auto justify-center items-center">
-                  <LoadingTable />
-                </TableCell>
-              </TableRow>
-            </RenderIf>
-            <RenderIf value={!context?.isLoading}>
-              {Array.isArray(currentData) && currentData.length > 0 ? (
-                currentData.map((regis, index) => (
-                  <TableRow key={index} className="odd:bg-muted/50">
-                    <TableCell className="pl-4">{startIndex + index + 1}</TableCell>
-                    <TableCell className="pl-4">{regis.title}</TableCell>
-                    <TableCell className="font-medium">{regis.topic}</TableCell>
-                    <TableCell>{regis.created_at}</TableCell>
-                    <TableCell className="pl-4">{regis.campaign_period}</TableCell>
-                    <TableCell>
-                      <StatusBadge status={regis.status} />
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-4">
-                        {context?.tooltips.map((item, idx) => (
-                          <Fragment key={idx}>
-                            <Link to={`/view/articles/${regis.id}`} state={{ background: location }}>
-                              <div className="cursor-pointer">
-                                <Tooltip
-                                  toolTipContent={item.content}
-                                  toolTipTrigger={<item.icon className={`size-5 ${item.className}`} />}
-                                />
-                              </div>
-                            </Link>
-                          </Fragment>
-                        ))}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={context?.titlesTable.length} className="text-center">
-                    <FallbackNoDataTable />
+            {Array.isArray(currentData) && currentData.length > 0 ? (
+              currentData.map((regis, index) => (
+                <TableRow key={index} className="odd:bg-muted/50">
+                  <TableCell className="pl-4">{index + 1}</TableCell>
+                  <TableCell className="pl-4">{regis.title}</TableCell>
+                  <TableCell className="font-medium">{regis.topic}</TableCell>
+                  <TableCell>{formatDateTime(regis.submittedAt, 'dd/MM/yyyy')}</TableCell>
+                  <TableCell className="pl-4">{regis.campaignName}</TableCell>
+                  <TableCell>
+                    <StatusBadge status={regis.status} />
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-4">
+                      {context?.tooltips.map((item, idx) => (
+                        <Fragment key={idx}>
+                          <Link to={`/view/articles/${regis.id}`} state={{ background: location }}>
+                            <div className="cursor-pointer">
+                              <Tooltip
+                                toolTipContent={item.content}
+                                toolTipTrigger={<item.icon className={`size-5`} />}
+                              />
+                            </div>
+                          </Link>
+                        </Fragment>
+                      ))}
+                    </div>
                   </TableCell>
                 </TableRow>
-              )}
-            </RenderIf>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={context?.titlesTable.length} className="text-center">
+                  <FallbackNoDataTable />
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
-      <RenderIf value={!!context?.data && context?.data?.length > 0}>
+      <RenderIf value={!!currentData.length && currentData.length > 0}>
         <div className="flex lg:flex-row flex-col gap-5 mt-4 items-center">
           <Pagination>
             <PaginationContent>
@@ -179,13 +182,18 @@ const UserListArticlesTableWithPagination = () => {
                 { label: '5 / trang', value: 5 },
                 { label: '10 / trang', value: 10 },
                 { label: '50 / trang', value: 50 },
-                { label: '100 / trang', value: 100 },
               ]}
               value={context?.perPage}
               setValue={(val) => {
                 if (context?.setPerPage && context?.setCurrentPage) {
                   context.setPerPage(val);
                   context.setCurrentPage(1);
+
+                  const queryString = buildSearchParamsWithFilters(1, Number(val), context.valueFilter);
+
+                  navigate(`/user/list-articles?${queryString}`, {
+                    replace: true,
+                  });
                 }
               }}
             />

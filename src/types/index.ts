@@ -604,22 +604,27 @@ export type UserListArticlesType = {
   id: string;
   title: string;
   topic: string;
-  created_at: number;
-  campaign_period: string;
+  submittedAt: string;
+  campaignName: string;
   status: string;
 };
 
-export type UserListArticlesFilterType = Pick<
-  UserListArticlesType,
-  'title' | 'topic' | 'campaign_period' | 'status'
-> & {
-  start_date: string;
-  end_date: string;
+export type UserListArticlesFilterType = Pick<UserListArticlesType, 'title' | 'status'> & {
+  startDate: string;
+  endDate: string;
+  topicName: string;
+  campaignId: string;
+};
+
+export type UserListArticlesResponseType = {
+  content: UserListArticlesType[];
+  totalPages: number;
+  totalElements: number;
 };
 
 export type UserListArticlesContextType = {
-  data: UserListArticlesType[] | undefined;
-  setData: Dispatch<SetStateAction<UserListArticlesType[] | undefined>>;
+  data: UserListArticlesResponseType | undefined;
+  setData: Dispatch<SetStateAction<UserListArticlesResponseType | undefined>>;
   isLoading: boolean;
   error: unknown;
   titlesTable: string[];
@@ -627,14 +632,13 @@ export type UserListArticlesContextType = {
     content: string;
     icon: LucideIcon;
     type: string;
-    className: string;
   }[];
-  currentPage: number;
-  setCurrentPage: Dispatch<SetStateAction<number>>;
+  valueFilter: UserListArticlesFilterType;
+  setValueFilter: Dispatch<SetStateAction<UserListArticlesFilterType>>;
   perPage: string;
   setPerPage: Dispatch<SetStateAction<string>>;
   handleClearFields: VoidFunction;
   handleFilters: VoidFunction;
-  valueFilter: UserListArticlesFilterType;
-  setValueFilter: Dispatch<SetStateAction<UserListArticlesFilterType>>;
+  currentPage: number;
+  setCurrentPage: Dispatch<SetStateAction<number>>;
 };

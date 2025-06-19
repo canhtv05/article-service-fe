@@ -1,10 +1,11 @@
 import { ReactNode, useEffect, useState } from 'react';
-import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 import { Eye } from 'lucide-react';
 
-import { UserListArticlesFilterType, UserListArticlesType } from '@/types';
+import { UserListArticlesFilterType, UserListArticlesResponseType } from '@/types';
 import { UserListArticlesContext } from '@/contexts/context/user/UserListArticlesContext';
+import { useSearchParams } from 'react-router-dom';
+import { httpRequest } from '@/utils/httpRequest';
 
 const tooltips = [
   {
@@ -18,53 +19,128 @@ const tooltips = [
 const titlesTable = ['#', 'Tiêu đề', 'Chủ đề', 'Ngày tạo', 'Đợt', 'Trạng thái', 'Hành động'];
 
 const UserListArticlesProvider = ({ children }: { children: ReactNode }) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const pageFromUrl = Number(searchParams.get('page')) || 1;
+  const sizeFromUrl = Number(searchParams.get('size')) || 5;
+  const title = searchParams.get('title') || '';
+  const status = searchParams.get('status') || '';
+  const startDate = searchParams.get('startDate') || '';
+  const endDate = searchParams.get('endDate') || '';
+  const topicName = searchParams.get('topicName') || '';
+  const campaignId = searchParams.get('campaignId') || '';
+
+  const [data, setData] = useState<UserListArticlesResponseType | undefined>(undefined);
+  const [currentPage, setCurrentPage] = useState(pageFromUrl);
+  const [perPage, setPerPage] = useState<string>(sizeFromUrl.toString());
+  const [valueFilter, setValueFilter] = useState<UserListArticlesFilterType>({
+    campaignId,
+    endDate,
+    startDate,
+    title,
+    topicName,
+    status,
+  });
+
+  useEffect(() => {
+    setValueFilter({
+      campaignId,
+      endDate,
+      startDate,
+      title,
+      topicName,
+      status,
+    });
+    setCurrentPage(pageFromUrl);
+    setPerPage(sizeFromUrl.toString());
+  }, [
+    campaignId,
+    endDate,
+    pageFromUrl,
+    searchParams,
+    setCurrentPage,
+    setPerPage,
+    setValueFilter,
+    sizeFromUrl,
+    startDate,
+    status,
+    title,
+    topicName,
+  ]);
+
   const {
-    data: userRegisterWrite,
+    data: topicManagement,
     isLoading,
     error,
-  } = useQuery<UserListArticlesType[]>({
-    queryKey: ['data_user_list_articles'],
+  } = useQuery({
+    queryKey: [
+      '/admin/bai-viet/ds-bai-viet-cua-toi',
+      currentPage,
+      perPage,
+      startDate,
+      endDate,
+      title,
+      topicName,
+      campaignId,
+      status,
+    ],
     queryFn: async () => {
-      const response = await axios.get('/data_user_list_articles.json');
+      const params: Record<string, string> = {
+        page: currentPage.toString(),
+        size: perPage,
+      };
+      if (topicName) params.topicName = topicName;
+      if (campaignId) params.campaignId = campaignId;
+      if (startDate) params.startDate = startDate;
+      if (endDate) params.endDate = endDate;
+      if (status) params.status = status;
+      if (title) params.title = title;
+
+      const response = await httpRequest.get('/admin/bai-viet/ds-bai-viet-cua-toi', {
+        params,
+      });
+
+      console.log(response.data);
+
       return response.data;
     },
   });
 
-  const [data, setData] = useState<UserListArticlesType[] | undefined>(undefined);
-  const [valueFilter, setValueFilter] = useState<UserListArticlesFilterType>({
-    end_date: '',
-    campaign_period: '',
-    title: '',
-    topic: '',
-    start_date: '',
-    status: '',
-  });
-
-  const [perPage, setPerPage] = useState<string>('5');
-  const [currentPage, setCurrentPage] = useState<number>(1);
-
   useEffect(() => {
-    if (userRegisterWrite) {
-      setData(userRegisterWrite);
-      setCurrentPage(1);
+    if (topicManagement) {
+      setData(topicManagement);
     }
-  }, [userRegisterWrite]);
+  }, [topicManagement]);
 
   const handleClearFields = () => {
     setValueFilter({
-      end_date: '',
-      campaign_period: '',
+      campaignId: '',
+      endDate: '',
+      startDate: '',
       title: '',
-      topic: '',
-      start_date: '',
+      topicName: '',
       status: '',
     });
-    if (!userRegisterWrite) return;
-    setData(userRegisterWrite);
+    setSearchParams({ page: '1', size: perPage });
     setCurrentPage(1);
   };
 
-  const handleFilters = () => {};
+  const handleFilters = () => {
+    const query: Record<string, string> = {
+      page: '1',
+      size: perPage,
+    };
+
+    if (valueFilter.campaignId) query.campaignId = valueFilter.campaignId;
+    if (valueFilter.endDate) query.endDate = String(valueFilter.endDate);
+    if (valueFilter.startDate) query.startDate = String(valueFilter.startDate);
+    if (valueFilter.status) query.status = String(valueFilter.status);
+    if (valueFilter.title) query.title = String(valueFilter.title);
+    if (valueFilter.topicName) query.topicName = String(valueFilter.topicName);
+
+    setSearchParams(query);
+    setCurrentPage(1);
+  };
 
   const values = {
     data,

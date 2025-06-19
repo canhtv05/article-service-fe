@@ -136,12 +136,6 @@ export const menusSidebar: MenuSidebarItemType[] = [
         type: 'my-articles',
         icon: File,
       },
-      {
-        label: 'Lịch sử đã xem',
-        to: '/user/viewed-history',
-        type: 'viewed-history',
-        icon: ClockFading,
-      },
     ],
   },
   {
