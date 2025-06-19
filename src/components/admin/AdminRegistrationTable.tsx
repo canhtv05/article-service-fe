@@ -11,7 +11,7 @@ import DialogCustom from '../DialogCustom';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { DateRange } from 'react-day-picker';
-import { format, parseISO } from 'date-fns';
+import { format, isWithinInterval, parseISO } from 'date-fns';
 import { DateRangePicker } from '../DateRangePicker';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { httpRequest } from '@/utils/httpRequest';
@@ -174,15 +174,26 @@ const AdminRegistrationTable = () => {
 
   const handleOnContinue = () => {
     const { writingEndDate, writingStartDate, endDate, startDate } = value;
+
     if (!writingEndDate || !writingStartDate || !endDate || !startDate) {
       toast.error('Vui lòng nhập đủ các trường');
       return;
     }
 
-    const campaignName = `Đợt ${format(parseISO(startDate), 'dd/MM/yyyy')} - ${format(
-      parseISO(endDate),
-      'dd/MM/yyyy',
-    )}`;
+    const writingStart = parseISO(writingStartDate);
+    const writingEnd = parseISO(writingEndDate);
+    const start = parseISO(startDate);
+    const end = parseISO(endDate);
+
+    const isWritingStartValid = isWithinInterval(writingStart, { start, end });
+    const isWritingEndValid = isWithinInterval(writingEnd, { start, end });
+
+    if (!isWritingStartValid || !isWritingEndValid) {
+      toast.error('Hạn đăng ký phải nằm trong đợt đăng ký');
+      return;
+    }
+
+    const campaignName = `Đợt ${format(start, 'dd/MM/yyyy')} - ${format(end, 'dd/MM/yyyy')}`;
 
     const data: ValueRegistration = {
       name: campaignName,
@@ -202,7 +213,6 @@ const AdminRegistrationTable = () => {
       startDate: '',
     });
   };
-
   // còn tạo đợt dăng ký xem sửa xóa
 
   return (

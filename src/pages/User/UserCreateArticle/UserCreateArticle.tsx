@@ -1,48 +1,63 @@
 import DialogCustom from '@/components/DialogCustom';
 import FieldsSelect from '@/components/FieldsSelect';
-import UploadImage from '@/components/UploadImage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import useTheme from '@/hooks/useTheme';
 import useViewport from '@/hooks/useViewport';
-import { useQuery } from '@tanstack/react-query';
+import { handleMutationError } from '@/utils/handleMutationError';
+import { httpRequest } from '@/utils/httpRequest';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import MDEditor from '@uiw/react-md-editor';
 import axios from 'axios';
 import { List } from 'lucide-react';
 import mammoth from 'mammoth';
-import { useEffect, useRef, useState } from 'react';
+import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 
-const Example = () => {
-  // dependent select
-  const [selectedA, setSelectedA] = useState('');
-  const [selectedB, setSelectedB] = useState('');
+interface WritingCampaign {
+  id: string;
+  name: string;
+}
 
-  const dataA = [
-    { label: 'Fruits', value: 'fruits' },
-    { label: 'Vehicles', value: 'vehicles' },
-  ];
+interface TopicData {
+  camPaignRegistrationId: string;
+  topicId: string;
+  topicName: string;
+}
 
-  const optionsMap: Record<string, { label: string; value: string }[]> = {
-    fruits: [
-      { label: 'Apple', value: 'apple' },
-      { label: 'Banana', value: 'banana' },
-    ],
-    vehicles: [
-      { label: 'Car', value: 'car' },
-      { label: 'Bike', value: 'bike' },
-    ],
-  };
-
-  const dataB = selectedA ? optionsMap[selectedA] || [] : [];
-
+const Example = ({
+  writingCampaign,
+  selectedA,
+  selectedB,
+  setSelectedA,
+  setSelectedB,
+  dataB,
+  title,
+  setTitle,
+}: {
+  writingCampaign: WritingCampaign[];
+  setSelectedA: Dispatch<SetStateAction<string>>;
+  setTitle: Dispatch<SetStateAction<string>>;
+  title: string;
+  setSelectedB: Dispatch<SetStateAction<string>>;
+  selectedA: string;
+  selectedB: string;
+  dataB: { label: string; value: string; key?: string }[];
+}) => {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col justify-end">
         <Label htmlFor="title" className="font-bold mb-2 leading-5">
           Tiêu đề bài viết:
         </Label>
-        <Input id="title" type="text" placeholder="Tiêu đề bài viết" value={''} onChange={() => console.log(1)} />
+        <Input
+          id="title"
+          type="text"
+          placeholder="Tiêu đề bài viết"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
       </div>
       <div className="flex flex-col justify-end">
         <Label htmlFor="campaign_period" className="font-bold mb-2 leading-5">
@@ -50,7 +65,7 @@ const Example = () => {
         </Label>
         <FieldsSelect
           id="campaign_period"
-          data={dataA}
+          data={writingCampaign.map((item) => ({ label: item.name, value: item.id }))}
           placeholder="Chọn đợt viết bài"
           label="Đợt viết bài"
           value={selectedA}
@@ -74,10 +89,16 @@ const Example = () => {
           resetValue={!selectedA}
         />
       </div>
-      <UploadImage />
     </div>
   );
 };
+
+interface CreateDataValue {
+  title: string;
+  content: string;
+  campaignRegistrationId: string;
+  status: string;
+}
 
 const UserCreateArticle = () => {
   const { height } = useViewport();
@@ -93,6 +114,9 @@ const UserCreateArticle = () => {
   });
 
   const [markdown, setMarkdown] = useState<string>(data || '');
+  const [selectedA, setSelectedA] = useState('');
+  const [selectedB, setSelectedB] = useState('');
+  const [title, setTitle] = useState('');
 
   useEffect(() => {
     if (data) {
@@ -109,7 +133,7 @@ const UserCreateArticle = () => {
     if (!file) return;
 
     if (!file.name.endsWith('.docx')) {
-      alert('Chỉ hỗ trợ file .docx. Vui lòng chuyển file .doc sang .docx');
+      toast.error('Chỉ hỗ trợ file .docx. Vui lòng chuyển file .doc sang .docx');
       return;
     }
 
@@ -129,6 +153,63 @@ const UserCreateArticle = () => {
     reader.readAsArrayBuffer(file);
   };
 
+  const { data: writingCampaign = [] } = useQuery<WritingCampaign[]>({
+    queryKey: ['writingCampaign'],
+    queryFn: async () => {
+      const res = await httpRequest.get('/dot-bai-viet/danh-sach-dot-bai-viet');
+      return res.data;
+    },
+  });
+
+  const { data: topicData = [] } = useQuery<TopicData[]>({
+    queryKey: ['topics', selectedA],
+    queryFn: async () => {
+      if (!selectedA) return [];
+      const res = await httpRequest.get(`/chu-de/chu-de-theo-dot/${selectedA}`);
+      return res.data;
+    },
+    enabled: !!selectedA,
+  });
+
+  const dataB =
+    topicData.length > 0
+      ? Array.from(new Map(topicData.map((td) => [td.camPaignRegistrationId, td])).values()).map((td) => ({
+          label: td.topicName,
+          value: td.camPaignRegistrationId,
+          key: td.topicId,
+        }))
+      : [];
+
+  const createMutation = useMutation({
+    mutationKey: ['create-article'],
+    mutationFn: async (data: CreateDataValue) => await httpRequest.post('/admin/bai-viet/tao-bai-viet', data),
+    onSuccess: () => {
+      toast.success('Tạo bài viết thành công');
+      setMarkdown('');
+      setTitle('');
+      setSelectedA('');
+      setSelectedB('');
+    },
+    onError: (error) => {
+      handleMutationError(error);
+    },
+  });
+
+  const handleCreateArticle = useCallback(() => {
+    if (!selectedA || !selectedB || !title) {
+      toast.error('Vui lòng chọn, nhập đủ trường');
+      return;
+    }
+    const data: CreateDataValue = {
+      title,
+      content: markdown,
+      campaignRegistrationId: selectedB,
+      status: 'Pending',
+    };
+
+    createMutation.mutate(data);
+  }, [selectedA, selectedB, title, markdown, createMutation]);
+
   return (
     <div className="h-full">
       <div className="flex gap-3 items-center justify-between my-2">
@@ -145,14 +226,25 @@ const UserCreateArticle = () => {
             Tải bài lên
           </Button>
           <DialogCustom
-            onContinue={() => console.log(1)}
+            onContinue={handleCreateArticle}
             title="Đăng bài viết"
             triggerComponent={
               <Button customize={'default'} disabled={markdown.trim().length < 20}>
                 Đăng bài
               </Button>
             }
-            component={<Example />}
+            component={
+              <Example
+                dataB={dataB}
+                selectedA={selectedA}
+                selectedB={selectedB}
+                setSelectedA={setSelectedA}
+                setSelectedB={setSelectedB}
+                writingCampaign={writingCampaign}
+                title={title}
+                setTitle={setTitle}
+              />
+            }
           />
         </div>
       </div>
@@ -165,12 +257,8 @@ const UserCreateArticle = () => {
         style={{ overflow: 'hidden', borderRadius: 8, background: 'var(--background)' }}
         value={markdown}
         onChange={(value) => handleChange(value)}
-        textareaProps={{
-          placeholder: `Nhập nội dung vào đây`,
-        }}
-        previewOptions={{
-          disallowedElements: ['style'],
-        }}
+        textareaProps={{ placeholder: `Nhập nội dung vào đây` }}
+        previewOptions={{ disallowedElements: ['style'] }}
       />
     </div>
   );
