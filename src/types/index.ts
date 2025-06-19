@@ -164,14 +164,19 @@ export type ArticleFilterType = {
   topicId: string;
 };
 
+type ArticleAssignments = {
+  assigneeName: string;
+};
+
 export type ListArticlesType = {
+  articleAssignments: ArticleAssignments[];
   id: string;
   title: string;
   authorName: string;
   topic: string;
   campaignName: string;
   status: string;
-  assignee_name: string;
+  assigneeName: string;
   createdAt: string;
   campaignRegistration: {
     topic: {
