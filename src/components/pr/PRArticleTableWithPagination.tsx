@@ -20,14 +20,17 @@ import ConfirmDialog from '../ConfirmDialog';
 import RenderIf from '../RenderIf';
 import { PRListArticlesContext } from '@/contexts/context/pr/PRListArticlesContext';
 import { Badge } from '../ui/badge';
-import { Notice } from '@/enums';
 import { ArticleFilterType } from '@/types';
 import { formatDateTime } from '@/lib/utils';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { httpRequest } from '@/utils/httpRequest';
+import { handleMutationError } from '@/utils/handleMutationError';
 
 const PRArticleTableWithPagination = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const articles = useContext(PRListArticlesContext);
+  const queryClient = useQueryClient();
 
   const currentPage = Number(articles?.currentPage);
   const totalPages = articles?.data?.totalPages || 0;
@@ -88,8 +91,42 @@ const PRArticleTableWithPagination = () => {
     return params.toString();
   };
 
-  const handleClick = () => {
-    toast.success(Notice.UPDATE_SUCCESS);
+  const allowUploadMutation = useMutation({
+    mutationKey: ['dang-bai'],
+    mutationFn: async (id: string) => await httpRequest.get(`/chu-de/quan-ly-dang-bai/${id}`),
+  });
+
+  const notAllowUploadMutation = useMutation({
+    mutationKey: ['huy-dang-bai'],
+    mutationFn: async (id: string) => await httpRequest.get(`/chu-de/quan-ly-xoa-bai/${id}`),
+  });
+
+  const handleClick = (id: string) => {
+    notAllowUploadMutation.mutate(id, {
+      onSuccess: () => {
+        toast.success('Cập nhật thành công');
+        queryClient.invalidateQueries({
+          predicate: (query) => Array.isArray(query.queryKey) && query.queryKey[0] === '/chu-de/danh-sach-bai-viet-PR',
+        });
+      },
+      onError: handleMutationError,
+    });
+  };
+
+  const handlePublish = (id: string, status: string) => {
+    if (status === 'Inactive') {
+      toast.error('Bài viết đã không được phép đăng nữa');
+      return;
+    }
+    allowUploadMutation.mutate(id, {
+      onSuccess: () => {
+        toast.success('Cập nhật thành công');
+        queryClient.invalidateQueries({
+          predicate: (query) => Array.isArray(query.queryKey) && query.queryKey[0] === '/chu-de/danh-sach-bai-viet-PR',
+        });
+      },
+      onError: handleMutationError,
+    });
   };
 
   return (
@@ -119,10 +156,10 @@ const PRArticleTableWithPagination = () => {
                     <StatusBadge status={article.status} />
                   </TableCell>
                   <TableCell className="flex justify-center">
-                    <RenderIf value={!!article.assignee_name}>
-                      <span className="font-medium">{`${article.assignee_name}`}</span>
+                    <RenderIf value={!!article.articleAssignments[0].assigneeName}>
+                      <span className="font-medium">{`${article.articleAssignments[0].assigneeName}`}</span>
                     </RenderIf>
-                    <RenderIf value={!article.assignee_name}>
+                    <RenderIf value={!article.articleAssignments[0].assigneeName}>
                       <Badge className="bg-amber-600/10 dark:bg-amber-600/20 hover:bg-amber-600/10 text-amber-500 border-amber-600/60 shadow-none rounded-full">
                         <div>Chưa phân công</div>
                       </Badge>
@@ -132,10 +169,25 @@ const PRArticleTableWithPagination = () => {
                     <div className="flex gap-4">
                       {articles?.tooltips.map((item, idx) => (
                         <Fragment key={idx}>
-                          <RenderIf value={item.type !== 'view'}>
+                          <RenderIf value={item.type === 'not_publish'}>
                             <ConfirmDialog
                               key={idx}
-                              onContinue={handleClick}
+                              onContinue={() => handleClick(article.id)}
+                              typeTitle={'chỉnh sửa'}
+                              triggerComponent={
+                                <div className="cursor-pointer">
+                                  <Tooltip
+                                    toolTipContent={item.content}
+                                    toolTipTrigger={<item.icon className={`size-5 ${item.className}`} />}
+                                  />
+                                </div>
+                              }
+                            />
+                          </RenderIf>
+                          <RenderIf value={item.type === 'publish'}>
+                            <ConfirmDialog
+                              key={idx}
+                              onContinue={() => handlePublish(article.id, article.status)}
                               typeTitle={'chỉnh sửa'}
                               triggerComponent={
                                 <div className="cursor-pointer">

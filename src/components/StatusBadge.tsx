@@ -31,11 +31,6 @@ const StatusBadge = ({ status }: { status: Status | string }) => {
           {s}
         </Badge>
       </RenderIf>
-      <RenderIf value={status === StatusSend.SENT}>
-        <Badge className="bg-emerald-600/10 dark:bg-emerald-600/20 hover:bg-emerald-600/10 text-emerald-500 border-emerald-600/60 shadow-none rounded-full">
-          {StatusSend.SENT}
-        </Badge>
-      </RenderIf>
       <RenderIf value={status === StatusSend.NOT_SENT}>
         <Badge className="bg-amber-600/10 dark:bg-amber-600/20 hover:bg-amber-600/10 text-amber-500 border-amber-600/60 shadow-none rounded-full">
           {StatusSend.NOT_SENT}
@@ -57,6 +52,11 @@ const StatusBadge = ({ status }: { status: Status | string }) => {
         </Badge>
       </RenderIf>
       <RenderIf value={status === StatusArchiveAndHistory.APPROVED}>
+        <Badge className="bg-emerald-600/10 dark:bg-emerald-600/20 hover:bg-emerald-600/10 text-emerald-500 border-emerald-600/60 shadow-none rounded-full">
+          {s}
+        </Badge>
+      </RenderIf>
+      <RenderIf value={status === StatusApproveArticle.PUBLISHED}>
         <Badge className="bg-emerald-600/10 dark:bg-emerald-600/20 hover:bg-emerald-600/10 text-emerald-500 border-emerald-600/60 shadow-none rounded-full">
           {s}
         </Badge>
