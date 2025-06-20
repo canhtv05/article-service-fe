@@ -1,7 +1,6 @@
 import { Fragment, useCallback } from 'react';
 
 import { Label } from '../ui/label';
-import { Input } from '../ui/input';
 import FieldsSelect from '../FieldsSelect';
 import { StatusArticle } from '@/enums';
 import { parseISO } from 'date-fns';
@@ -10,6 +9,7 @@ import { DateRangePicker } from '../DateRangePicker';
 import { useUserListArticlesContext } from '@/contexts/context/user/UserListArticlesContext';
 import { useQuery } from '@tanstack/react-query';
 import { httpRequest } from '@/utils/httpRequest';
+import { Input } from '../ui/input';
 
 type Campaign = {
   name: string;

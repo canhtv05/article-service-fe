@@ -1,33 +1,76 @@
-import { Fragment, useContext } from 'react';
+import { Fragment, useCallback, useContext } from 'react';
 
 import { Label } from '../ui/label';
-import { Input } from '../ui/input';
 import FieldsSelect from '../FieldsSelect';
-import { StatusSend } from '@/enums';
 import { StaffListArticlesContext } from '@/contexts/context/staff/StaffListArticlesContext';
+import { Input } from '../ui/input';
+import { useQuery } from '@tanstack/react-query';
+import { httpRequest } from '@/utils/httpRequest';
+
+type Campaign = {
+  name: string;
+};
+
+type CampaignListResponse = Campaign[];
 
 const StaffFilterListArticleComponent = () => {
   const articles = useContext(StaffListArticlesContext);
 
+  const { data } = useQuery({
+    queryKey: ['/danh-sach-chu-de2'],
+    queryFn: async () => {
+      const response = await httpRequest.get('/chu-de/danh-sach-chu-de2');
+      return response.data;
+    },
+  });
+
+  const mappedOptions = useCallback(
+    () =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      data?.map((item: any) => ({
+        value: item.id,
+        label: item.name,
+      })) ?? [],
+    [data],
+  );
+
+  const { data: campaigns } = useQuery<CampaignListResponse>({
+    queryKey: ['/admin/bai-viet/danh-sach-bai-viet'],
+    queryFn: async () => {
+      const response = await httpRequest.get('/dot-bai-viet/danh-sach-dot-bai-viet');
+      return response.data;
+    },
+  });
+
+  const mappedOptionCampaignName = useCallback(
+    () =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      campaigns?.map((item: any) => ({
+        value: item.id,
+        label: item.name,
+      })) ?? [],
+    [campaigns],
+  );
+
   if (!articles) return;
 
-  const { campaign_period, status, topic_name, title_and_author_name } = articles.valueFilter;
+  const { status, titleAndAuthorName, topicId, writingCampaignId } = articles.valueFilter;
 
   return (
     <Fragment>
       <div className="flex flex-col justify-end">
-        <Label htmlFor="title_and_author_name" className="font-bold mb-2 leading-5">
+        <Label htmlFor="titleAndAuthorName" className="font-bold mb-2 leading-5">
           Tên tiêu đề và tên tác giả của bài viết:
         </Label>
         <Input
-          id="title_and_author_name"
+          id="titleAndAuthorName"
           type="text"
           placeholder="Tìm kiếm theo tiêu đề và tên tác giả của bài viết"
-          value={title_and_author_name}
+          value={titleAndAuthorName}
           onChange={(e) => {
             articles.setValueFilter((prev) => ({
               ...prev,
-              title_and_author_name: e.target.value,
+              titleAndAuthorName: e.target.value,
             }));
           }}
         />
@@ -40,19 +83,14 @@ const StaffFilterListArticleComponent = () => {
         <FieldsSelect
           id="topic_name"
           placeholder="-- Chọn chủ đề --"
-          data={[
-            { label: 'Công nghệ', value: 'Công nghệ' },
-            { label: 'Bền vững', value: 'Bền vững' },
-            { label: 'Nông nghiệp', value: 'Nông nghiệp' },
-          ]}
+          data={mappedOptions()}
           label="Chủ đề"
-          defaultValue={''}
-          value={topic_name}
+          value={topicId}
           setValue={(val) => {
-            if (typeof val === 'string' && articles && val !== topic_name) {
+            if (typeof val === 'string' && articles && val !== topicId) {
               articles.setValueFilter((prev) => ({
                 ...prev,
-                topic_name: val,
+                topicId: val,
               }));
             }
           }}
@@ -65,15 +103,15 @@ const StaffFilterListArticleComponent = () => {
         </Label>
         <FieldsSelect
           id="status"
-          placeholder="Chọn trạng thái"
+          placeholder="-- Chọn trạng thái --"
           data={[
-            { label: 'Tất cả', value: StatusSend.ALL },
-            { label: 'Đã gửi cho PR', value: StatusSend.SENT },
-            { label: 'Chưa gửi cho PR', value: StatusSend.NOT_SENT },
+            { label: 'Đã phê duyệt', value: 'Approved' },
+            { label: 'Từ chối', value: 'Inactive' },
+            { label: 'Đã gửi cho PR', value: 'SendToPR' },
+            { label: 'Đã đăng', value: 'Published' },
           ]}
           label="Trạng thái"
-          defaultValue={StatusSend.ALL}
-          value={status}
+          value={status ?? undefined}
           setValue={(val) => {
             if (typeof val === 'string' && articles && val !== status) {
               articles.setValueFilter((prev) => ({
@@ -92,18 +130,15 @@ const StaffFilterListArticleComponent = () => {
         <FieldsSelect
           id="campaign_period"
           placeholder="-- Chọn đợt viết bài --"
-          data={[
-            { label: 'Tháng 10 (01/10/2005 - 30/10/2005)', value: 'Tháng 10 (01/10/2005 - 30/10/2005)' },
-            { label: 'Tháng 9 (08/09/2005 - 30/09/2005)', value: 'Tháng 9 (08/09/2005 - 30/09/2005)' },
-          ]}
+          data={mappedOptionCampaignName()}
           label="Đợt viết bài"
           defaultValue={''}
-          value={campaign_period}
+          value={writingCampaignId}
           setValue={(val) => {
-            if (typeof val === 'string' && articles && val !== campaign_period) {
+            if (typeof val === 'string' && articles && val !== writingCampaignId) {
               articles.setValueFilter((prev) => ({
                 ...prev,
-                campaign_period: val,
+                writingCampaignId: val,
               }));
             }
           }}

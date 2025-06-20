@@ -147,19 +147,19 @@ const PRArticleTableWithPagination = () => {
               currentData.map((article, index) => (
                 <TableRow key={index} className="odd:bg-muted/50">
                   <TableCell className="pl-4">{index + 1}</TableCell>
-                  <TableCell className="pl-4">{article.title}</TableCell>
-                  <TableCell className="font-medium">{article.authorName}</TableCell>
-                  <TableCell>{article.topic}</TableCell>
-                  <TableCell className="pl-4">{formatDateTime(article.createdAt, 'dd/MM/yyyy')}</TableCell>
-                  <TableCell>{article.campaignName}</TableCell>
+                  <TableCell className="pl-4">{article?.title}</TableCell>
+                  <TableCell className="font-medium">{article?.authorName}</TableCell>
+                  <TableCell>{article?.topic}</TableCell>
+                  <TableCell className="pl-4">{formatDateTime(article?.createdAt, 'dd/MM/yyyy')}</TableCell>
+                  <TableCell>{article?.campaignName}</TableCell>
                   <TableCell>
-                    <StatusBadge status={article.status} />
+                    <StatusBadge status={article?.status} />
                   </TableCell>
                   <TableCell className="flex justify-center">
-                    <RenderIf value={!!article.articleAssignments[0].assigneeName}>
-                      <span className="font-medium">{`${article.articleAssignments[0].assigneeName}`}</span>
+                    <RenderIf value={!!article?.articleAssignments[0]?.assigneeName}>
+                      <span className="font-medium">{`${article?.articleAssignments[0]?.assigneeName}`}</span>
                     </RenderIf>
-                    <RenderIf value={!article.articleAssignments[0].assigneeName}>
+                    <RenderIf value={!article?.articleAssignments[0]?.assigneeName}>
                       <Badge className="bg-amber-600/10 dark:bg-amber-600/20 hover:bg-amber-600/10 text-amber-500 border-amber-600/60 shadow-none rounded-full">
                         <div>Chưa phân công</div>
                       </Badge>

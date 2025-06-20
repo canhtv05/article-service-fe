@@ -36,10 +36,10 @@ const DialogCustom = ({
   };
 
   return (
-    <>
+    <div>
       <Dialog open={openMain} onOpenChange={setOpenMain}>
         <DialogTrigger asChild>{triggerComponent}</DialogTrigger>
-        <DialogContent className="max-w-[600px]">
+        <DialogContent className="max-w-[600px] p-5">
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
             <DialogDescription />
@@ -57,7 +57,7 @@ const DialogCustom = ({
       </Dialog>
 
       <Dialog open={openConfirm} onOpenChange={setOpenConfirm}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="max-w-sm p-5">
           <DialogHeader>
             <DialogDescription />
             <DialogTitle>Bạn có chắc chắn muốn tiếp tục?</DialogTitle>
@@ -70,7 +70,7 @@ const DialogCustom = ({
           </DialogHeader>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 };
 

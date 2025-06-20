@@ -1,5 +1,5 @@
 import DialogLink from '../DialogLink';
-import { Avatar, AvatarFallback } from '../ui/avatar';
+import { Avatar } from '../ui/avatar';
 // import { Badge } from '../ui/badge';
 import MarkdownRenderer from '../MarkdownRender';
 import { useQuery } from '@tanstack/react-query';
@@ -19,8 +19,6 @@ const ViewArticle = ({ component }: { component?: ReactElement }) => {
       return response.data;
     },
   });
-
-  console.log(data);
 
   return (
     <DialogLink open={true} title="Xem bài viết" outline component={component}>

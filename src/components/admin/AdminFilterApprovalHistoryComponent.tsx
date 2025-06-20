@@ -1,12 +1,12 @@
 import { Fragment } from 'react';
 
 import { Label } from '../ui/label';
-import { Input } from '../ui/input';
 import FieldsSelect from '../FieldsSelect';
 import { DateRangePicker } from '../DateRangePicker';
 import { DateRange } from 'react-day-picker';
 import { parseISO } from 'date-fns';
 import { useAdminApprovalHistoryContext } from '@/contexts/context/admin/AdminApprovalHistoryContext';
+import { Input } from '../ui/input';
 
 const AdminFilterApprovalHistoryComponent = () => {
   const approvalHistory = useAdminApprovalHistoryContext();
@@ -61,6 +61,7 @@ const AdminFilterApprovalHistoryComponent = () => {
             { label: 'Đã phê duyệt', value: 'Approved' },
             { label: 'Từ chối', value: 'Inactive' },
             { label: 'Đã gửi cho PR', value: 'SendToPR' },
+            { label: 'Đã đăng', value: 'Published' },
           ]}
           label="Trạng thái"
           value={status}
