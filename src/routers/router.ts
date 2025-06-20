@@ -31,6 +31,7 @@ const UserMyArticles = lazy(() => import('@/pages/user/UserMyArticles'));
 const StaffListArticles = lazy(() => import('@/pages/staff'));
 
 const LoginForm = lazy(() => import('@/pages/login'));
+const Profile = lazy(() => import('@/components/user/UserProfile'));
 
 const publicRoutes = [
   {
@@ -137,6 +138,10 @@ const modals = [
   {
     path: configs.routes.modals.addUsersToCampaign,
     component: ModalAddUserToCampaign,
+  },
+  {
+    path: configs.routes.modals.profile,
+    component: Profile,
   },
 ];
 

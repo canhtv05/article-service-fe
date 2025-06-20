@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeftRight, BadgeCheck, Bell, ChevronsUpDown, LogOut } from 'lucide-react';
+import { ArrowLeftRight, BadgeCheck, ChevronsUpDown, LogOut } from 'lucide-react';
 
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
 import {
@@ -13,12 +13,52 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenuLabel } from '@radix-ui/react-dropdown-menu';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/zustand/authStore';
+import { useMutation } from '@tanstack/react-query';
+import { httpRequest } from '@/utils/httpRequest';
+import cookieUtil from '@/utils/cookieUtil';
+import { toast } from 'sonner';
+import axios from 'axios';
+import { useCallback } from 'react';
 
 export function NavUser() {
   const { isMobile } = useSidebar();
   const user = useAuthStore();
+  const clearUser = useAuthStore((s) => s.clearUser);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const logoutMutation = useMutation({
+    mutationKey: ['logout'],
+    mutationFn: async () =>
+      await httpRequest.post(
+        '/auth/logout',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${cookieUtil.getStorage()?.accessToken}`,
+          },
+        },
+      ),
+    onSuccess: () => {
+      cookieUtil.deleteStorage();
+      clearUser();
+      toast.success('Đăng xuất thành công');
+      navigate('/login');
+    },
+    onError: (error: Error) => {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message ?? 'Đăng xuất thất bại');
+      } else {
+        toast.error('Đăng xuất thất bại');
+      }
+    },
+  });
+
+  const handleLogout = useCallback(() => {
+    logoutMutation.mutate();
+  }, [logoutMutation]);
 
   return (
     <SidebarMenu>
@@ -60,9 +100,13 @@ export function NavUser() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  navigate('/profile', { state: { background: location } });
+                }}
+              >
                 <BadgeCheck />
-                Account
+                Tài khoản
               </DropdownMenuItem>
               <Link to={`/author-switch`}>
                 <DropdownMenuItem>
@@ -70,15 +114,11 @@ export function NavUser() {
                   Role switch
                 </DropdownMenuItem>
               </Link>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
-              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
-              Log out
+              Đăng xuất
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

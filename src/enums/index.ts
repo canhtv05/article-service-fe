@@ -31,6 +31,7 @@ export enum Assignment {
 export enum StatusSend {
   NOT_SENT = 'Chưa gửi cho PR',
   ALL = 'Tất cả',
+  SENT = '',
 }
 
 export enum StatusRegistration {

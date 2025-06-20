@@ -100,8 +100,6 @@ const UserListArticlesProvider = ({ children }: { children: ReactNode }) => {
         params,
       });
 
-      console.log(response.data);
-
       return response.data;
     },
   });

@@ -7,13 +7,13 @@ import FallbackNoDataTable from '../FallbackNoDataTable';
 import { AddUserToCampaignType } from '@/types';
 import { Button } from '../ui/button';
 import { UserPlus } from 'lucide-react';
-import { Input } from '../ui/input';
 import { httpRequest } from '@/utils/httpRequest';
 import cookieUtil from '@/utils/cookieUtil';
 import ConfirmDialog from '../ConfirmDialog';
 import { handleMutationError } from '@/utils/handleMutationError';
 import { toast } from 'sonner';
 import { useParams } from 'react-router-dom';
+import { Input } from '../ui/input';
 
 const titlesTable = ['', '#', 'Giảng viên', 'Chủ đề', 'Số lượng bài viết', 'Hành động'];
 type DataAssign = {

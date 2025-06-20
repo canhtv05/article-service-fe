@@ -2,7 +2,6 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import UserListStatistics from './UserListStatistics';
 import UserCurrentCampaignPeriod from './UserCurrentCampaignPeriod';
-import UserTopArticles from './UserTopArticles';
 
 const items: { title: string; content: React.FC }[] = [
   {
@@ -13,15 +12,11 @@ const items: { title: string; content: React.FC }[] = [
     title: 'Đợt viết bài hiện tại',
     content: UserCurrentCampaignPeriod,
   },
-  {
-    title: 'TOP 5 bài viết được yêu thích',
-    content: UserTopArticles,
-  },
 ];
 
 const UserTabInfo = () => {
   return (
-    <div className="grid lg:grid-cols-3 grid-cols-1 gap-3 p-2">
+    <div className="grid lg:grid-cols-2 grid-cols-1 gap-3 p-2">
       {items.map((item) => (
         <Card key={item.title}>
           <CardHeader>

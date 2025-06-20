@@ -30,9 +30,8 @@ export interface ApiResponse<T> {
 export interface UserResponse extends AbstractEntity {
   fullName: string;
   gender: Gender;
-  dob: string;
   email: string;
-  phoneNumber: string;
+  phone: string;
   profilePicture: string;
 }
 
@@ -240,24 +239,32 @@ export type PRStaffsContextType = {
 };
 
 export type StaffListArticleType = {
+  id: string;
   title: string;
-  author_name: string;
-  topic_name: string;
-  campaign_period: string;
+  authorName: string;
+  topcicName: string;
   status: string;
-  created_at: string;
-  article_id: string;
+  createdAt: string;
+  impactDate: string;
 };
 
 export type StaffListArticleFilterType = {
-  title_and_author_name: string;
-  topic_name: string;
+  titleAndAuthorName: string;
+  topicId: string;
   status: string;
-  campaign_period: string;
+  writingCampaignId: string;
+  assignerName: string;
+};
+
+export type StaffListArticleResponseType = {
+  content: StaffListArticleType[];
+  totalPages: number;
+  totalElements: number;
 };
 
 export type StaffListArticleContextType = {
-  data: StaffListArticleType[] | undefined;
+  data: StaffListArticleResponseType | undefined;
+  setData: Dispatch<SetStateAction<StaffListArticleResponseType | undefined>>;
   isLoading: boolean;
   error: unknown;
   titlesTable: string[];
@@ -265,16 +272,16 @@ export type StaffListArticleContextType = {
     content: string;
     icon: LucideIcon;
     type: string;
-    className: string;
+    className?: string;
   }[];
-  currentPage: number;
-  setCurrentPage: Dispatch<SetStateAction<number>>;
+  valueFilter: StaffListArticleFilterType;
+  setValueFilter: Dispatch<SetStateAction<StaffListArticleFilterType>>;
   perPage: string;
   setPerPage: Dispatch<SetStateAction<string>>;
   handleClearFields: VoidFunction;
   handleFilters: VoidFunction;
-  valueFilter: StaffListArticleFilterType;
-  setValueFilter: Dispatch<SetStateAction<StaffListArticleFilterType>>;
+  currentPage: number;
+  setCurrentPage: Dispatch<SetStateAction<number>>;
 };
 
 export type AdminRegistrationPeriodType = {

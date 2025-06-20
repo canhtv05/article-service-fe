@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 
 import StatusBadge from '@/components/StatusBadge';
 import { StatusRegistration } from '@/enums';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
@@ -13,6 +12,7 @@ import { httpRequest } from '@/utils/httpRequest';
 import { handleMutationError } from '@/utils/handleMutationError';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/zustand/authStore';
+import { Input } from '@/components/ui/input';
 
 interface SelectValue {
   id: string;

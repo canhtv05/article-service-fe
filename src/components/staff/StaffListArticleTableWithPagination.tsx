@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Fragment, useContext } from 'react';
 import { toast } from 'sonner';
 
@@ -18,24 +18,23 @@ import Tooltip from '../Tooltip';
 import FallbackNoDataTable from '../FallbackNoDataTable';
 import ConfirmDialog from '../ConfirmDialog';
 import RenderIf from '../RenderIf';
-import LoadingTable from '../LoadingTable';
-import { Notice } from '@/enums';
+import { Status } from '@/enums';
 import { StaffListArticlesContext } from '@/contexts/context/staff/StaffListArticlesContext';
+import { StaffListArticleFilterType } from '@/types';
+import { formatDateTime } from '@/lib/utils';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { httpRequest } from '@/utils/httpRequest';
 
 const StaffListArticleTableWithPagination = () => {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const location = useLocation();
   const articles = useContext(StaffListArticlesContext);
 
-  // Tính toán phân trang
-  const perPage = Number(articles?.perPage) || 10;
-  const currentPage = articles?.currentPage || 1;
-  const totalItems = articles?.data?.length || 0;
-  const totalPages = Math.ceil(totalItems / perPage);
+  const currentPage = Number(articles?.currentPage);
+  const totalPages = articles?.data?.totalPages || 0;
 
-  // Lấy dữ liệu cho trang hiện tại
-  const startIndex = (currentPage - 1) * perPage;
-  const endIndex = startIndex + perPage;
-  const currentData = articles?.data?.slice(startIndex, endIndex) || [];
+  const currentData = articles?.data?.content || [];
 
   // Tạo danh sách số trang
   const getPageNumbers = () => {
@@ -69,11 +68,66 @@ const StaffListArticleTableWithPagination = () => {
   const handlePageChange = (page: number) => {
     if (articles?.setCurrentPage && page >= 1 && page <= totalPages) {
       articles.setCurrentPage(page);
+
+      const queryString = buildSearchParamsWithFilters(page, Number(articles.perPage), articles.valueFilter);
+
+      navigate(`/staff/list-articles?${queryString}`, { replace: true });
     }
   };
 
-  const handleClick = () => {
-    toast.success(Notice.UPDATE_SUCCESS);
+  const buildSearchParamsWithFilters = (page: number, size: number, filters: StaffListArticleFilterType) => {
+    const params = new URLSearchParams();
+
+    params.set('page', String(page));
+    params.set('size', String(size));
+
+    if (filters.assignerName) params.set('assignerName', filters.assignerName);
+    if (filters.status) params.set('status', filters.status);
+    if (filters.titleAndAuthorName) params.set('titleAndAuthorName', String(filters.titleAndAuthorName));
+    if (filters.topicId) params.set('topicId', String(filters.topicId));
+    if (filters.writingCampaignId) params.set('writingCampaignId', String(filters.writingCampaignId));
+
+    return params.toString();
+  };
+
+  const handleApprovalArticle = useMutation({
+    mutationKey: ['approve-article'],
+    mutationFn: async (id: string) => await httpRequest.get(`/admin/bai-viet/tu-choi-bai-viet/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) && query.queryKey[0] === '/admin/bai-viet/danh-sach-bai-viet-phan-cong',
+      });
+      toast.success(Status.UPDATE_SUCCESS);
+      navigate('/staff/list-articles?page=1&size=5', { replace: true });
+    },
+    onError: () => {
+      toast.error(Status.UPDATE_FAILED);
+    },
+  });
+
+  const handlePostArticle = useMutation({
+    mutationKey: ['approve-article'],
+    mutationFn: async (id: string) => await httpRequest.get(`/chu-de/quan-ly-dang-bai/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) && query.queryKey[0] === '/admin/bai-viet/danh-sach-bai-viet-phan-cong',
+      });
+      toast.success(Status.UPDATE_SUCCESS);
+      navigate('/staff/list-articles?page=1&size=5', { replace: true });
+    },
+    onError: () => {
+      toast.error(Status.UPDATE_FAILED);
+    },
+  });
+
+  const handleReject = (id: string) => {
+    handleApprovalArticle.mutate(id);
+  };
+
+  const handlePublish = (id: string) => {
+    handlePostArticle.mutate(id);
   };
 
   return (
@@ -90,74 +144,82 @@ const StaffListArticleTableWithPagination = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <RenderIf value={!!articles?.isLoading}>
-              <TableRow className="h-[130px]">
-                <TableCell colSpan={articles?.titlesTable.length} className="flex my-auto justify-center items-center">
-                  <LoadingTable />
-                </TableCell>
-              </TableRow>
-            </RenderIf>
-            <RenderIf value={!articles?.isLoading}>
-              {Array.isArray(currentData) && currentData.length > 0 ? (
-                currentData.map((article, index) => (
-                  <TableRow key={index} className="odd:bg-muted/50">
-                    <TableCell className="pl-4">{startIndex + index + 1}</TableCell>
-                    <TableCell className="pl-4">{article.title}</TableCell>
-                    <TableCell className="font-medium">{article.author_name}</TableCell>
-                    <TableCell>{article.topic_name}</TableCell>
-                    <TableCell className="pl-4">{article.created_at}</TableCell>
-                    <TableCell>
-                      <StatusBadge status={article.status} />
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-4">
-                        {articles?.tooltips.map((item, idx) => (
-                          <Fragment key={idx}>
-                            <RenderIf value={item.type !== 'view'}>
-                              <ConfirmDialog
-                                key={idx}
-                                onContinue={handleClick}
-                                typeTitle={'chỉnh sửa'}
-                                triggerComponent={
-                                  <div className="cursor-pointer">
-                                    <Tooltip
-                                      toolTipContent={item.content}
-                                      toolTipTrigger={<item.icon className={`size-5 ${item.className}`} />}
-                                    />
-                                  </div>
-                                }
+            {Array.isArray(currentData) && currentData.length > 0 ? (
+              currentData.map((article, index) => (
+                <TableRow key={index} className="odd:bg-muted/50">
+                  <TableCell className="pl-4">{index + 1}</TableCell>
+                  <TableCell className="pl-4">{article?.title}</TableCell>
+                  <TableCell className="font-medium">{article?.authorName}</TableCell>
+                  <TableCell>{article?.topcicName}</TableCell>
+                  <TableCell className="pl-4">
+                    {article?.createdAt ? formatDateTime(article?.createdAt, 'dd/MM/yyyy') : ''}
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={article?.status} />
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-4">
+                      {articles?.tooltips.map((item, idx) => (
+                        <Fragment key={idx}>
+                          <RenderIf value={item.type === 'not_publish'}>
+                            <ConfirmDialog
+                              key={idx}
+                              onContinue={() => handleReject(article.id)}
+                              typeTitle={'chỉnh sửa'}
+                              triggerComponent={
+                                <div className="cursor-pointer">
+                                  <Tooltip
+                                    toolTipContent={item.content}
+                                    toolTipTrigger={<item.icon className={`size-5 ${item.className}`} />}
+                                  />
+                                </div>
+                              }
+                            />
+                          </RenderIf>
+                          <RenderIf value={item.type === 'publish'}>
+                            <ConfirmDialog
+                              key={idx}
+                              onContinue={() => handlePublish(article.id)}
+                              typeTitle={'chỉnh sửa'}
+                              triggerComponent={
+                                <div className="cursor-pointer">
+                                  <Tooltip
+                                    toolTipContent={item.content}
+                                    toolTipTrigger={<item.icon className={`size-5 ${item.className}`} />}
+                                  />
+                                </div>
+                              }
+                            />
+                          </RenderIf>
+                          <RenderIf value={item.type === 'view'}>
+                            <Link
+                              to={`/view/articles/${article.id}`}
+                              state={{ background: location }}
+                              className="cursor-pointer"
+                            >
+                              <Tooltip
+                                toolTipContent={item.content}
+                                toolTipTrigger={<item.icon className={`size-5 ${item.className}`} />}
                               />
-                            </RenderIf>
-                            <RenderIf value={item.type === 'view'}>
-                              <Link
-                                to={`/view/articles/${article.article_id}`}
-                                state={{ background: location }}
-                                className="cursor-pointer"
-                              >
-                                <Tooltip
-                                  toolTipContent={item.content}
-                                  toolTipTrigger={<item.icon className={`size-5 ${item.className}`} />}
-                                />
-                              </Link>
-                            </RenderIf>
-                          </Fragment>
-                        ))}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={articles?.titlesTable.length} className="text-center">
-                    <FallbackNoDataTable />
+                            </Link>
+                          </RenderIf>
+                        </Fragment>
+                      ))}
+                    </div>
                   </TableCell>
                 </TableRow>
-              )}
-            </RenderIf>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={articles?.titlesTable.length} className="text-center">
+                  <FallbackNoDataTable />
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
-      <RenderIf value={!!articles?.data && articles?.data?.length > 0}>
+      <RenderIf value={!!currentData.length && currentData.length > 0}>
         <div className="flex lg:flex-row flex-col gap-5 mt-4 items-center">
           <Pagination>
             <PaginationContent>
@@ -201,13 +263,18 @@ const StaffListArticleTableWithPagination = () => {
                 { label: '5 / trang', value: 5 },
                 { label: '10 / trang', value: 10 },
                 { label: '50 / trang', value: 50 },
-                { label: '100 / trang', value: 100 },
               ]}
               value={articles?.perPage}
               setValue={(val) => {
                 if (articles?.setPerPage && articles?.setCurrentPage) {
                   articles.setPerPage(val);
                   articles.setCurrentPage(1);
+
+                  const queryString = buildSearchParamsWithFilters(1, Number(val), articles.valueFilter);
+
+                  navigate(`/staff/list-articles?${queryString}`, {
+                    replace: true,
+                  });
                 }
               }}
             />

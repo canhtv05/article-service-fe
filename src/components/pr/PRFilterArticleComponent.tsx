@@ -1,12 +1,13 @@
 import { Fragment, useCallback, useContext } from 'react';
 
 import { Label } from '../ui/label';
-import { Input } from '../ui/input';
+
 import FieldsSelect from '../FieldsSelect';
 import { StatusArticle, StatusSend } from '@/enums';
 import { PRListArticlesContext } from '@/contexts/context/pr/PRListArticlesContext';
 import { useQuery } from '@tanstack/react-query';
 import { httpRequest } from '@/utils/httpRequest';
+import { Input } from '../ui/input';
 
 type Campaign = {
   name: string;
