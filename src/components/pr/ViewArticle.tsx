@@ -1,5 +1,5 @@
 import DialogLink from '../DialogLink';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Avatar, AvatarFallback } from '../ui/avatar';
 // import { Badge } from '../ui/badge';
 import MarkdownRenderer from '../MarkdownRender';
 import { useQuery } from '@tanstack/react-query';
@@ -8,6 +8,7 @@ import { ReactElement } from 'react';
 import { httpRequest } from '@/utils/httpRequest';
 import { formatDateTime } from '@/lib/utils';
 import { useParams } from 'react-router-dom';
+import Image from '../Image';
 
 const ViewArticle = ({ component }: { component?: ReactElement }) => {
   const { id } = useParams();
@@ -19,6 +20,8 @@ const ViewArticle = ({ component }: { component?: ReactElement }) => {
     },
   });
 
+  console.log(data);
+
   return (
     <DialogLink open={true} title="Xem bài viết" outline component={component}>
       <RenderIf value={!isLoading}>
@@ -26,8 +29,7 @@ const ViewArticle = ({ component }: { component?: ReactElement }) => {
           <div className="flex gap-2">
             <div className="flex justify-center">
               <Avatar className="size-[45px]">
-                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                <AvatarFallback>{data?.authorName}</AvatarFallback>
+                <Image src={data?.author?.profilePicture} alt={data?.authorName} />
               </Avatar>
             </div>
             <div className="flex flex-col justify-center items-start">

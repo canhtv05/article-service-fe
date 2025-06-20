@@ -1,52 +1,57 @@
 import TabsUnderlined from '../TabCustom';
-import UserTabInfo from './UserTabInfo';
+import UserArticle from './UserArticle';
 
 const tabs = [
   {
     name: 'Tất cả',
     value: 'Tất cả',
-    content: UserTabInfo,
+    content: UserArticle,
   },
-  {
-    name: 'Bản nháp',
-    value: 'Bản nháp',
-    content: UserTabInfo,
-  },
+  // {
+  //   name: 'Bản nháp',
+  //   value: 'Bản nháp',
+  //   content: UserTabInfo,
+  // },
   {
     name: 'Chờ phê duyệt',
     value: 'Chờ phê duyệt',
-    content: UserTabInfo,
+    content: UserArticle,
+    status: 'Pending',
   },
-  {
-    name: 'Gửi lại chờ phê duyệt',
-    value: 'Gửi lại chờ phê duyệt',
-    content: UserTabInfo,
-  },
+  // {
+  //   name: 'Gửi lại chờ phê duyệt',
+  //   value: 'Gửi lại chờ phê duyệt',
+  //   content: UserTabInfo,
+  // },
   {
     name: 'Đã phê duyệt',
     value: 'Đã phê duyệt',
-    content: UserTabInfo,
+    content: UserArticle,
+    status: 'Approved',
   },
 
   {
     name: 'Bị từ chối',
     value: 'Bị từ chối',
-    content: UserTabInfo,
+    content: UserArticle,
+    status: 'Inactive',
   },
-  {
-    name: 'Không đăng',
-    value: 'Không đăng',
-    content: UserTabInfo,
-  },
+  // {
+  //   name: 'Không đăng',
+  //   value: 'Không đăng',
+  //   content: UserTabInfo,
+  // },
   {
     name: 'Đã đăng',
     value: 'Đã đăng',
-    content: UserTabInfo,
+    content: UserArticle,
+    status: 'Published',
   },
   {
     name: 'Đã gửi phòng PR',
     value: 'Đã gửi phòng PR',
-    content: UserTabInfo,
+    content: UserArticle,
+    status: 'SendToPR',
   },
 ];
 

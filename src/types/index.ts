@@ -30,9 +30,8 @@ export interface ApiResponse<T> {
 export interface UserResponse extends AbstractEntity {
   fullName: string;
   gender: Gender;
-  dob: string;
   email: string;
-  phoneNumber: string;
+  phone: string;
   profilePicture: string;
 }
 

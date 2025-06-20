@@ -36,6 +36,7 @@ const routes = {
     viewArticle: '/view/articles/:id',
     addUsersToCampaign: '/add/users-to-campaign/:id',
     approveArticle: '/approve-article/:id',
+    profile: '/profile',
   },
 };
 

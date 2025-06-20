@@ -5,11 +5,11 @@ export default function TabsUnderlined({
   tabs,
   type = 'underline',
 }: {
-  tabs: { name: string; value: string; content: React.FC }[];
+  tabs: { name: string; value: string; content: React.FC<{ status?: string }>; status?: string }[];
 } & { type?: 'underline' | 'full' }) {
   return (
     <Tabs defaultValue={tabs[0].value} className="w-full">
-      <TabsList className="w-full p-0 bg-background justify-start border-b rounded-none">
+      <TabsList className="w-full p-0 my-5 bg-background justify-start border-b rounded-none">
         {tabs.map((tab) => (
           <TabsTrigger
             tabType={type}
@@ -24,7 +24,7 @@ export default function TabsUnderlined({
 
       {tabs.map((tab) => (
         <TabsContent key={tab.value} value={tab.value}>
-          <tab.content />
+          <tab.content status={tab.status} />
         </TabsContent>
       ))}
     </Tabs>
